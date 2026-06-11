@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Lopez Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body style="background:#fef8f0;">
+
+    <div id="pagina-admin">
+        <div class="admin-header">
+            <span></span>
+            <h2>Panel Admin</h2>
+            <span></span>
+        </div>
+
+        <div class="container admin-container">
+
+            <!-- Link a la tienda -->
+            <div class="admin-section tienda-link-section">
+                <h3>🔗 Tu tienda online</h3>
+                <p class="tienda-link-desc">Comparte este enlace con tus clientes</p>
+                <div class="tienda-link-box">
+                    <span id="tienda-url">cargando...</span>
+                    <button class="btn-copiar" onclick="copiarLink()">Copiar</button>
+                </div>
+                <a id="btn-ver-tienda" href="index.html" target="_blank" class="btn-ver-tienda">
+                    👁️ Ver tienda
+                </a>
+            </div>
+
+            <!-- Info tienda -->
+            <div class="admin-section">
+                <h3>⚙️ Info de la tienda</h3>
+                <label>Nombre</label>
+                <input type="text" id="admin-nombre" placeholder="Nombre de tu tienda">
+                <label>Descripción</label>
+                <input type="text" id="admin-descripcion" placeholder="Descripción corta">
+                <label>WhatsApp (con código de país, sin +)</label>
+                <input type="text" id="admin-whatsapp" placeholder="59169356292">
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Mostrar precios</span>
+                        <span class="toggle-desc">Los clientes verán el precio de cada producto</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-precios" checked onchange="toggleCampoPrecio(this)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Mostrar redes sociales</span>
+                        <span class="toggle-desc">Muestra los íconos de Facebook, TikTok y WhatsApp</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-redes" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <button class="btn-guardar" onclick="guardarConfig()">Guardar info</button>
+            </div>
+
+            <!-- Redes sociales -->
+            <div class="admin-section">
+                <h3>📱 Redes sociales</h3>
+                <label>Facebook URL</label>
+                <input type="text" id="admin-facebook" placeholder="https://facebook.com/...">
+                <label>TikTok URL</label>
+                <input type="text" id="admin-tiktok" placeholder="https://tiktok.com/@...">
+                <button class="btn-guardar" onclick="guardarConfig()">Guardar redes</button>
+            </div>
+
+            <!-- Categorías -->
+            <div class="admin-section">
+                <h3>🗂️ Categorías</h3>
+                <div id="admin-categorias-lista"></div>
+                <div class="admin-nueva-cat">
+                    <input type="text" id="nueva-categoria" placeholder="Nueva categoría (ej: Tortas)">
+                    <button class="btn-agregar" onclick="agregarCategoria()">+ Agregar</button>
+                </div>
+            </div>
+
+            <!-- Agregar producto -->
+            <div class="admin-section">
+                <h3>➕ Agregar producto</h3>
+                <label>Nombre del producto</label>
+                <input type="text" id="prod-nombre" placeholder="Nombre">
+                <label>Precio (Bs.)</label>
+                <input type="number" id="prod-precio" placeholder="0.00" step="0.01">
+                <label>Tallas disponibles <span style="color:#bbb;font-weight:400;font-size:0.78rem;">(opcional)</span></label>
+                <div class="tallas-container">
+                    <div class="tallas-predefinidas">
+                        <button class="talla-btn" onclick="toggleTallaPred(this,'XS')">XS</button>
+                        <button class="talla-btn" onclick="toggleTallaPred(this,'S')">S</button>
+                        <button class="talla-btn" onclick="toggleTallaPred(this,'M')">M</button>
+                        <button class="talla-btn" onclick="toggleTallaPred(this,'L')">L</button>
+                        <button class="talla-btn" onclick="toggleTallaPred(this,'XL')">XL</button>
+                        <button class="talla-btn" onclick="toggleTallaPred(this,'XXL')">XXL</button>
+                        <button class="talla-btn" onclick="toggleTallaPred(this,'Única')">Única</button>
+                    </div>
+                    <div class="tallas-custom-row">
+                        <input type="text" id="talla-custom" placeholder="Talla personalizada (ej: 32, Niño)">
+                        <button class="btn-agregar-talla" onclick="agregarTallaCustom()">+ Agregar</button>
+                    </div>
+                    <div class="tallas-seleccionadas" id="tallas-seleccionadas"></div>
+                    <p class="tallas-hint">Toca para seleccionar, o escribe una personalizada</p>
+                </div>
+                <label>Categoría</label>
+                <select id="prod-categoria"></select>
+                <label>Imagen del producto</label>
+                <div class="upload-area" id="upload-area" onclick="document.getElementById('input-imagen').click()">
+                    <input type="file" id="input-imagen" accept="image/*" style="display:none"
+                        onchange="previsualizarImagen(event)">
+                    <div id="upload-placeholder">
+                        <span class="upload-icon">📷</span>
+                        <p>Toca para subir una foto</p>
+                        <small>JPG, PNG, WEBP</small>
+                    </div>
+                    <img id="preview-imagen" src="" alt="Preview" style="display:none">
+                </div>
+                <input type="hidden" id="prod-imagen-base64">
+                <button class="btn-guardar" onclick="agregarProducto()">+ Agregar producto</button>
+            </div>
+
+            <!-- Lista productos -->
+            <div class="admin-section">
+                <h3>📦 Mis productos</h3>
+                <div id="admin-productos-lista"></div>
+            </div>
+
+            <!-- ===== EXPORTAR script.js ===== -->
+            <div class="admin-section" style="border: 2px solid #c27e4a; background: #fff8f2;">
+                <h3>📥 Exportar para Netlify</h3>
+                <p style="color:#666; font-size:0.88rem; margin-bottom:12px;">
+                    Cuando termines de cargar todos los productos, presiona este botón. 
+                    Se descargará un <strong>script.js</strong> listo para subir a Netlify junto con tus otros archivos.
+                </p>
+                <button class="btn-guardar" onclick="exportarScriptJS()"
+                    style="background:#c27e4a; font-size:1rem; padding:14px; width:100%; border-radius:12px;">
+                    ⬇️ Descargar script.js para Netlify
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // ===== TALLAS =====
+        let tallasSeleccionadas = [];
+
+        function toggleTallaPred(btn, talla) {
+            const idx = tallasSeleccionadas.indexOf(talla);
+            if (idx === -1) { tallasSeleccionadas.push(talla); btn.classList.add('activa'); }
+            else { tallasSeleccionadas.splice(idx, 1); btn.classList.remove('activa'); }
+            renderTallasSeleccionadas();
+        }
+
+        function agregarTallaCustom() {
+            const input = document.getElementById('talla-custom');
+            const val = input.value.trim();
+            if (!val) return;
+            if (tallasSeleccionadas.includes(val)) { alert('Esa talla ya está agregada'); return; }
+            tallasSeleccionadas.push(val);
+            input.value = '';
+            renderTallasSeleccionadas();
+        }
+
+        function quitarTalla(talla) {
+            tallasSeleccionadas = tallasSeleccionadas.filter(t => t !== talla);
+            document.querySelectorAll('.tallas-predefinidas .talla-btn').forEach(b => {
+                if (b.textContent.trim() === talla) b.classList.remove('activa');
+            });
+            renderTallasSeleccionadas();
+        }
+
+        function renderTallasSeleccionadas() {
+            const cont = document.getElementById('tallas-seleccionadas');
+            cont.innerHTML = tallasSeleccionadas.map(t =>
+                `<span class="talla-tag">${t}<button onclick="quitarTalla('${t}')">×</button></span>`
+            ).join('');
+        }
+
+        function toggleCampoPrecio(toggle) {
+            const input = document.getElementById('prod-precio');
+            input.disabled = !toggle.checked;
+            input.value = '';
+            input.placeholder = toggle.checked ? '0.00' : 'Precio oculto';
+        }
+
+        // ===== IMAGEN CON COMPRESIÓN =====
+        function previsualizarImagen(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const MAX = 600;
+                    let w = img.width, h = img.height;
+                    if (w > h && w > MAX) { h = h * MAX / w; w = MAX; }
+                    else if (h > MAX) { w = w * MAX / h; h = MAX; }
+                    canvas.width = w;
+                    canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('prod-imagen-base64').value = base64;
+                    const preview = document.getElementById('preview-imagen');
+                    preview.src = base64;
+                    preview.style.display = 'block';
+                    document.getElementById('upload-placeholder').style.display = 'none';
+                    document.getElementById('upload-area').style.borderColor = '#c27e4a';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function limpiarImagen() {
+            document.getElementById('prod-imagen-base64').value = '';
+            document.getElementById('preview-imagen').src = '';
+            document.getElementById('preview-imagen').style.display = 'none';
+            document.getElementById('upload-placeholder').style.display = 'flex';
+            document.getElementById('upload-area').style.borderColor = '#f0e0d0';
+            document.getElementById('input-imagen').value = '';
+        }
+
+        // ===== AGREGAR PRODUCTO =====
+        async function agregarProducto() {
+            const nombre = document.getElementById('prod-nombre').value.trim();
+            const precioRaw = parseFloat(document.getElementById('prod-precio').value);
+            const precio = config.mostrarPrecios !== false ? precioRaw : 0;
+            const categoria = document.getElementById('prod-categoria').value;
+            const imagen = document.getElementById('prod-imagen-base64').value;
+
+            if (!nombre) { alert('Escribe el nombre del producto'); return; }
+            if (!imagen) { alert('Sube una imagen del producto'); return; }
+            if (config.mostrarPrecios !== false && isNaN(precioRaw)) {
+                alert('Ingresa un precio válido');
+                return;
+            }
+
+            const nuevoId = productos.length > 0
+                ? Math.max(...productos.map(p => p.id)) + 1 : 1;
+
+            productos.push({ id: nuevoId, nombre, precio, categoria, imagen, tallas: [...tallasSeleccionadas] });
+
+            try {
+                await guardarDatos();
+            } catch (e) {
+                alert('⚠️ Sin espacio de almacenamiento. Abre la consola (F12) y escribe: indexedDB.deleteDatabase("tiendaDB") para liberar espacio.');
+                productos.pop();
+                return;
+            }
+
+            document.getElementById('prod-nombre').value = '';
+            document.getElementById('prod-precio').value = '';
+            limpiarImagen();
+            tallasSeleccionadas = [];
+            renderTallasSeleccionadas();
+            document.querySelectorAll('.tallas-predefinidas .talla-btn').forEach(b => b.classList.remove('activa'));
+
+            renderAdminProductos();
+            alert('✅ Producto agregado correctamente');
+        }
+
+        // ===== CONFIG =====
+        function cargarFormAdmin() {
+            const n = document.getElementById('admin-nombre');
+            if (!n) return;
+            document.getElementById('admin-nombre').value = config.nombre;
+            document.getElementById('admin-descripcion').value = config.descripcion;
+            document.getElementById('admin-whatsapp').value = config.whatsapp;
+            document.getElementById('admin-facebook').value = config.facebook;
+            document.getElementById('admin-tiktok').value = config.tiktok;
+            document.getElementById('toggle-precios').checked = config.mostrarPrecios !== false;
+            document.getElementById('toggle-redes').checked = config.mostrarRedes !== false;
+            toggleCampoPrecio(document.getElementById('toggle-precios'));
+        }
+
+        function guardarConfig() {
+            config.nombre = document.getElementById('admin-nombre').value.trim();
+            config.descripcion = document.getElementById('admin-descripcion').value.trim();
+            config.whatsapp = document.getElementById('admin-whatsapp').value.trim();
+            config.facebook = document.getElementById('admin-facebook').value.trim();
+            config.tiktok = document.getElementById('admin-tiktok').value.trim();
+            config.mostrarPrecios = document.getElementById('toggle-precios').checked;
+            config.mostrarRedes = document.getElementById('toggle-redes').checked;
+            guardarDatos();
+            alert('✅ Configuración guardada');
+        }
+
+        // ===== LINK TIENDA =====
+        function mostrarLinkTienda() {
+            const base = window.location.href.replace('admin.html', 'index.html');
+            document.getElementById('tienda-url').textContent = base;
+            document.getElementById('btn-ver-tienda').href = base;
+        }
+
+        function copiarLink() {
+            const url = document.getElementById('tienda-url').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.querySelector('.btn-copiar');
+                btn.textContent = '✓ Copiado';
+                btn.style.background = '#2e7d32';
+                setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = ''; }, 2000);
+            });
+        }
+
+        // ===== EXPORTAR script.js =====
+        function exportarScriptJS() {
+            const configStr = JSON.stringify(config, null, 4);
+            const categoriasStr = JSON.stringify(categorias, null, 4);
+            const productosStr = JSON.stringify(productos, null, 4);
+
+            const contenido = `// ===== ESTADO GLOBAL =====
+let config = ${configStr};
+
+let categorias = ${categoriasStr};
+
+let productos = ${productosStr};
+
+let carrito = [];
+let filtroActivo = "todos";
+
+// ===== INDEXEDDB =====
+let db = null;
+
+function abrirDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open('tiendaDB', 1);
+        req.onupgradeneeded = function (e) {
+            const d = e.target.result;
+            if (!d.objectStoreNames.contains('datos')) {
+                d.createObjectStore('datos', { keyPath: 'clave' });
+            }
+        };
+        req.onsuccess = function (e) { db = e.target.result; resolve(db); };
+        req.onerror = function () { reject('Error abriendo DB'); };
+    });
+}
+
+function dbSet(clave, valor) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('datos', 'readwrite');
+        tx.objectStore('datos').put({ clave, valor });
+        tx.oncomplete = resolve;
+        tx.onerror = reject;
+    });
+}
+
+function dbGet(clave) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('datos', 'readonly');
+        const req = tx.objectStore('datos').get(clave);
+        req.onsuccess = () => resolve(req.result ? req.result.valor : null);
+        req.onerror = reject;
+    });
+}
+
+async function guardarDatos() {
+    await dbSet('config', config);
+    await dbSet('categorias', categorias);
+    await dbSet('productos', productos);
+}
+
+async function cargarDatos() {
+    await abrirDB();
+    const c = await dbGet('config');
+    const cat = await dbGet('categorias');
+    const prod = await dbGet('productos');
+    if (c) config = c;
+    if (cat) categorias = cat;
+    if (prod) productos = prod;
+}
+
+// ===== NAVEGACIÓN =====
+function mostrarTienda() {
+    document.getElementById('pagina-tienda').classList.remove('oculto');
+    document.getElementById('pagina-carrito').classList.add('oculto');
+}
+
+// ===== RENDERIZAR TIENDA =====
+function renderTienda() {
+    document.getElementById('tienda-nombre').textContent = config.nombre;
+    document.getElementById('tienda-descripcion').textContent = config.descripcion;
+    document.getElementById('link-facebook').href = config.facebook;
+    document.getElementById('link-tiktok').href = config.tiktok;
+    document.getElementById('link-whatsapp').href =
+        \`https://wa.me/\${config.whatsapp}?text=Hola%2C%20quisiera%20hacer%20un%20pedido\`;
+
+    const socialLinks = document.querySelector('.social-links');
+    if (socialLinks) {
+        socialLinks.style.display = config.mostrarRedes !== false ? 'flex' : 'none';
+    }
+
+    renderCategorias();
+    renderProductos("todos");
+}
+
+function renderCategorias() {
+    const lista = document.getElementById('lista-categorias');
+    if (!lista) return;
+    const todas = ["todos", ...categorias];
+    lista.innerHTML = todas.map(cat => {
+        const count = cat === "todos"
+            ? productos.length
+            : productos.filter(p => p.categoria === cat).length;
+        return \`
+            <div class="category-item \${filtroActivo === cat ? 'active' : ''}"
+                 onclick="filtrarCategoria('\${cat}')">
+                <span>\${cat === "todos" ? "Todos" : capitalizar(cat)}</span>
+                <span class="count">(\${count})</span>
+            </div>\`;
+    }).join('');
+}
+
+function renderProductos(filtro) {
+    const lista = document.getElementById('lista-productos');
+    if (!lista) return;
+    const filtrados = filtro === "todos"
+        ? productos
+        : productos.filter(p => p.categoria === filtro);
+
+    if (filtrados.length === 0) {
+        lista.innerHTML = \`<div style="grid-column:1/-1;text-align:center;color:#aaa;padding:40px 0;">
+            No hay productos en esta categoría</div>\`;
+        return;
+    }
+
+    lista.innerHTML = filtrados.map(p => {
+        const tieneTallas = p.tallas && p.tallas.length > 0;
+        const selectorTallas = tieneTallas ? \`
+            <div class="tallas-selector">
+                <span class="tallas-label">Talla:</span>
+                <div class="tallas-opciones">
+                    \${p.tallas.map(t => \`<button class="talla-btn" onclick="seleccionarTalla(this, \${p.id})" data-talla="\${t}">\${t}</button>\`).join('')}
+                </div>
+            </div>\` : '';
+
+        return \`
+        <div class="product-card" id="card-\${p.id}">
+            <img src="\${p.imagen}" alt="\${p.nombre}" class="product-img"
+                 onerror="this.src='https://placehold.co/200x200?text=Sin+imagen'">
+            <div class="product-info">
+                <h3>\${p.nombre}</h3>
+                \${config.mostrarPrecios !== false ? \`<p class="price">Bs. \${p.precio.toFixed(2)}</p>\` : ''}
+            </div>
+            \${selectorTallas}
+            <button class="btn-preguntar" onclick="agregarAlCarrito(\${p.id}, this)">
+                🛒 Agregar
+            </button>
+        </div>\`;
+    }).join('');
+}
+
+function filtrarCategoria(cat) {
+    filtroActivo = cat;
+    renderCategorias();
+    renderProductos(cat);
+}
+
+function capitalizar(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ===== TALLAS =====
+function seleccionarTalla(btn, prodId) {
+    const card = document.getElementById(\`card-\${prodId}\`);
+    card.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('activa'));
+    btn.classList.add('activa');
+}
+
+function getTallaSeleccionada(prodId) {
+    const card = document.getElementById(\`card-\${prodId}\`);
+    if (!card) return null;
+    const activa = card.querySelector('.talla-btn.activa');
+    return activa ? activa.dataset.talla : null;
+}
+
+// ===== CARRITO =====
+function agregarAlCarrito(id, btn) {
+    const prod = productos.find(p => p.id === id);
+    if (!prod) return;
+
+    const tieneTallas = prod.tallas && prod.tallas.length > 0;
+    const tallaSeleccionada = tieneTallas ? getTallaSeleccionada(id) : null;
+
+    if (tieneTallas && !tallaSeleccionada) {
+        btn.textContent = "⚠️ Elige talla";
+        btn.style.background = "#e67e22";
+        btn.style.color = "white";
+        setTimeout(() => {
+            btn.textContent = "🛒 Agregar";
+            btn.style.background = "";
+            btn.style.color = "";
+        }, 1200);
+        return;
+    }
+
+    const clave = tieneTallas ? \`\${id}_\${tallaSeleccionada}\` : \`\${id}\`;
+    const existe = carrito.find(c => c.clave === clave);
+    if (existe) {
+        existe.cantidad++;
+    } else {
+        carrito.push({ ...prod, cantidad: 1, talla: tallaSeleccionada, clave });
+    }
+
+    actualizarContadorCarrito();
+
+    btn.textContent = "✓ Agregado";
+    btn.style.background = "#c27e4a";
+    btn.style.color = "white";
+    setTimeout(() => {
+        btn.textContent = "🛒 Agregar";
+        btn.style.background = "";
+        btn.style.color = "";
+    }, 1000);
+
+    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(30);
+}
+
+function actualizarContadorCarrito() {
+    const el = document.getElementById('carrito-count');
+    if (!el) return;
+    const total = carrito.reduce((sum, c) => sum + c.cantidad, 0);
+    el.textContent = total;
+}
+
+function mostrarCarrito() {
+    const carritoEl = document.getElementById('pagina-carrito');
+    const tiendaEl = document.getElementById('pagina-tienda');
+    if (!carritoEl || !tiendaEl) return;
+    tiendaEl.classList.add('oculto');
+    carritoEl.classList.remove('oculto');
+    renderCarrito();
+}
+
+function renderCarrito() {
+    const cont = document.getElementById('carrito-items');
+    if (!cont) return;
+
+    if (carrito.length === 0) {
+        cont.innerHTML = \`
+            <div class="carrito-vacio">
+                <span>🛒</span>
+                Tu carrito está vacío
+            </div>\`;
+        document.getElementById('carrito-total-precio').textContent = 'Bs. 0.00';
+        document.getElementById('btn-enviar-whatsapp').href = '#';
+        return;
+    }
+
+    cont.innerHTML = carrito.map(item => \`
+        <div class="carrito-item">
+            <img src="\${item.imagen}" alt="\${item.nombre}"
+                 onerror="this.src='https://placehold.co/60?text=?'">
+            <div class="carrito-item-info">
+                <h4>\${item.nombre}\${item.talla ? \` <span class="carrito-talla">Talla \${item.talla}</span>\` : ''}</h4>
+                \${config.mostrarPrecios !== false ? \`<p>Bs. \${(item.precio * item.cantidad).toFixed(2)}</p>\` : ''}
+            </div>
+            <div class="carrito-item-controles">
+                <button class="btn-cantidad" onclick="cambiarCantidad('\${item.clave}', -1)">−</button>
+                <span class="cantidad-num">\${item.cantidad}</span>
+                <button class="btn-cantidad" onclick="cambiarCantidad('\${item.clave}', 1)">+</button>
+            </div>
+        </div>
+    \`).join('');
+
+    const total = carrito.reduce((sum, c) => sum + c.precio * c.cantidad, 0);
+    document.getElementById('carrito-total-precio').textContent =
+        config.mostrarPrecios !== false ? \`Bs. \${total.toFixed(2)}\` : '—';
+
+    let mensaje = \`Hola \${config.nombre}, quiero hacer este pedido:%0A%0A\`;
+    carrito.forEach(item => {
+        const tallaTexto = item.talla ? \` (Talla \${item.talla})\` : '';
+        mensaje += \`• \${item.nombre}\${tallaTexto} x\${item.cantidad}\${config.mostrarPrecios !== false ? \` = Bs. \${(item.precio * item.cantidad).toFixed(2)}\` : ''}%0A\`;
+    });
+    if (config.mostrarPrecios !== false) {
+        mensaje += \`%0A*Total: Bs. \${total.toFixed(2)}*\`;
+    }
+    document.getElementById('btn-enviar-whatsapp').href =
+        \`https://wa.me/\${config.whatsapp}?text=\${mensaje}\`;
+}
+
+function cambiarCantidad(clave, delta) {
+    const item = carrito.find(c => c.clave === clave);
+    if (!item) return;
+    item.cantidad += delta;
+    if (item.cantidad <= 0) carrito = carrito.filter(c => c.clave !== clave);
+    actualizarContadorCarrito();
+    renderCarrito();
+}
+
+function vaciarCarrito() {
+    carrito = [];
+    actualizarContadorCarrito();
+    renderCarrito();
+}
+
+// ===== ADMIN =====
+function renderAdminCategorias() {
+    const cont = document.getElementById('admin-categorias-lista');
+    if (!cont) return;
+    cont.innerHTML = categorias.map(cat => \`
+        <span class="cat-tag">
+            \${capitalizar(cat)}
+            <button onclick="eliminarCategoria('\${cat}')">×</button>
+        </span>
+    \`).join('');
+
+    const sel = document.getElementById('prod-categoria');
+    if (!sel) return;
+    sel.innerHTML = categorias.map(cat =>
+        \`<option value="\${cat}">\${capitalizar(cat)}</option>\`
+    ).join('');
+}
+
+function agregarCategoria() {
+    const input = document.getElementById('nueva-categoria');
+    const val = input.value.trim().toLowerCase();
+    if (!val) return;
+    if (categorias.includes(val)) { alert('Esa categoría ya existe'); return; }
+    categorias.push(val);
+    guardarDatos();
+    input.value = '';
+    renderAdminCategorias();
+}
+
+function eliminarCategoria(cat) {
+    if (!confirm(\`¿Eliminar la categoría "\${cat}"?\`)) return;
+    categorias = categorias.filter(c => c !== cat);
+    guardarDatos();
+    renderAdminCategorias();
+}
+
+function eliminarProducto(id) {
+    if (!confirm('¿Eliminar este producto?')) return;
+    productos = productos.filter(p => p.id !== id);
+    guardarDatos();
+    renderAdminProductos();
+}
+
+function renderAdminProductos() {
+    const cont = document.getElementById('admin-productos-lista');
+    if (!cont) return;
+    if (productos.length === 0) {
+        cont.innerHTML = '<p style="color:#aaa;font-size:0.85rem;">No hay productos aún</p>';
+        return;
+    }
+    cont.innerHTML = productos.map(p => \`
+        <div class="admin-prod-item">
+            <img src="\${p.imagen}" alt="\${p.nombre}"
+                 onerror="this.src='https://placehold.co/50?text=?'">
+            <div class="admin-prod-info">
+                <h4 onclick="editarNombre(this, \${p.id})" style="cursor:pointer;" title="Toca para editar">\${p.nombre}</h4>
+                <p>Bs. \${p.precio.toFixed(2)}</p>
+                <span>\${capitalizar(p.categoria)}</span>
+                <div class="admin-tallas-edit">
+    \${(p.tallas || []).map(t => \`
+        <span class="talla-tag">\${t}
+            <button onclick="quitarTallaProducto(\${p.id}, '\${t}')">×</button>
+        </span>\`).join('')}
+    <button class="btn-agregar-talla-inline" onclick="agregarTallaProducto(\${p.id})">+ talla</button>
+</div>
+            </div>
+            <button class="btn-eliminar" onclick="eliminarProducto(\${p.id})">Eliminar</button>
+        </div>
+    \`).join('');
+}
+
+function editarNombre(el, id) {
+    const nombreActual = el.textContent;
+    el.innerHTML = \`<input type="text" value="\${nombreActual}"
+        style="font-size:inherit;font-family:inherit;border:1.5px solid #c27e4a;border-radius:6px;padding:2px 6px;width:100%;outline:none;"
+        onblur="guardarNombre(this, \${id})"
+        onkeydown="if(event.key==='Enter') this.blur(); if(event.key==='Escape') { this.value='\${nombreActual}'; this.blur(); }">\`;
+    el.querySelector('input').focus();
+}
+
+function guardarNombre(input, id) {
+    const nuevoNombre = input.value.trim();
+    if (nuevoNombre) {
+        const prod = productos.find(p => p.id === id);
+        if (prod) {
+            prod.nombre = nuevoNombre;
+            guardarDatos();
+        }
+    }
+    renderAdminProductos();
+}
+
+function quitarTallaProducto(id, talla) {
+    const prod = productos.find(p => p.id === id);
+    if (!prod) return;
+    prod.tallas = prod.tallas.filter(t => t !== talla);
+    guardarDatos();
+    renderAdminProductos();
+}
+
+function agregarTallaProducto(id) {
+    const talla = prompt('¿Qué talla quieres agregar?');
+    if (!talla || !talla.trim()) return;
+    const prod = productos.find(p => p.id === id);
+    if (!prod) return;
+    if (!prod.tallas) prod.tallas = [];
+    if (prod.tallas.includes(talla.trim())) { alert('Esa talla ya existe'); return; }
+    prod.tallas.push(talla.trim());
+    guardarDatos();
+    renderAdminProductos();
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
+    await cargarDatos();
+
+    if (document.getElementById('pagina-tienda')) {
+        renderTienda();
+        document.getElementById('btn-carrito').addEventListener('click', () => {
+            if (carrito.length === 0) {
+                alert('Tu carrito está vacío. Agrega productos primero.');
+                return;
+            }
+            mostrarCarrito();
+        });
+    }
+});
+`;
+
+            const blob = new Blob([contenido], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'script.js';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('✅ script.js descargado. Reemplaza el script.js viejo con este archivo y sube todo a Netlify.');
+        }
+
+        // ===== CONFIG =====
+        function cargarFormAdmin() {
+            const n = document.getElementById('admin-nombre');
+            if (!n) return;
+            document.getElementById('admin-nombre').value = config.nombre;
+            document.getElementById('admin-descripcion').value = config.descripcion;
+            document.getElementById('admin-whatsapp').value = config.whatsapp;
+            document.getElementById('admin-facebook').value = config.facebook;
+            document.getElementById('admin-tiktok').value = config.tiktok;
+            document.getElementById('toggle-precios').checked = config.mostrarPrecios !== false;
+            document.getElementById('toggle-redes').checked = config.mostrarRedes !== false;
+            toggleCampoPrecio(document.getElementById('toggle-precios'));
+        }
+
+        function guardarConfig() {
+            config.nombre = document.getElementById('admin-nombre').value.trim();
+            config.descripcion = document.getElementById('admin-descripcion').value.trim();
+            config.whatsapp = document.getElementById('admin-whatsapp').value.trim();
+            config.facebook = document.getElementById('admin-facebook').value.trim();
+            config.tiktok = document.getElementById('admin-tiktok').value.trim();
+            config.mostrarPrecios = document.getElementById('toggle-precios').checked;
+            config.mostrarRedes = document.getElementById('toggle-redes').checked;
+            guardarDatos();
+            alert('✅ Configuración guardada');
+        }
+
+        // ===== LINK TIENDA =====
+        function mostrarLinkTienda() {
+            const base = window.location.href.replace('admin.html', 'index.html');
+            document.getElementById('tienda-url').textContent = base;
+            document.getElementById('btn-ver-tienda').href = base;
+        }
+
+        function copiarLink() {
+            const url = document.getElementById('tienda-url').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.querySelector('.btn-copiar');
+                btn.textContent = '✓ Copiado';
+                btn.style.background = '#2e7d32';
+                setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = ''; }, 2000);
+            });
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', async () => {
+            await cargarDatos();
+            cargarFormAdmin();
+            renderAdminCategorias();
+            renderAdminProductos();
+            mostrarLinkTienda();
+        });
+    </script>
+</body>
+</html>

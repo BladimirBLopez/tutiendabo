@@ -1,194 +1,97 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#c27e4a">
-    <title>Lopez Style - Yacuiba</title>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <title>Lopez Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
-    <div class="portada-full">
-        <img src="img/portada.png" alt="Portada Guli Pastelería" class="portada-img">
+    <!-- TIENDA -->
+    <div id="pagina-tienda">
+
+        <div class="portada-full">
+            <img src="img/portada.png" alt="Portada" class="portada-img">
+        </div>
+
+        <div class="logo-wrapper">
+            <img src="img/logo.png" alt="Logo" class="logo-img">
+        </div>
+
+        <div class="content-card">
+            <div class="container">
+
+                <div class="description-section">
+                    <h2 id="tienda-nombre">Guli</h2>
+                    <p id="tienda-descripcion">Creamos postres y detalles hechos con amor.</p>
+                </div>
+
+                <div class="social-links">
+                    <a href="#" id="link-facebook" class="social-btn" target="_blank">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                    </a>
+                    <a href="#" id="link-tiktok" class="social-btn" target="_blank">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+                    </a>
+                    <a href="#" id="link-whatsapp" class="social-btn social-btn-wa" target="_blank">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.857L.057 23.428a.75.75 0 0 0 .921.921l5.571-1.476A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.712 9.712 0 0 1-4.953-1.355l-.355-.212-3.683.975.993-3.585-.232-.369A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
+                    </a>
+                </div>
+
+                <div class="whatsapp-badge">
+                    <span class="icon-wa"></span>
+                    Respuesta en minutos por WhatsApp
+                </div>
+
+                <div class="categories-wrapper">
+                    <div class="categories" id="lista-categorias"></div>
+                </div>
+
+                <div class="products-list" id="lista-productos"></div>
+
+            </div>
+        </div>
+
+        <div class="barra-contacto">
+            <div class="barra-info">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#c27e4a" stroke-width="2" width="26" height="26">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <div>
+                    <p class="barra-titulo">¿Tienes una pregunta?</p>
+                    <p class="barra-subtitulo">Escríbenos por WhatsApp</p>
+                </div>
+            </div>
+            <button class="barra-btn" id="btn-carrito">
+                🛒 Ver pedido <span class="carrito-count" id="carrito-count">0</span>
+            </button>
+        </div>
+
     </div>
 
-    <div class="logo-wrapper">
-        <img src="img/logo.png" alt="Guli Pastelería" class="logo-img">
-    </div>
-
-    <div class="content-card">
+    <!-- CARRITO -->
+    <div id="pagina-carrito" class="oculto">
+        <div class="admin-header">
+            <button class="btn-back" onclick="mostrarTienda()">← Volver</button>
+            <h2>Tu pedido</h2>
+            <span></span>
+        </div>
         <div class="container">
-
-            <div class="description-section">
-                <h2>Lopez Style</h2>
-                <p>Tienda de moda urbana juvenil con shorts, poleras y prendas en tendencia. Estilo actual para tu día a
-                    día 🔥
-                </p>
+            <div id="carrito-items"></div>
+            <div class="carrito-total">
+                <span>Total:</span>
+                <span id="carrito-total-precio">Bs. 0.00</span>
             </div>
-
-            <div class="social-links">
-                <a href="https://facebook.com/gulipasteleria" class="social-btn" target="_blank">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                    </svg>
-                </a>
-                <a href="https://tiktok.com/@gulipasteleria" class="social-btn" target="_blank">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-                        <path
-                            d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z" />
-                    </svg>
-                </a>
-                <a href="https://chat.whatsapp.com/DuPWihatqI9LusU8pKbcIc?s=cl&p=a&ilr=4"
-                    class="social-btn social-btn-wa" target="_blank">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-                        <path
-                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                        <path
-                            d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.857L.057 23.428a.75.75 0 0 0 .921.921l5.571-1.476A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.712 9.712 0 0 1-4.953-1.355l-.355-.212-3.683.975.993-3.585-.232-.369A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z" />
-                    </svg>
-                </a>
-            </div>
-
-            <div class="whatsapp-badge">
-                <span class="icon-wa"></span>
-                Respuesta en minutos por WhatsApp
-            </div>
-
-            <div class="categories-wrapper">
-                <div class="categories">
-                    <div class="category-item active" data-filter="todos">
-                        <span>Todos</span>
-                        <span class="count">(0)</span>
-                    </div>
-                    <div class="category-item" data-filter="shorts">
-                        <span>Shorts</span>
-                        <span class="count">(0)</span>
-                    </div>
-                    <div class="category-item" data-filter="poleras">
-                        <span>Poleras</span>
-                        <span class="count">(0)</span>
-                    </div>
-                    <div class="category-item" data-filter="pantalon">
-                        <span>Pantalon</span>
-                        <span class="count">(0)</span>
-                    </div>
-                    <div class="category-item" data-filter="otros">
-                        <span>Otros</span>
-                        <span class="count">(0)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="products-list">
-
-                <div class="product-card" data-category="shorts">
-                    <img src="img/Short Nike Plomo.jpg" alt="short nike Plomo" class="product-img">
-                    <div class="product-info">
-                        <h3>Short Nike Plomo</h3>
-                        <p class="price">TALLAS: M, L, X.</p>
-                    </div>
-                    <a href="https://wa.me/59175180321?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Short%20Nike%20Plomo
-" class="btn-preguntar" target="_blank">Preguntar</a>
-                </div>
-
-                <div class="product-card" data-category="poleras">
-                    <img src="img/Polera Milano Italia.jpg" alt="Polera Milano Italia" class="product-img">
-                    <div class="product-info">
-                        <h3>Polera Milano Italia</h3>
-                        <p class="price">TALLAS: M, L, X.</p>
-                    </div>
-                    <a href="https://wa.me/59175180321?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Polera%20Milano%20Italia
-" class="btn-preguntar" target="_blank">Preguntar</a>
-                </div>
-
-                <div class="product-card" data-category="shorts">
-                    <img src="img/Short Spider.jpg" alt="Short Spider" class="product-img">
-                    <div class="product-info">
-                        <h3>Short Spider</h3>
-                        <p class="price">TALLAS: M, L, X.</p>
-
-                    </div>
-                    <a href="https://wa.me/59175180321?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Short%20Spider
-" class="btn-preguntar" target="_blank">Preguntar</a>
-                </div>
-                <div class="product-card" data-category="poleras">
-                    <img src="img/Polera Puma.jpg" alt="Polera Puma" class="product-img">
-                    <div class="product-info">
-                        <h3>Polera Puma</h3>
-                        <p class="price">TALLAS: M, L, X.</p>
-                    </div>
-                    <a href="https://wa.me/59175180321?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Polera%20Puma
-" class="btn-preguntar" target="_blank">Preguntar</a>
-                </div>
-                <div class="product-card" data-category="pantalon">
-                    <img src="img/pantalon ralla.jpg" alt="Pantalon ralla" class="product-img">
-                    <div class="product-info">
-                        <h3>Pantalon ralla</h3>
-                        <p class="price">TALLAS: M, L, X.</p>
-                    </div>
-                    <a href="https://wa.me/59175180321?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Pantalon%20ralla
-" class="btn-preguntar" target="_blank">Preguntar</a>
-                </div>
-                <div class="product-card" data-category="shorts">
-                    <img src="img/Short Nike con Rayos.jpg" alt="Short Nike con Rayos" class="product-img">
-                    <div class="product-info">
-                        <h3>Short Nike con rayos</h3>
-                        <p class="price">TALLAS: M, L, X.</p>
-                    </div>
-                    <a href="https://wa.me/59175180321?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Short%20Nike%20con%20rayos
-" class="btn-preguntar" target="_blank">Preguntar</a>
-                </div>
-                <div class="product-card" data-category="shorts">
-                    <img src="img/Short Los Angeles.jpg" alt="Short Los Angels" class="product-img">
-                    <div class="product-info">
-                        <h3>Short Los Angels</h3>
-                        <p class="price">TALLAS: M, L, X.</p>
-
-                    </div>
-                    <a href="https://wa.me/59175180321?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Short%20Los%20Angels
-" class="btn-preguntar" target="_blank">Preguntar</a>
-                </div>
-
-                <div class="product-card" data-category="shorts">
-                    <img src="img/Short Playero.jpg" alt="Short Playero" class="product-img">
-                    <div class="product-info">
-                        <h3>Short Playero</h3>
-                        <p class="price">TALLAS: M, L, X.</p>
-
-                    </div>
-                    <a href="https://wa.me/59175180321?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Short%20Playero
-" class="btn-preguntar" target="_blank">Preguntar</a>
-                </div>
-
-            </div>
-
+            <a id="btn-enviar-whatsapp" href="#" target="_blank" class="btn-enviar-wa">
+                Enviar pedido por WhatsApp
+            </a>
+            <button class="btn-vaciar" onclick="vaciarCarrito()">Vaciar carrito</button>
         </div>
-    </div>
-
-    <div class="barra-contacto">
-        <div class="barra-info">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#c27e4a" stroke-width="2" width="26" height="26">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            <div>
-                <p class="barra-titulo">¿Tienes una pregunta?</p>
-                <p class="barra-subtitulo">Escríbenos por WhatsApp</p>
-            </div>
-        </div>
-        <a href="https://wa.me/59175180321?text=Hola:%20Escriba%20su%20consulta%20aquí" class="barra-btn"
-            target="_blank">
-            Chatear ahora
-        </a>
     </div>
 
     <script src="script.js"></script>
 </body>
-
 </html>
