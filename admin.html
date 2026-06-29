@@ -26,6 +26,50 @@
 
     body { font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
 
+    /* ── Login ── */
+    #pantalla-login {
+      position:fixed; inset:0; background:var(--bg);
+      display:flex; align-items:center; justify-content:center;
+      z-index:9999; padding:24px;
+    }
+    .login-card {
+      background:var(--card); border-radius:24px;
+      border:1px solid var(--border);
+      padding:36px 28px; width:100%; max-width:340px;
+      box-shadow:0 8px 40px rgba(0,0,0,.08);
+      text-align:center;
+    }
+    .login-icon { font-size:2.8rem; margin-bottom:12px; }
+    .login-title { font-size:1.2rem; font-weight:700; color:var(--brand-dk); margin-bottom:4px; }
+    .login-subtitle { font-size:.78rem; color:var(--muted); margin-bottom:24px; }
+    .login-input-wrap { position:relative; margin-bottom:14px; }
+    .login-input {
+      width:100%; padding:12px 44px 12px 14px;
+      border:1.5px solid var(--border); border-radius:12px;
+      font-family:'Poppins',sans-serif; font-size:.9rem;
+      background:#fafafa; text-align:center;
+      letter-spacing:3px; font-weight:600;
+    }
+    .login-input:focus { outline:none; border-color:var(--brand); background:#fff; }
+    .btn-toggle-pass {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; font-size:1.1rem; color:var(--muted);
+    }
+    .login-error {
+      background:#fdecea; color:var(--danger);
+      border-radius:10px; padding:8px 14px;
+      font-size:.78rem; font-weight:600;
+      margin-bottom:14px; display:none;
+    }
+    .btn-login {
+      width:100%; padding:13px; border-radius:12px; border:none;
+      background:var(--brand); color:#fff;
+      font-family:'Poppins',sans-serif; font-size:.9rem; font-weight:700;
+      cursor:pointer; transition:background .2s;
+    }
+    .btn-login:hover { background:var(--brand-dk); }
+    .login-hint { font-size:.72rem; color:var(--muted); margin-top:16px; }
+
     /* ── Header ── */
     .header {
       background:var(--card);
@@ -297,15 +341,36 @@
 </head>
 <body>
 
+<!-- ═══ PANTALLA LOGIN ═══ -->
+<div id="pantalla-login">
+  <div class="login-card">
+    <div class="login-icon">🔐</div>
+    <div class="login-title">Panel Admin</div>
+    <div class="login-subtitle">Ingresa tu clave para continuar</div>
+
+    <div class="login-error" id="login-error">Clave incorrecta. Intenta de nuevo.</div>
+
+    <div class="login-input-wrap">
+      <input type="password" id="login-input" class="login-input"
+        placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') verificarClave()">
+      <button class="btn-toggle-pass" onclick="toggleVerClave()" id="btn-ojo">👁</button>
+    </div>
+
+    <button class="btn-login" onclick="verificarClave()">Entrar</button>
+    <p class="login-hint">Clave predeterminada: <strong>admin123</strong><br>Cámbiala en el código antes de publicar.</p>
+  </div>
+</div>
+
 <!-- Header -->
-<div class="header">
+<div class="header" id="contenido-admin" style="display:none;">
   <span class="header-logo">🏪</span>
   <h1 id="header-store-name">Panel Admin</h1>
   <a href="index.html" target="_blank" class="btn-ver-tienda">Ver tienda</a>
 </div>
 
 <!-- Tabs -->
-<div class="tabs">
+<div class="tabs" style="display:none;">
   <button class="tab active" data-tab="productos">📦 Productos</button>
   <button class="tab" data-tab="categorias">🏷️ Categorías</button>
   <button class="tab" data-tab="config">⚙️ Tienda</button>
@@ -470,6 +535,45 @@
 
 <script>
 // ══════════════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════════════
+const CLAVE_ADMIN = 'admin123'; // ← cambia esto por la clave de tu cliente
+
+function verificarClave() {
+  const val = document.getElementById('login-input').value;
+  if (val === CLAVE_ADMIN) {
+    sessionStorage.setItem('admin_ok', '1');
+    document.getElementById('pantalla-login').style.display = 'none';
+    document.getElementById('contenido-admin').style.display = 'flex';
+    document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
+    iniciarAdmin();
+  } else {
+    const err = document.getElementById('login-error');
+    err.style.display = 'block';
+    document.getElementById('login-input').value = '';
+    document.getElementById('login-input').focus();
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+function toggleVerClave() {
+  const inp = document.getElementById('login-input');
+  const ojo = document.getElementById('btn-ojo');
+  if (inp.type === 'password') { inp.type = 'text'; ojo.textContent = '🙈'; }
+  else { inp.type = 'password'; ojo.textContent = '👁'; }
+}
+
+// Verificar si ya está logueado en esta sesión
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('admin_ok') === '1') {
+    document.getElementById('pantalla-login').style.display = 'none';
+    document.getElementById('contenido-admin').style.display = 'flex';
+    document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
+    iniciarAdmin();
+  }
+});
+
+// ══════════════════════════════════════════════
 //  ESTADO GLOBAL
 // ══════════════════════════════════════════════
 let categorias = [];
@@ -484,12 +588,12 @@ const MAX_IMAGENES = 6;
 // ══════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', async () => {
+async function iniciarAdmin() {
   initTabs();
   await cargarConfig();
   await cargarCategorias();
   await cargarProductos();
-});
+}
 
 // ══════════════════════════════════════════════
 //  TABS
