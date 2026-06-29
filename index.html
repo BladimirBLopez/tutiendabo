@@ -92,27 +92,32 @@
     .category-btn.active { background:var(--brand); border-color:var(--brand); color:#fff; }
 
     /* ── Productos ── */
-    .products-list { display:flex; flex-direction:column; gap:16px; }
+    .products-list {
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+    }
 
     .product-card {
-      background:var(--card); border-radius:var(--radius);
+      background:var(--card); border-radius:16px;
       border:1px solid var(--border); overflow:hidden;
-      box-shadow:0 2px 8px rgba(0,0,0,.04);
+      box-shadow:0 2px 12px rgba(0,0,0,.06);
       transition:transform .2s, box-shadow .2s;
+      display:flex; flex-direction:column;
     }
-    .product-card:active { transform:scale(.98); }
+    .product-card:active { transform:scale(.97); }
 
     .product-img-wrap { position:relative; overflow:hidden; background:var(--brand-lt); }
     .product-img {
-      width:100%; aspect-ratio:4/3; object-fit:cover; display:block;
-      cursor:pointer; transition:transform .3s;
+      width:100%; aspect-ratio:1/1; object-fit:cover; display:block;
+      cursor:pointer; transition:transform .4s;
     }
-    .product-img:hover { transform:scale(1.03); }
+    .product-img:hover { transform:scale(1.06); }
 
     .badge-estado {
-      position:absolute; top:10px; left:10px;
-      padding:4px 12px; border-radius:20px;
-      font-size:.72rem; font-weight:700;
+      position:absolute; top:8px; left:8px;
+      padding:3px 9px; border-radius:20px;
+      font-size:.65rem; font-weight:700;
       pointer-events:none; z-index:10;
     }
     .badge-nuevo   { background:#25d366; color:#fff; }
@@ -122,38 +127,53 @@
     .img-agotado { opacity:.5; filter:grayscale(.5); }
 
     .img-count-badge {
-      position:absolute; bottom:8px; right:8px;
-      background:rgba(0,0,0,.5); color:#fff;
-      font-size:.72rem; padding:3px 8px; border-radius:20px;
-      pointer-events:none;
+      position:absolute; bottom:7px; right:7px;
+      background:rgba(0,0,0,.45); color:#fff;
+      font-size:.65rem; padding:2px 7px; border-radius:20px;
+      pointer-events:none; backdrop-filter:blur(4px);
     }
 
     .img-dots {
-      position:absolute; bottom:6px; left:50%; transform:translateX(-50%);
+      position:absolute; bottom:7px; left:50%; transform:translateX(-50%);
       display:flex; gap:4px;
     }
-    .img-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.5); }
+    .img-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.5); }
     .img-dot.active { background:#fff; }
 
-    .product-info { padding:14px 16px; }
-    .product-name { font-size:.95rem; font-weight:600; color:var(--text); margin-bottom:4px; }
-    .product-price { font-size:.85rem; color:var(--brand-dk); font-weight:600; }
+    .product-info {
+      padding:10px 11px 12px;
+      display:flex; flex-direction:column; flex:1;
+    }
+    .product-name {
+      font-size:.82rem; font-weight:700; color:var(--text);
+      line-height:1.3; margin-bottom:3px;
+      display:-webkit-box; -webkit-line-clamp:2;
+      -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .product-desc {
+      font-size:.7rem; color:var(--muted); line-height:1.4; margin-bottom:5px;
+      display:-webkit-box; -webkit-line-clamp:2;
+      -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .product-price {
+      font-size:.88rem; color:var(--brand); font-weight:700; margin-bottom:6px;
+    }
 
-    .product-tallas { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+    .product-tallas { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
     .talla-badge {
-      padding:3px 10px; border-radius:20px; font-size:.75rem;
+      padding:2px 7px; border-radius:20px; font-size:.65rem;
       border:1.5px solid var(--border); color:var(--muted); font-weight:600;
     }
 
     .btn-pedir {
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      padding:10px; border-radius:10px; border:none;
+      display:flex; align-items:center; justify-content:center; gap:5px;
+      padding:9px 6px; border-radius:10px; border:none;
       background:var(--brand); color:#fff;
-      font-family:'Poppins',sans-serif; font-size:.85rem; font-weight:600;
-      cursor:pointer; width:100%; transition:background .2s;
+      font-family:'Poppins',sans-serif; font-size:.75rem; font-weight:600;
+      cursor:pointer; width:100%; transition:background .2s; margin-top:auto;
     }
     .btn-pedir:hover { background:var(--brand-dk); }
-    .btn-pedir svg { width:16px; height:16px; }
+    .btn-pedir svg { width:13px; height:13px; flex-shrink:0; }
 
     /* ── Carrito ── */
     .barra-contacto {
@@ -555,7 +575,7 @@ function renderProductos(lista) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.nombre}</div>
-        ${p.descripcion ? `<div style="font-size:.78rem;color:var(--muted);margin:4px 0 6px;line-height:1.5;">${p.descripcion}</div>` : ''}
+        ${p.descripcion ? `<div class="product-desc">${p.descripcion}</div>` : ''}
         ${mostrarPrecio ? `<div class="product-price">${moneda} ${p.precio.toFixed(2)}</div>` : ''}
         ${tallas.length > 0
           ? `<div class="product-tallas">${tallas.map(t => `<span class="talla-badge">${t}</span>`).join('')}</div>`
