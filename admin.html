@@ -331,6 +331,13 @@
     .badge-active   { background:#e8f8ee; color:var(--success); }
     .badge-inactive { background:#f5f5f5; color:var(--muted); }
 
+    .estado-chip {
+      padding:7px 16px; border-radius:20px; font-size:.8rem; font-weight:600;
+      border:1.5px solid var(--border); background:#fafafa; color:var(--muted);
+      cursor:pointer; transition:all .2s;
+    }
+    .estado-chip.active { background:var(--brand); border-color:var(--brand); color:#fff; }
+
     .color-palette {
       width:34px; height:34px; border-radius:50%; cursor:pointer;
       border:3px solid transparent; transition:all .2s;
@@ -542,6 +549,14 @@
 
     <div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <span id="img-count-label" style="font-size:.72rem;color:var(--muted);"></span>
+    </div>
+
+    <label style="margin-top:14px;">Estado del producto</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;" id="estado-chips">
+      <div class="estado-chip active" data-val="normal" onclick="elegirEstado('normal')">Normal</div>
+      <div class="estado-chip" data-val="nuevo" onclick="elegirEstado('nuevo')">🆕 Nuevo</div>
+      <div class="estado-chip" data-val="agotado" onclick="elegirEstado('agotado')">😔 Agotado</div>
+      <div class="estado-chip" data-val="oferta" onclick="elegirEstado('oferta')">🔥 Oferta</div>
     </div>
 
     <div class="toggle-row" style="margin-top:14px;">
@@ -821,6 +836,7 @@ function abrirCrear() {
 
   tallasSeleccionadas = [];
   imagenesProducto    = [];
+  elegirEstado('normal');
   renderTallasChips();
   renderImgGrid();
   document.getElementById('modal-producto').classList.add('open');
@@ -840,6 +856,7 @@ function abrirEditar(id) {
 
   tallasSeleccionadas = p.tallas || [];
   imagenesProducto    = (p.imagenes || []).map(url => ({ url, path: null }));
+  elegirEstado(p.estado || 'normal');
   renderTallasChips();
   renderImgGrid();
   document.getElementById('modal-producto').classList.add('open');
@@ -975,6 +992,7 @@ async function guardarProducto() {
     tallas:       tallasSeleccionadas,
     imagenes:     imagenesProducto.map(x => x.url),
     activo:       document.getElementById('prod-activo').checked,
+    estado:       document.querySelector('.estado-chip.active')?.dataset.val || 'normal',
   };
 
   let error;
@@ -1000,6 +1018,12 @@ async function eliminarProducto() {
   cerrarModal();
   await cargarProductos();
   toast('Producto eliminado');
+}
+
+function elegirEstado(val) {
+  document.querySelectorAll('.estado-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.val === val);
+  });
 }
 
 // ══════════════════════════════════════════════
