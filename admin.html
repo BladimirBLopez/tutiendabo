@@ -438,6 +438,9 @@
     <label>Moneda</label>
     <input type="text" id="cfg-moneda" placeholder="Bs.">
 
+    <label>Horario de atención</label>
+    <textarea id="cfg-horario" placeholder="ej. Lunes a Viernes: 9am - 7pm&#10;Sábados: 9am - 2pm&#10;Domingos: Cerrado" style="min-height:80px;"></textarea>
+
     <label style="margin-top:14px;">🎨 Color principal de la tienda</label>
     <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap;">
       <input type="color" id="cfg-color-principal" value="#c27e4a"
@@ -673,6 +676,7 @@ async function cargarConfig() {
   document.getElementById('cfg-facebook').value     = data.facebook     || '';
   document.getElementById('cfg-tiktok').value       = data.tiktok       || '';
   document.getElementById('cfg-moneda').value       = data.moneda       || 'Bs.';
+  document.getElementById('cfg-horario').value      = data.horario      || '';
   document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
   document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
 
@@ -701,6 +705,7 @@ async function guardarConfig() {
     facebook:        document.getElementById('cfg-facebook').value.trim(),
     tiktok:          document.getElementById('cfg-tiktok').value.trim(),
     moneda:          document.getElementById('cfg-moneda').value.trim() || 'Bs.',
+    horario:         document.getElementById('cfg-horario').value.trim(),
     mostrar_precios: document.getElementById('cfg-mostrar-precios').checked,
     mostrar_redes:   document.getElementById('cfg-mostrar-redes').checked,
     color_principal: document.getElementById('cfg-color-principal').value,
