@@ -555,6 +555,7 @@ function renderProductos(lista) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.nombre}</div>
+        ${p.descripcion ? `<div style="font-size:.78rem;color:var(--muted);margin:4px 0 6px;line-height:1.5;">${p.descripcion}</div>` : ''}
         ${mostrarPrecio ? `<div class="product-price">${moneda} ${p.precio.toFixed(2)}</div>` : ''}
         ${tallas.length > 0
           ? `<div class="product-tallas">${tallas.map(t => `<span class="talla-badge">${t}</span>`).join('')}</div>`
