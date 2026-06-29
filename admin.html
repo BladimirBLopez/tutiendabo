@@ -1,804 +1,876 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — Lopez Style</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-</head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Tu Tienda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
 
-<body style="background:#fef8f0;">
-
-    <div id="pagina-admin">
-        <div class="admin-header">
-            <span></span>
-            <h2>Panel Admin</h2>
-            <span></span>
-        </div>
-
-        <div class="container admin-container">
-
-            <!-- Link a la tienda -->
-            <div class="admin-section tienda-link-section">
-                <h3>🔗 Tu tienda online</h3>
-                <p class="tienda-link-desc">Comparte este enlace con tus clientes</p>
-                <div class="tienda-link-box">
-                    <span id="tienda-url">cargando...</span>
-                    <button class="btn-copiar" onclick="copiarLink()">Copiar</button>
-                </div>
-                <a id="btn-ver-tienda" href="index.html" target="_blank" class="btn-ver-tienda">
-                    👁️ Ver tienda
-                </a>
-            </div>
-
-            <!-- Info tienda -->
-            <div class="admin-section">
-                <h3>⚙️ Info de la tienda</h3>
-                <label>Nombre</label>
-                <input type="text" id="admin-nombre" placeholder="Nombre de tu tienda">
-                <label>Descripción</label>
-                <input type="text" id="admin-descripcion" placeholder="Descripción corta">
-                <label>WhatsApp (con código de país, sin +)</label>
-                <input type="text" id="admin-whatsapp" placeholder="59169356292">
-
-                <div class="toggle-row">
-                    <div class="toggle-info">
-                        <span class="toggle-label">Mostrar precios</span>
-                        <span class="toggle-desc">Los clientes verán el precio de cada producto</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggle-precios" checked onchange="toggleCampoPrecio(this)">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-
-                <div class="toggle-row">
-                    <div class="toggle-info">
-                        <span class="toggle-label">Mostrar redes sociales</span>
-                        <span class="toggle-desc">Muestra los íconos de Facebook, TikTok y WhatsApp</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggle-redes" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-
-                <button class="btn-guardar" onclick="guardarConfig()">Guardar info</button>
-            </div>
-
-            <!-- Redes sociales -->
-            <div class="admin-section">
-                <h3>📱 Redes sociales</h3>
-                <label>Facebook URL</label>
-                <input type="text" id="admin-facebook" placeholder="https://facebook.com/...">
-                <label>TikTok URL</label>
-                <input type="text" id="admin-tiktok" placeholder="https://tiktok.com/@...">
-                <button class="btn-guardar" onclick="guardarConfig()">Guardar redes</button>
-            </div>
-
-            <!-- Categorías -->
-            <div class="admin-section">
-                <h3>🗂️ Categorías</h3>
-                <div id="admin-categorias-lista"></div>
-                <div class="admin-nueva-cat">
-                    <input type="text" id="nueva-categoria" placeholder="Nueva categoría (ej: Tortas)">
-                    <button class="btn-agregar" onclick="agregarCategoria()">+ Agregar</button>
-                </div>
-            </div>
-
-            <!-- Agregar producto -->
-            <div class="admin-section">
-                <h3>➕ Agregar producto</h3>
-                <label>Nombre del producto</label>
-                <input type="text" id="prod-nombre" placeholder="Nombre">
-                <label>Precio (Bs.)</label>
-                <input type="number" id="prod-precio" placeholder="0.00" step="0.01">
-                <label>Tallas disponibles <span style="color:#bbb;font-weight:400;font-size:0.78rem;">(opcional)</span></label>
-                <div class="tallas-container">
-                    <div class="tallas-predefinidas">
-                        <button class="talla-btn" onclick="toggleTallaPred(this,'XS')">XS</button>
-                        <button class="talla-btn" onclick="toggleTallaPred(this,'S')">S</button>
-                        <button class="talla-btn" onclick="toggleTallaPred(this,'M')">M</button>
-                        <button class="talla-btn" onclick="toggleTallaPred(this,'L')">L</button>
-                        <button class="talla-btn" onclick="toggleTallaPred(this,'XL')">XL</button>
-                        <button class="talla-btn" onclick="toggleTallaPred(this,'XXL')">XXL</button>
-                        <button class="talla-btn" onclick="toggleTallaPred(this,'Única')">Única</button>
-                    </div>
-                    <div class="tallas-custom-row">
-                        <input type="text" id="talla-custom" placeholder="Talla personalizada (ej: 32, Niño)">
-                        <button class="btn-agregar-talla" onclick="agregarTallaCustom()">+ Agregar</button>
-                    </div>
-                    <div class="tallas-seleccionadas" id="tallas-seleccionadas"></div>
-                    <p class="tallas-hint">Toca para seleccionar, o escribe una personalizada</p>
-                </div>
-                <label>Categoría</label>
-                <select id="prod-categoria"></select>
-                <label>Imagen del producto</label>
-                <div class="upload-area" id="upload-area" onclick="document.getElementById('input-imagen').click()">
-                    <input type="file" id="input-imagen" accept="image/*" style="display:none"
-                        onchange="previsualizarImagen(event)">
-                    <div id="upload-placeholder">
-                        <span class="upload-icon">📷</span>
-                        <p>Toca para subir una foto</p>
-                        <small>JPG, PNG, WEBP</small>
-                    </div>
-                    <img id="preview-imagen" src="" alt="Preview" style="display:none">
-                </div>
-                <input type="hidden" id="prod-imagen-base64">
-                <button class="btn-guardar" onclick="agregarProducto()">+ Agregar producto</button>
-            </div>
-
-            <!-- Lista productos -->
-            <div class="admin-section">
-                <h3>📦 Mis productos</h3>
-                <div id="admin-productos-lista"></div>
-            </div>
-
-            <!-- ===== EXPORTAR script.js ===== -->
-            <div class="admin-section" style="border: 2px solid #c27e4a; background: #fff8f2;">
-                <h3>📥 Exportar para Netlify</h3>
-                <p style="color:#666; font-size:0.88rem; margin-bottom:12px;">
-                    Cuando termines de cargar todos los productos, presiona este botón. 
-                    Se descargará un <strong>script.js</strong> listo para subir a Netlify junto con tus otros archivos.
-                </p>
-                <button class="btn-guardar" onclick="exportarScriptJS()"
-                    style="background:#c27e4a; font-size:1rem; padding:14px; width:100%; border-radius:12px;">
-                    ⬇️ Descargar script.js para Netlify
-                </button>
-            </div>
-
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-    <script>
-        // ===== TALLAS =====
-        let tallasSeleccionadas = [];
-
-        function toggleTallaPred(btn, talla) {
-            const idx = tallasSeleccionadas.indexOf(talla);
-            if (idx === -1) { tallasSeleccionadas.push(talla); btn.classList.add('activa'); }
-            else { tallasSeleccionadas.splice(idx, 1); btn.classList.remove('activa'); }
-            renderTallasSeleccionadas();
-        }
-
-        function agregarTallaCustom() {
-            const input = document.getElementById('talla-custom');
-            const val = input.value.trim();
-            if (!val) return;
-            if (tallasSeleccionadas.includes(val)) { alert('Esa talla ya está agregada'); return; }
-            tallasSeleccionadas.push(val);
-            input.value = '';
-            renderTallasSeleccionadas();
-        }
-
-        function quitarTalla(talla) {
-            tallasSeleccionadas = tallasSeleccionadas.filter(t => t !== talla);
-            document.querySelectorAll('.tallas-predefinidas .talla-btn').forEach(b => {
-                if (b.textContent.trim() === talla) b.classList.remove('activa');
-            });
-            renderTallasSeleccionadas();
-        }
-
-        function renderTallasSeleccionadas() {
-            const cont = document.getElementById('tallas-seleccionadas');
-            cont.innerHTML = tallasSeleccionadas.map(t =>
-                `<span class="talla-tag">${t}<button onclick="quitarTalla('${t}')">×</button></span>`
-            ).join('');
-        }
-
-        function toggleCampoPrecio(toggle) {
-            const input = document.getElementById('prod-precio');
-            input.disabled = !toggle.checked;
-            input.value = '';
-            input.placeholder = toggle.checked ? '0.00' : 'Precio oculto';
-        }
-
-        // ===== IMAGEN CON COMPRESIÓN =====
-        function previsualizarImagen(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = new Image();
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    const MAX = 600;
-                    let w = img.width, h = img.height;
-                    if (w > h && w > MAX) { h = h * MAX / w; w = MAX; }
-                    else if (h > MAX) { w = w * MAX / h; h = MAX; }
-                    canvas.width = w;
-                    canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    const base64 = canvas.toDataURL('image/jpeg', 0.7);
-                    document.getElementById('prod-imagen-base64').value = base64;
-                    const preview = document.getElementById('preview-imagen');
-                    preview.src = base64;
-                    preview.style.display = 'block';
-                    document.getElementById('upload-placeholder').style.display = 'none';
-                    document.getElementById('upload-area').style.borderColor = '#c27e4a';
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function limpiarImagen() {
-            document.getElementById('prod-imagen-base64').value = '';
-            document.getElementById('preview-imagen').src = '';
-            document.getElementById('preview-imagen').style.display = 'none';
-            document.getElementById('upload-placeholder').style.display = 'flex';
-            document.getElementById('upload-area').style.borderColor = '#f0e0d0';
-            document.getElementById('input-imagen').value = '';
-        }
-
-        // ===== AGREGAR PRODUCTO =====
-        async function agregarProducto() {
-            const nombre = document.getElementById('prod-nombre').value.trim();
-            const precioRaw = parseFloat(document.getElementById('prod-precio').value);
-            const precio = config.mostrarPrecios !== false ? precioRaw : 0;
-            const categoria = document.getElementById('prod-categoria').value;
-            const imagen = document.getElementById('prod-imagen-base64').value;
-
-            if (!nombre) { alert('Escribe el nombre del producto'); return; }
-            if (!imagen) { alert('Sube una imagen del producto'); return; }
-            if (config.mostrarPrecios !== false && isNaN(precioRaw)) {
-                alert('Ingresa un precio válido');
-                return;
-            }
-
-            const nuevoId = productos.length > 0
-                ? Math.max(...productos.map(p => p.id)) + 1 : 1;
-
-            productos.push({ id: nuevoId, nombre, precio, categoria, imagen, tallas: [...tallasSeleccionadas] });
-
-            try {
-                await guardarDatos();
-            } catch (e) {
-                alert('⚠️ Sin espacio de almacenamiento. Abre la consola (F12) y escribe: indexedDB.deleteDatabase("tiendaDB") para liberar espacio.');
-                productos.pop();
-                return;
-            }
-
-            document.getElementById('prod-nombre').value = '';
-            document.getElementById('prod-precio').value = '';
-            limpiarImagen();
-            tallasSeleccionadas = [];
-            renderTallasSeleccionadas();
-            document.querySelectorAll('.tallas-predefinidas .talla-btn').forEach(b => b.classList.remove('activa'));
-
-            renderAdminProductos();
-            alert('✅ Producto agregado correctamente');
-        }
-
-        // ===== CONFIG =====
-        function cargarFormAdmin() {
-            const n = document.getElementById('admin-nombre');
-            if (!n) return;
-            document.getElementById('admin-nombre').value = config.nombre;
-            document.getElementById('admin-descripcion').value = config.descripcion;
-            document.getElementById('admin-whatsapp').value = config.whatsapp;
-            document.getElementById('admin-facebook').value = config.facebook;
-            document.getElementById('admin-tiktok').value = config.tiktok;
-            document.getElementById('toggle-precios').checked = config.mostrarPrecios !== false;
-            document.getElementById('toggle-redes').checked = config.mostrarRedes !== false;
-            toggleCampoPrecio(document.getElementById('toggle-precios'));
-        }
-
-        function guardarConfig() {
-            config.nombre = document.getElementById('admin-nombre').value.trim();
-            config.descripcion = document.getElementById('admin-descripcion').value.trim();
-            config.whatsapp = document.getElementById('admin-whatsapp').value.trim();
-            config.facebook = document.getElementById('admin-facebook').value.trim();
-            config.tiktok = document.getElementById('admin-tiktok').value.trim();
-            config.mostrarPrecios = document.getElementById('toggle-precios').checked;
-            config.mostrarRedes = document.getElementById('toggle-redes').checked;
-            guardarDatos();
-            alert('✅ Configuración guardada');
-        }
-
-        // ===== LINK TIENDA =====
-        function mostrarLinkTienda() {
-            const base = window.location.href.replace('admin.html', 'index.html');
-            document.getElementById('tienda-url').textContent = base;
-            document.getElementById('btn-ver-tienda').href = base;
-        }
-
-        function copiarLink() {
-            const url = document.getElementById('tienda-url').textContent;
-            navigator.clipboard.writeText(url).then(() => {
-                const btn = document.querySelector('.btn-copiar');
-                btn.textContent = '✓ Copiado';
-                btn.style.background = '#2e7d32';
-                setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = ''; }, 2000);
-            });
-        }
-
-        // ===== EXPORTAR script.js =====
-        function exportarScriptJS() {
-            const configStr = JSON.stringify(config, null, 4);
-            const categoriasStr = JSON.stringify(categorias, null, 4);
-            const productosStr = JSON.stringify(productos, null, 4);
-
-            const contenido = `// ===== ESTADO GLOBAL =====
-let config = ${configStr};
-
-let categorias = ${categoriasStr};
-
-let productos = ${productosStr};
-
-let carrito = [];
-let filtroActivo = "todos";
-
-// ===== INDEXEDDB =====
-let db = null;
-
-function abrirDB() {
-    return new Promise((resolve, reject) => {
-        const req = indexedDB.open('tiendaDB', 1);
-        req.onupgradeneeded = function (e) {
-            const d = e.target.result;
-            if (!d.objectStoreNames.contains('datos')) {
-                d.createObjectStore('datos', { keyPath: 'clave' });
-            }
-        };
-        req.onsuccess = function (e) { db = e.target.result; resolve(db); };
-        req.onerror = function () { reject('Error abriendo DB'); };
-    });
-}
-
-function dbSet(clave, valor) {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('datos', 'readwrite');
-        tx.objectStore('datos').put({ clave, valor });
-        tx.oncomplete = resolve;
-        tx.onerror = reject;
-    });
-}
-
-function dbGet(clave) {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('datos', 'readonly');
-        const req = tx.objectStore('datos').get(clave);
-        req.onsuccess = () => resolve(req.result ? req.result.valor : null);
-        req.onerror = reject;
-    });
-}
-
-async function guardarDatos() {
-    await dbSet('config', config);
-    await dbSet('categorias', categorias);
-    await dbSet('productos', productos);
-}
-
-async function cargarDatos() {
-    await abrirDB();
-    const c = await dbGet('config');
-    const cat = await dbGet('categorias');
-    const prod = await dbGet('productos');
-    if (c) config = c;
-    if (cat) categorias = cat;
-    if (prod) productos = prod;
-}
-
-// ===== NAVEGACIÓN =====
-function mostrarTienda() {
-    document.getElementById('pagina-tienda').classList.remove('oculto');
-    document.getElementById('pagina-carrito').classList.add('oculto');
-}
-
-// ===== RENDERIZAR TIENDA =====
-function renderTienda() {
-    document.getElementById('tienda-nombre').textContent = config.nombre;
-    document.getElementById('tienda-descripcion').textContent = config.descripcion;
-    document.getElementById('link-facebook').href = config.facebook;
-    document.getElementById('link-tiktok').href = config.tiktok;
-    document.getElementById('link-whatsapp').href =
-        \`https://wa.me/\${config.whatsapp}?text=Hola%2C%20quisiera%20hacer%20un%20pedido\`;
-
-    const socialLinks = document.querySelector('.social-links');
-    if (socialLinks) {
-        socialLinks.style.display = config.mostrarRedes !== false ? 'flex' : 'none';
+    :root {
+      --brand:   #c27e4a;
+      --brand-dk: #8b4513;
+      --brand-lt: #fff3e8;
+      --bg:      #fef8f0;
+      --card:    #ffffff;
+      --text:    #1a1a1a;
+      --muted:   #888;
+      --border:  #e8ddd2;
+      --danger:  #e74c3c;
+      --success: #27ae60;
+      --radius:  14px;
     }
 
-    renderCategorias();
-    renderProductos("todos");
+    body { font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* ── Header ── */
+    .header {
+      background:var(--card);
+      border-bottom:1px solid var(--border);
+      padding:16px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,.06);
+    }
+    .header h1 { font-size:.95rem; font-weight:700; color:var(--brand-dk); }
+    .header-logo { font-size:1.4rem; }
+    .btn-ver-tienda {
+      font-size:.75rem; font-weight:600; color:var(--brand);
+      text-decoration:none; border:1.5px solid var(--brand);
+      padding:5px 12px; border-radius:20px;
+      transition:all .2s;
+    }
+    .btn-ver-tienda:hover { background:var(--brand); color:#fff; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display:flex; background:var(--card);
+      border-bottom:1px solid var(--border);
+      overflow-x:auto; -webkit-overflow-scrolling:touch;
+    }
+    .tab {
+      flex:1; min-width:80px;
+      padding:12px 8px;
+      font-size:.78rem; font-weight:600;
+      color:var(--muted); border:none; background:none;
+      cursor:pointer; border-bottom:2px solid transparent;
+      transition:all .2s; white-space:nowrap;
+      font-family:'Poppins',sans-serif;
+    }
+    .tab.active { color:var(--brand); border-bottom-color:var(--brand); }
+
+    /* ── Sections ── */
+    .section { display:none; padding:16px 16px 100px; max-width:600px; margin:0 auto; }
+    .section.visible { display:block; }
+
+    /* ── Cards ── */
+    .card {
+      background:var(--card); border-radius:var(--radius);
+      border:1px solid var(--border);
+      padding:18px; margin-bottom:14px;
+      box-shadow:0 2px 8px rgba(0,0,0,.04);
+    }
+    .card-title { font-size:.85rem; font-weight:700; color:var(--brand-dk); margin-bottom:14px; }
+
+    /* ── Form elements ── */
+    label { display:block; font-size:.75rem; font-weight:600; color:var(--muted); margin:10px 0 4px; }
+    input[type=text], input[type=number], textarea, select {
+      width:100%; padding:10px 12px;
+      border:1.5px solid var(--border); border-radius:10px;
+      font-family:'Poppins',sans-serif; font-size:.85rem;
+      background:#fafafa; color:var(--text);
+      transition:border-color .2s;
+    }
+    input:focus, textarea:focus, select:focus { outline:none; border-color:var(--brand); background:#fff; }
+    textarea { min-height:70px; resize:vertical; }
+
+    /* ── Toggle ── */
+    .toggle-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 0; border-bottom:1px solid var(--border);
+    }
+    .toggle-row:last-child { border-bottom:none; }
+    .toggle-info { flex:1; }
+    .toggle-label { font-size:.85rem; font-weight:600; display:block; }
+    .toggle-desc  { font-size:.72rem; color:var(--muted); }
+    .toggle-switch { position:relative; width:44px; height:24px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; inset:0; background:#ddd;
+      border-radius:24px; transition:.3s; cursor:pointer;
+    }
+    .toggle-slider:before {
+      content:''; position:absolute;
+      width:18px; height:18px; border-radius:50%;
+      background:#fff; left:3px; top:3px; transition:.3s;
+      box-shadow:0 1px 4px rgba(0,0,0,.2);
+    }
+    input:checked + .toggle-slider { background:var(--brand); }
+    input:checked + .toggle-slider:before { transform:translateX(20px); }
+
+    /* ── Buttons ── */
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:6px;
+      padding:11px 20px; border-radius:10px; border:none;
+      font-family:'Poppins',sans-serif; font-size:.85rem; font-weight:600;
+      cursor:pointer; transition:all .2s; text-decoration:none;
+    }
+    .btn-primary   { background:var(--brand); color:#fff; width:100%; }
+    .btn-primary:hover   { background:var(--brand-dk); }
+    .btn-secondary { background:var(--brand-lt); color:var(--brand-dk); }
+    .btn-secondary:hover { background:#f0d5b8; }
+    .btn-danger    { background:#fdecea; color:var(--danger); }
+    .btn-danger:hover { background:#fad7d4; }
+    .btn-outline   { background:transparent; border:1.5px solid var(--brand); color:var(--brand); }
+    .btn-sm { padding:7px 14px; font-size:.78rem; }
+    .btn-full { width:100%; }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+
+    /* ── Product list ── */
+    .product-item {
+      display:flex; align-items:center; gap:12px;
+      padding:12px; background:var(--card);
+      border:1px solid var(--border); border-radius:var(--radius);
+      margin-bottom:10px; cursor:pointer;
+      transition:box-shadow .2s;
+    }
+    .product-item:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); }
+    .product-thumb {
+      width:58px; height:58px; object-fit:cover;
+      border-radius:10px; flex-shrink:0;
+      background:var(--brand-lt);
+    }
+    .product-thumb-empty {
+      width:58px; height:58px; border-radius:10px;
+      background:var(--brand-lt); flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.4rem; color:var(--brand);
+    }
+    .product-info { flex:1; min-width:0; }
+    .product-name { font-size:.88rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .product-meta { font-size:.72rem; color:var(--muted); margin-top:2px; }
+    .product-actions { display:flex; gap:6px; }
+
+    /* ── Image upload grid ── */
+    .img-grid {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+      margin:10px 0;
+    }
+    .img-slot {
+      aspect-ratio:1; border-radius:10px;
+      overflow:hidden; position:relative;
+      background:var(--brand-lt); border:2px dashed var(--border);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:border-color .2s;
+    }
+    .img-slot:hover { border-color:var(--brand); }
+    .img-slot img { width:100%; height:100%; object-fit:cover; display:block; }
+    .img-slot-icon { font-size:1.6rem; color:var(--brand); opacity:.6; }
+    .img-slot .btn-remove-img {
+      position:absolute; top:4px; right:4px;
+      background:rgba(0,0,0,.6); color:#fff;
+      border:none; border-radius:50%; width:22px; height:22px;
+      font-size:.8rem; cursor:pointer; display:flex;
+      align-items:center; justify-content:center;
+      opacity:0; transition:opacity .2s;
+    }
+    .img-slot:hover .btn-remove-img { opacity:1; }
+    .img-slot .uploading-overlay {
+      position:absolute; inset:0; background:rgba(255,255,255,.85);
+      display:flex; align-items:center; justify-content:center;
+      font-size:.7rem; color:var(--brand); font-weight:600;
+    }
+
+    /* ── Tallas ── */
+    .tallas-wrap { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+    .talla-chip {
+      padding:4px 12px; border-radius:20px;
+      font-size:.78rem; font-weight:600; cursor:pointer;
+      border:1.5px solid var(--border); background:#fafafa;
+      color:var(--muted); transition:all .2s;
+    }
+    .talla-chip.selected { background:var(--brand); border-color:var(--brand); color:#fff; }
+    .talla-custom-row { display:flex; gap:6px; margin-top:8px; }
+    .talla-custom-row input { flex:1; margin:0; }
+
+    /* ── Categorías list ── */
+    .cat-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 14px; background:var(--card);
+      border:1px solid var(--border); border-radius:10px;
+      margin-bottom:8px;
+    }
+    .cat-name { flex:1; font-size:.88rem; font-weight:500; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,.5); z-index:1000;
+      justify-content:flex-end;
+      backdrop-filter:blur(4px);
+    }
+    .modal-overlay.open { display:flex; }
+    .modal {
+      background:var(--card); width:100%; max-width:480px;
+      height:100vh; overflow-y:auto;
+      border-radius:20px 0 0 20px;
+      padding:24px 20px 100px;
+      animation:slideIn .25s ease;
+    }
+    @keyframes slideIn { from { transform:translateX(100%); } to { transform:translateX(0); } }
+    .modal-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:20px;
+    }
+    .modal-title { font-size:1rem; font-weight:700; }
+    .btn-close-modal {
+      background:var(--brand-lt); border:none; border-radius:50%;
+      width:32px; height:32px; font-size:1rem; cursor:pointer;
+      color:var(--brand-dk); display:flex; align-items:center; justify-content:center;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+      background:#1a1a1a; color:#fff; border-radius:20px;
+      padding:10px 22px; font-size:.82rem; font-weight:500;
+      z-index:9999; pointer-events:none;
+      opacity:0; transition:opacity .3s;
+      white-space:nowrap;
+    }
+    .toast.show { opacity:1; }
+    .toast.success { background:var(--success); }
+    .toast.error   { background:var(--danger); }
+
+    /* ── Loading ── */
+    .loading { text-align:center; padding:40px; color:var(--muted); font-size:.85rem; }
+    .spinner { display:inline-block; width:24px; height:24px; border:3px solid var(--border);
+      border-top-color:var(--brand); border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── Empty state ── */
+    .empty-state { text-align:center; padding:40px 20px; color:var(--muted); }
+    .empty-state .empty-icon { font-size:2.5rem; margin-bottom:10px; }
+    .empty-state p { font-size:.85rem; }
+
+    /* ── FAB ── */
+    .fab {
+      position:fixed; bottom:28px; right:20px;
+      width:56px; height:56px; border-radius:50%;
+      background:var(--brand); color:#fff; border:none;
+      font-size:1.5rem; cursor:pointer;
+      box-shadow:0 4px 20px rgba(194,126,74,.5);
+      display:flex; align-items:center; justify-content:center;
+      z-index:200; transition:all .2s;
+    }
+    .fab:hover { background:var(--brand-dk); transform:scale(1.05); }
+
+    /* ── Sections bottom nav ── */
+    .bottom-bar {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--card); border-top:1px solid var(--border);
+      padding:16px 20px 20px;
+      box-shadow:0 -4px 20px rgba(0,0,0,.06);
+    }
+
+    /* ── Drag handle ── */
+    .drag-handle { color:var(--border); font-size:1.1rem; cursor:grab; }
+
+    /* ── Badge ── */
+    .badge {
+      display:inline-block; padding:2px 8px;
+      border-radius:20px; font-size:.68rem; font-weight:700;
+    }
+    .badge-active   { background:#e8f8ee; color:var(--success); }
+    .badge-inactive { background:#f5f5f5; color:var(--muted); }
+
+    @media (min-width:600px) {
+      .section { padding:20px 20px 80px; }
+      .modal { animation:slideInDesktop .25s ease; border-radius:20px; height:auto; max-height:90vh; margin:auto; }
+      @keyframes slideInDesktop { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
+      .modal-overlay { align-items:center; justify-content:center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <span class="header-logo">🏪</span>
+  <h1 id="header-store-name">Panel Admin</h1>
+  <a href="index.html" target="_blank" class="btn-ver-tienda">Ver tienda</a>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" data-tab="productos">📦 Productos</button>
+  <button class="tab" data-tab="categorias">🏷️ Categorías</button>
+  <button class="tab" data-tab="config">⚙️ Tienda</button>
+</div>
+
+<!-- ═══ TAB: PRODUCTOS ═══ -->
+<div id="tab-productos" class="section visible">
+  <div id="lista-productos">
+    <div class="loading"><div class="spinner"></div></div>
+  </div>
+
+  <!-- FAB para nuevo producto -->
+  <button class="fab" id="btn-nuevo-producto" title="Nuevo producto">＋</button>
+</div>
+
+<!-- ═══ TAB: CATEGORÍAS ═══ -->
+<div id="tab-categorias" class="section">
+  <div class="card">
+    <div class="card-title">Nueva categoría</div>
+    <label>Nombre</label>
+    <input type="text" id="nueva-cat-nombre" placeholder="ej. chamarras">
+    <br><br>
+    <button class="btn btn-primary" onclick="crearCategoria()">Crear categoría</button>
+  </div>
+
+  <div id="lista-categorias">
+    <div class="loading"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: CONFIG ═══ -->
+<div id="tab-config" class="section">
+  <div class="card">
+    <div class="card-title">Info de la tienda</div>
+
+    <label>Nombre de la tienda</label>
+    <input type="text" id="cfg-nombre" placeholder="Mi Tienda">
+
+    <label>Descripción</label>
+    <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes"></textarea>
+
+    <label>WhatsApp (con código de país, sin +)</label>
+    <input type="text" id="cfg-whatsapp" placeholder="59169356292">
+
+    <label>Facebook (URL completa)</label>
+    <input type="text" id="cfg-facebook" placeholder="https://facebook.com/...">
+
+    <label>TikTok (URL completa)</label>
+    <input type="text" id="cfg-tiktok" placeholder="https://tiktok.com/@...">
+
+    <label>Moneda</label>
+    <input type="text" id="cfg-moneda" placeholder="Bs.">
+  </div>
+
+  <div class="card">
+    <div class="card-title">Opciones</div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <span class="toggle-label">Mostrar precios</span>
+        <span class="toggle-desc">Los clientes verán el precio de cada producto</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="cfg-mostrar-precios">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <span class="toggle-label">Mostrar redes sociales</span>
+        <span class="toggle-desc">Muestra botones de Facebook, TikTok y WhatsApp</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="cfg-mostrar-redes" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Logo y portada</div>
+
+    <label>Logo de la tienda</label>
+    <div id="logo-preview-wrap" style="margin:8px 0;">
+      <img id="logo-preview" src="" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:none;border:2px solid var(--border);">
+    </div>
+    <input type="file" id="logo-input" accept="image/*" onchange="subirImagenConfig('logo')" style="display:none;">
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-input').click()">📷 Cambiar logo</button>
+
+    <label style="margin-top:14px;">Imagen de portada</label>
+    <div id="portada-preview-wrap" style="margin:8px 0;">
+      <img id="portada-preview" src="" style="width:100%;height:120px;object-fit:cover;border-radius:10px;display:none;">
+    </div>
+    <input type="file" id="portada-input" accept="image/*" onchange="subirImagenConfig('portada')" style="display:none;">
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('portada-input').click()">📷 Cambiar portada</button>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar configuración</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL: CREAR / EDITAR PRODUCTO ═══ -->
+<div class="modal-overlay" id="modal-producto">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-titulo">Nuevo producto</span>
+      <button class="btn-close-modal" onclick="cerrarModal()">✕</button>
+    </div>
+
+    <input type="hidden" id="prod-id">
+
+    <label>Nombre del producto</label>
+    <input type="text" id="prod-nombre" placeholder="ej. Short Spider">
+
+    <label>Categoría</label>
+    <select id="prod-categoria">
+      <option value="">Sin categoría</option>
+    </select>
+
+    <label>Precio</label>
+    <input type="number" id="prod-precio" placeholder="0" min="0" step="0.5">
+
+    <label>Tallas disponibles</label>
+    <div class="tallas-wrap" id="tallas-chips">
+      <!-- generadas dinámicamente -->
+    </div>
+    <div class="talla-custom-row">
+      <input type="text" id="talla-custom-input" placeholder="Talla personalizada (ej. XXL)">
+      <button class="btn btn-secondary btn-sm" onclick="agregarTallaCustom()">Agregar</button>
+    </div>
+
+    <label style="margin-top:14px;">Fotos del producto</label>
+    <p style="font-size:.72rem;color:var(--muted);margin-bottom:8px;">Toca un cuadro para subir una foto desde tu teléfono</p>
+    <div class="img-grid" id="img-grid">
+      <!-- slots generados -->
+    </div>
+
+    <div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <span id="img-count-label" style="font-size:.72rem;color:var(--muted);"></span>
+    </div>
+
+    <div class="toggle-row" style="margin-top:14px;">
+      <div class="toggle-info">
+        <span class="toggle-label">Producto activo</span>
+        <span class="toggle-desc">Si está desactivado, no aparece en la tienda</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="prod-activo" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:20px;">
+      <button class="btn btn-primary" style="flex:1" onclick="guardarProducto()">💾 Guardar</button>
+      <button class="btn btn-danger btn-sm" id="btn-eliminar" style="display:none" onclick="eliminarProducto()">🗑</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ══════════════════════════════════════════════
+let categorias = [];
+let productos  = [];
+let config     = {};
+let tallasSeleccionadas = [];
+let imagenesProducto    = [];   // array de { url, path }
+
+const TALLAS_PREDEFINIDAS = ['XS','S','M','L','XL','XXL','Único'];
+const MAX_IMAGENES = 6;
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  initTabs();
+  await cargarConfig();
+  await cargarCategorias();
+  await cargarProductos();
+});
+
+// ══════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════
+function initTabs() {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('visible');
+    });
+  });
+}
+
+// ══════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════
+async function cargarConfig() {
+  const { data, error } = await db.from('config_tienda').select('*').eq('id', 1).single();
+  if (error) return;
+  config = data;
+
+  document.getElementById('cfg-nombre').value       = data.nombre       || '';
+  document.getElementById('cfg-descripcion').value  = data.descripcion  || '';
+  document.getElementById('cfg-whatsapp').value     = data.whatsapp     || '';
+  document.getElementById('cfg-facebook').value     = data.facebook     || '';
+  document.getElementById('cfg-tiktok').value       = data.tiktok       || '';
+  document.getElementById('cfg-moneda').value       = data.moneda       || 'Bs.';
+  document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
+  document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
+
+  document.getElementById('header-store-name').textContent = data.nombre || 'Panel Admin';
+
+  if (data.logo_url) {
+    const img = document.getElementById('logo-preview');
+    img.src = data.logo_url; img.style.display = 'block';
+  }
+  if (data.portada_url) {
+    const img = document.getElementById('portada-preview');
+    img.src = data.portada_url; img.style.display = 'block';
+  }
+}
+
+async function guardarConfig() {
+  const payload = {
+    nombre:          document.getElementById('cfg-nombre').value.trim(),
+    descripcion:     document.getElementById('cfg-descripcion').value.trim(),
+    whatsapp:        document.getElementById('cfg-whatsapp').value.trim(),
+    facebook:        document.getElementById('cfg-facebook').value.trim(),
+    tiktok:          document.getElementById('cfg-tiktok').value.trim(),
+    moneda:          document.getElementById('cfg-moneda').value.trim() || 'Bs.',
+    mostrar_precios: document.getElementById('cfg-mostrar-precios').checked,
+    mostrar_redes:   document.getElementById('cfg-mostrar-redes').checked,
+  };
+
+  const { error } = await db.from('config_tienda').update(payload).eq('id', 1);
+  if (error) { toast('Error al guardar', 'error'); return; }
+  document.getElementById('header-store-name').textContent = payload.nombre;
+  toast('Configuración guardada ✓', 'success');
+}
+
+async function subirImagenConfig(tipo) {
+  const input  = document.getElementById(tipo + '-input');
+  const file   = input.files[0];
+  if (!file) return;
+
+  const ext    = file.name.split('.').pop();
+  const path   = `${tipo}_${Date.now()}.${ext}`;
+
+  toast('Subiendo imagen…');
+  const { error } = await db.storage.from('config').upload(path, file, { upsert: true });
+  if (error) { toast('Error al subir imagen', 'error'); return; }
+
+  const url = getImageUrl(path, 'config');
+  const campo = tipo === 'logo' ? 'logo_url' : 'portada_url';
+  await db.from('config_tienda').update({ [campo]: url }).eq('id', 1);
+
+  const img = document.getElementById(tipo + '-preview');
+  img.src = url; img.style.display = 'block';
+  toast('Imagen actualizada ✓', 'success');
+}
+
+// ══════════════════════════════════════════════
+//  CATEGORÍAS
+// ══════════════════════════════════════════════
+async function cargarCategorias() {
+  const { data } = await db.from('categorias').select('*').order('orden');
+  categorias = data || [];
+  renderCategorias();
+  actualizarSelectCategorias();
 }
 
 function renderCategorias() {
-    const lista = document.getElementById('lista-categorias');
-    if (!lista) return;
-    const todas = ["todos", ...categorias];
-    lista.innerHTML = todas.map(cat => {
-        const count = cat === "todos"
-            ? productos.length
-            : productos.filter(p => p.categoria === cat).length;
-        return \`
-            <div class="category-item \${filtroActivo === cat ? 'active' : ''}"
-                 onclick="filtrarCategoria('\${cat}')">
-                <span>\${cat === "todos" ? "Todos" : capitalizar(cat)}</span>
-                <span class="count">(\${count})</span>
-            </div>\`;
-    }).join('');
+  const el = document.getElementById('lista-categorias');
+  if (!categorias.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏷️</div><p>No hay categorías aún</p></div>`;
+    return;
+  }
+  el.innerHTML = categorias.map(c => `
+    <div class="cat-item">
+      <span class="drag-handle">⠿</span>
+      <span class="cat-name">${c.nombre}</span>
+      <button class="btn btn-danger btn-sm" onclick="eliminarCategoria('${c.id}')">🗑</button>
+    </div>
+  `).join('');
 }
 
-function renderProductos(filtro) {
-    const lista = document.getElementById('lista-productos');
-    if (!lista) return;
-    const filtrados = filtro === "todos"
-        ? productos
-        : productos.filter(p => p.categoria === filtro);
-
-    if (filtrados.length === 0) {
-        lista.innerHTML = \`<div style="grid-column:1/-1;text-align:center;color:#aaa;padding:40px 0;">
-            No hay productos en esta categoría</div>\`;
-        return;
-    }
-
-    lista.innerHTML = filtrados.map(p => {
-        const tieneTallas = p.tallas && p.tallas.length > 0;
-        const selectorTallas = tieneTallas ? \`
-            <div class="tallas-selector">
-                <span class="tallas-label">Talla:</span>
-                <div class="tallas-opciones">
-                    \${p.tallas.map(t => \`<button class="talla-btn" onclick="seleccionarTalla(this, \${p.id})" data-talla="\${t}">\${t}</button>\`).join('')}
-                </div>
-            </div>\` : '';
-
-        return \`
-        <div class="product-card" id="card-\${p.id}">
-            <img src="\${p.imagen}" alt="\${p.nombre}" class="product-img"
-                 onerror="this.src='https://placehold.co/200x200?text=Sin+imagen'">
-            <div class="product-info">
-                <h3>\${p.nombre}</h3>
-                \${config.mostrarPrecios !== false ? \`<p class="price">Bs. \${p.precio.toFixed(2)}</p>\` : ''}
-            </div>
-            \${selectorTallas}
-            <button class="btn-preguntar" onclick="agregarAlCarrito(\${p.id}, this)">
-                🛒 Agregar
-            </button>
-        </div>\`;
-    }).join('');
+function actualizarSelectCategorias() {
+  const sel = document.getElementById('prod-categoria');
+  const actual = sel.value;
+  sel.innerHTML = '<option value="">Sin categoría</option>' +
+    categorias.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+  sel.value = actual;
 }
 
-function filtrarCategoria(cat) {
-    filtroActivo = cat;
-    renderCategorias();
-    renderProductos(cat);
+async function crearCategoria() {
+  const nombre = document.getElementById('nueva-cat-nombre').value.trim();
+  if (!nombre) { toast('Escribe un nombre', 'error'); return; }
+  const { error } = await db.from('categorias').insert({ nombre, orden: categorias.length });
+  if (error) { toast('Error al crear', 'error'); return; }
+  document.getElementById('nueva-cat-nombre').value = '';
+  await cargarCategorias();
+  toast('Categoría creada ✓', 'success');
 }
 
-function capitalizar(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+async function eliminarCategoria(id) {
+  if (!confirm('¿Eliminar esta categoría?')) return;
+  await db.from('categorias').delete().eq('id', id);
+  await cargarCategorias();
+  toast('Categoría eliminada');
 }
 
-// ===== TALLAS =====
-function seleccionarTalla(btn, prodId) {
-    const card = document.getElementById(\`card-\${prodId}\`);
-    card.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('activa'));
-    btn.classList.add('activa');
+// ══════════════════════════════════════════════
+//  PRODUCTOS — LISTA
+// ══════════════════════════════════════════════
+async function cargarProductos() {
+  const { data } = await db
+    .from('productos')
+    .select('*, categorias(nombre)')
+    .order('orden');
+  productos = data || [];
+  renderProductos();
 }
 
-function getTallaSeleccionada(prodId) {
-    const card = document.getElementById(\`card-\${prodId}\`);
-    if (!card) return null;
-    const activa = card.querySelector('.talla-btn.activa');
-    return activa ? activa.dataset.talla : null;
-}
-
-// ===== CARRITO =====
-function agregarAlCarrito(id, btn) {
-    const prod = productos.find(p => p.id === id);
-    if (!prod) return;
-
-    const tieneTallas = prod.tallas && prod.tallas.length > 0;
-    const tallaSeleccionada = tieneTallas ? getTallaSeleccionada(id) : null;
-
-    if (tieneTallas && !tallaSeleccionada) {
-        btn.textContent = "⚠️ Elige talla";
-        btn.style.background = "#e67e22";
-        btn.style.color = "white";
-        setTimeout(() => {
-            btn.textContent = "🛒 Agregar";
-            btn.style.background = "";
-            btn.style.color = "";
-        }, 1200);
-        return;
-    }
-
-    const clave = tieneTallas ? \`\${id}_\${tallaSeleccionada}\` : \`\${id}\`;
-    const existe = carrito.find(c => c.clave === clave);
-    if (existe) {
-        existe.cantidad++;
-    } else {
-        carrito.push({ ...prod, cantidad: 1, talla: tallaSeleccionada, clave });
-    }
-
-    actualizarContadorCarrito();
-
-    btn.textContent = "✓ Agregado";
-    btn.style.background = "#c27e4a";
-    btn.style.color = "white";
-    setTimeout(() => {
-        btn.textContent = "🛒 Agregar";
-        btn.style.background = "";
-        btn.style.color = "";
-    }, 1000);
-
-    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(30);
-}
-
-function actualizarContadorCarrito() {
-    const el = document.getElementById('carrito-count');
-    if (!el) return;
-    const total = carrito.reduce((sum, c) => sum + c.cantidad, 0);
-    el.textContent = total;
-}
-
-function mostrarCarrito() {
-    const carritoEl = document.getElementById('pagina-carrito');
-    const tiendaEl = document.getElementById('pagina-tienda');
-    if (!carritoEl || !tiendaEl) return;
-    tiendaEl.classList.add('oculto');
-    carritoEl.classList.remove('oculto');
-    renderCarrito();
-}
-
-function renderCarrito() {
-    const cont = document.getElementById('carrito-items');
-    if (!cont) return;
-
-    if (carrito.length === 0) {
-        cont.innerHTML = \`
-            <div class="carrito-vacio">
-                <span>🛒</span>
-                Tu carrito está vacío
-            </div>\`;
-        document.getElementById('carrito-total-precio').textContent = 'Bs. 0.00';
-        document.getElementById('btn-enviar-whatsapp').href = '#';
-        return;
-    }
-
-    cont.innerHTML = carrito.map(item => \`
-        <div class="carrito-item">
-            <img src="\${item.imagen}" alt="\${item.nombre}"
-                 onerror="this.src='https://placehold.co/60?text=?'">
-            <div class="carrito-item-info">
-                <h4>\${item.nombre}\${item.talla ? \` <span class="carrito-talla">Talla \${item.talla}</span>\` : ''}</h4>
-                \${config.mostrarPrecios !== false ? \`<p>Bs. \${(item.precio * item.cantidad).toFixed(2)}</p>\` : ''}
-            </div>
-            <div class="carrito-item-controles">
-                <button class="btn-cantidad" onclick="cambiarCantidad('\${item.clave}', -1)">−</button>
-                <span class="cantidad-num">\${item.cantidad}</span>
-                <button class="btn-cantidad" onclick="cambiarCantidad('\${item.clave}', 1)">+</button>
-            </div>
+function renderProductos() {
+  const el = document.getElementById('lista-productos');
+  if (!productos.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><p>No hay productos aún.<br>Toca <strong>＋</strong> para agregar el primero.</p></div>`;
+    return;
+  }
+  el.innerHTML = productos.map(p => {
+    const thumb   = p.imagenes && p.imagenes[0] ? p.imagenes[0] : null;
+    const catName = p.categorias ? p.categorias.nombre : '—';
+    const badge   = p.activo
+      ? `<span class="badge badge-active">Activo</span>`
+      : `<span class="badge badge-inactive">Inactivo</span>`;
+    return `
+      <div class="product-item" onclick="abrirEditar('${p.id}')">
+        ${thumb
+          ? `<img class="product-thumb" src="${thumb}" alt="${p.nombre}" loading="lazy">`
+          : `<div class="product-thumb-empty">📷</div>`}
+        <div class="product-info">
+          <div class="product-name">${p.nombre}</div>
+          <div class="product-meta">${catName} · ${p.tallas && p.tallas.length ? p.tallas.join(', ') : 'Sin tallas'}</div>
+          <div style="margin-top:4px;">${badge}</div>
         </div>
-    \`).join('');
-
-    const total = carrito.reduce((sum, c) => sum + c.precio * c.cantidad, 0);
-    document.getElementById('carrito-total-precio').textContent =
-        config.mostrarPrecios !== false ? \`Bs. \${total.toFixed(2)}\` : '—';
-
-    let mensaje = \`Hola \${config.nombre}, quiero hacer este pedido:%0A%0A\`;
-    carrito.forEach(item => {
-        const tallaTexto = item.talla ? \` (Talla \${item.talla})\` : '';
-        mensaje += \`• \${item.nombre}\${tallaTexto} x\${item.cantidad}\${config.mostrarPrecios !== false ? \` = Bs. \${(item.precio * item.cantidad).toFixed(2)}\` : ''}%0A\`;
-    });
-    if (config.mostrarPrecios !== false) {
-        mensaje += \`%0A*Total: Bs. \${total.toFixed(2)}*\`;
-    }
-    document.getElementById('btn-enviar-whatsapp').href =
-        \`https://wa.me/\${config.whatsapp}?text=\${mensaje}\`;
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    `;
+  }).join('');
 }
 
-function cambiarCantidad(clave, delta) {
-    const item = carrito.find(c => c.clave === clave);
-    if (!item) return;
-    item.cantidad += delta;
-    if (item.cantidad <= 0) carrito = carrito.filter(c => c.clave !== clave);
-    actualizarContadorCarrito();
-    renderCarrito();
+// ══════════════════════════════════════════════
+//  MODAL PRODUCTO
+// ══════════════════════════════════════════════
+document.getElementById('btn-nuevo-producto').onclick = () => abrirCrear();
+
+function abrirCrear() {
+  document.getElementById('modal-titulo').textContent = 'Nuevo producto';
+  document.getElementById('prod-id').value     = '';
+  document.getElementById('prod-nombre').value = '';
+  document.getElementById('prod-categoria').value = '';
+  document.getElementById('prod-precio').value = '';
+  document.getElementById('prod-activo').checked = true;
+  document.getElementById('btn-eliminar').style.display = 'none';
+
+  tallasSeleccionadas = [];
+  imagenesProducto    = [];
+  renderTallasChips();
+  renderImgGrid();
+  document.getElementById('modal-producto').classList.add('open');
 }
 
-function vaciarCarrito() {
-    carrito = [];
-    actualizarContadorCarrito();
-    renderCarrito();
+function abrirEditar(id) {
+  const p = productos.find(x => x.id === id);
+  if (!p) return;
+
+  document.getElementById('modal-titulo').textContent    = 'Editar producto';
+  document.getElementById('prod-id').value               = p.id;
+  document.getElementById('prod-nombre').value           = p.nombre;
+  document.getElementById('prod-categoria').value        = p.categoria_id || '';
+  document.getElementById('prod-precio').value           = p.precio || '';
+  document.getElementById('prod-activo').checked         = p.activo;
+  document.getElementById('btn-eliminar').style.display  = 'inline-flex';
+
+  tallasSeleccionadas = p.tallas || [];
+  imagenesProducto    = (p.imagenes || []).map(url => ({ url, path: null }));
+  renderTallasChips();
+  renderImgGrid();
+  document.getElementById('modal-producto').classList.add('open');
 }
 
-// ===== ADMIN =====
-function renderAdminCategorias() {
-    const cont = document.getElementById('admin-categorias-lista');
-    if (!cont) return;
-    cont.innerHTML = categorias.map(cat => \`
-        <span class="cat-tag">
-            \${capitalizar(cat)}
-            <button onclick="eliminarCategoria('\${cat}')">×</button>
-        </span>
-    \`).join('');
-
-    const sel = document.getElementById('prod-categoria');
-    if (!sel) return;
-    sel.innerHTML = categorias.map(cat =>
-        \`<option value="\${cat}">\${capitalizar(cat)}</option>\`
-    ).join('');
+function cerrarModal() {
+  document.getElementById('modal-producto').classList.remove('open');
 }
 
-function agregarCategoria() {
-    const input = document.getElementById('nueva-categoria');
-    const val = input.value.trim().toLowerCase();
-    if (!val) return;
-    if (categorias.includes(val)) { alert('Esa categoría ya existe'); return; }
-    categorias.push(val);
-    guardarDatos();
-    input.value = '';
-    renderAdminCategorias();
-}
-
-function eliminarCategoria(cat) {
-    if (!confirm(\`¿Eliminar la categoría "\${cat}"?\`)) return;
-    categorias = categorias.filter(c => c !== cat);
-    guardarDatos();
-    renderAdminCategorias();
-}
-
-function eliminarProducto(id) {
-    if (!confirm('¿Eliminar este producto?')) return;
-    productos = productos.filter(p => p.id !== id);
-    guardarDatos();
-    renderAdminProductos();
-}
-
-function renderAdminProductos() {
-    const cont = document.getElementById('admin-productos-lista');
-    if (!cont) return;
-    if (productos.length === 0) {
-        cont.innerHTML = '<p style="color:#aaa;font-size:0.85rem;">No hay productos aún</p>';
-        return;
-    }
-    cont.innerHTML = productos.map(p => \`
-        <div class="admin-prod-item">
-            <img src="\${p.imagen}" alt="\${p.nombre}"
-                 onerror="this.src='https://placehold.co/50?text=?'">
-            <div class="admin-prod-info">
-                <h4 onclick="editarNombre(this, \${p.id})" style="cursor:pointer;" title="Toca para editar">\${p.nombre}</h4>
-                <p>Bs. \${p.precio.toFixed(2)}</p>
-                <span>\${capitalizar(p.categoria)}</span>
-                <div class="admin-tallas-edit">
-    \${(p.tallas || []).map(t => \`
-        <span class="talla-tag">\${t}
-            <button onclick="quitarTallaProducto(\${p.id}, '\${t}')">×</button>
-        </span>\`).join('')}
-    <button class="btn-agregar-talla-inline" onclick="agregarTallaProducto(\${p.id})">+ talla</button>
-</div>
-            </div>
-            <button class="btn-eliminar" onclick="eliminarProducto(\${p.id})">Eliminar</button>
-        </div>
-    \`).join('');
-}
-
-function editarNombre(el, id) {
-    const nombreActual = el.textContent;
-    el.innerHTML = \`<input type="text" value="\${nombreActual}"
-        style="font-size:inherit;font-family:inherit;border:1.5px solid #c27e4a;border-radius:6px;padding:2px 6px;width:100%;outline:none;"
-        onblur="guardarNombre(this, \${id})"
-        onkeydown="if(event.key==='Enter') this.blur(); if(event.key==='Escape') { this.value='\${nombreActual}'; this.blur(); }">\`;
-    el.querySelector('input').focus();
-}
-
-function guardarNombre(input, id) {
-    const nuevoNombre = input.value.trim();
-    if (nuevoNombre) {
-        const prod = productos.find(p => p.id === id);
-        if (prod) {
-            prod.nombre = nuevoNombre;
-            guardarDatos();
-        }
-    }
-    renderAdminProductos();
-}
-
-function quitarTallaProducto(id, talla) {
-    const prod = productos.find(p => p.id === id);
-    if (!prod) return;
-    prod.tallas = prod.tallas.filter(t => t !== talla);
-    guardarDatos();
-    renderAdminProductos();
-}
-
-function agregarTallaProducto(id) {
-    const talla = prompt('¿Qué talla quieres agregar?');
-    if (!talla || !talla.trim()) return;
-    const prod = productos.find(p => p.id === id);
-    if (!prod) return;
-    if (!prod.tallas) prod.tallas = [];
-    if (prod.tallas.includes(talla.trim())) { alert('Esa talla ya existe'); return; }
-    prod.tallas.push(talla.trim());
-    guardarDatos();
-    renderAdminProductos();
-}
-
-// ===== INIT =====
-document.addEventListener('DOMContentLoaded', async () => {
-    await cargarDatos();
-
-    if (document.getElementById('pagina-tienda')) {
-        renderTienda();
-        document.getElementById('btn-carrito').addEventListener('click', () => {
-            if (carrito.length === 0) {
-                alert('Tu carrito está vacío. Agrega productos primero.');
-                return;
-            }
-            mostrarCarrito();
-        });
-    }
+// Cerrar al tocar el overlay
+document.getElementById('modal-producto').addEventListener('click', e => {
+  if (e.target === e.currentTarget) cerrarModal();
 });
-`;
 
-            const blob = new Blob([contenido], { type: 'text/javascript' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'script.js';
-            a.click();
-            URL.revokeObjectURL(url);
+// ── Tallas ──
+function renderTallasChips() {
+  const el = document.getElementById('tallas-chips');
+  el.innerHTML = TALLAS_PREDEFINIDAS.map(t => `
+    <div class="talla-chip ${tallasSeleccionadas.includes(t) ? 'selected' : ''}"
+         onclick="toggleTalla('${t}')">${t}</div>
+  `).join('') +
+  tallasSeleccionadas
+    .filter(t => !TALLAS_PREDEFINIDAS.includes(t))
+    .map(t => `
+      <div class="talla-chip selected" onclick="toggleTalla('${t}')">
+        ${t} ✕
+      </div>`).join('');
+}
 
-            alert('✅ script.js descargado. Reemplaza el script.js viejo con este archivo y sube todo a Netlify.');
-        }
+function toggleTalla(t) {
+  if (tallasSeleccionadas.includes(t)) {
+    tallasSeleccionadas = tallasSeleccionadas.filter(x => x !== t);
+  } else {
+    tallasSeleccionadas.push(t);
+  }
+  renderTallasChips();
+}
 
-        // ===== CONFIG =====
-        function cargarFormAdmin() {
-            const n = document.getElementById('admin-nombre');
-            if (!n) return;
-            document.getElementById('admin-nombre').value = config.nombre;
-            document.getElementById('admin-descripcion').value = config.descripcion;
-            document.getElementById('admin-whatsapp').value = config.whatsapp;
-            document.getElementById('admin-facebook').value = config.facebook;
-            document.getElementById('admin-tiktok').value = config.tiktok;
-            document.getElementById('toggle-precios').checked = config.mostrarPrecios !== false;
-            document.getElementById('toggle-redes').checked = config.mostrarRedes !== false;
-            toggleCampoPrecio(document.getElementById('toggle-precios'));
-        }
+function agregarTallaCustom() {
+  const inp = document.getElementById('talla-custom-input');
+  const val = inp.value.trim().toUpperCase();
+  if (!val) return;
+  if (!tallasSeleccionadas.includes(val)) tallasSeleccionadas.push(val);
+  inp.value = '';
+  renderTallasChips();
+}
 
-        function guardarConfig() {
-            config.nombre = document.getElementById('admin-nombre').value.trim();
-            config.descripcion = document.getElementById('admin-descripcion').value.trim();
-            config.whatsapp = document.getElementById('admin-whatsapp').value.trim();
-            config.facebook = document.getElementById('admin-facebook').value.trim();
-            config.tiktok = document.getElementById('admin-tiktok').value.trim();
-            config.mostrarPrecios = document.getElementById('toggle-precios').checked;
-            config.mostrarRedes = document.getElementById('toggle-redes').checked;
-            guardarDatos();
-            alert('✅ Configuración guardada');
-        }
+// ── Imágenes grid ──
+function renderImgGrid() {
+  const grid  = document.getElementById('img-grid');
+  const slots = [];
 
-        // ===== LINK TIENDA =====
-        function mostrarLinkTienda() {
-            const base = window.location.href.replace('admin.html', 'index.html');
-            document.getElementById('tienda-url').textContent = base;
-            document.getElementById('btn-ver-tienda').href = base;
-        }
+  // Imágenes existentes
+  imagenesProducto.forEach((img, i) => {
+    slots.push(`
+      <div class="img-slot" id="slot-${i}">
+        <img src="${img.url}" alt="foto ${i+1}" loading="lazy">
+        <button class="btn-remove-img" onclick="quitarImagen(${i}, event)">✕</button>
+      </div>
+    `);
+  });
 
-        function copiarLink() {
-            const url = document.getElementById('tienda-url').textContent;
-            navigator.clipboard.writeText(url).then(() => {
-                const btn = document.querySelector('.btn-copiar');
-                btn.textContent = '✓ Copiado';
-                btn.style.background = '#2e7d32';
-                setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = ''; }, 2000);
-            });
-        }
+  // Slots vacíos para subir
+  const libres = MAX_IMAGENES - imagenesProducto.length;
+  for (let i = 0; i < libres; i++) {
+    const idx = imagenesProducto.length + i;
+    if (i === 0) { // solo el primer slot vacío es clickeable
+      slots.push(`
+        <div class="img-slot" onclick="triggerUpload(${idx})">
+          <span class="img-slot-icon">📷</span>
+          <input type="file" id="file-input-${idx}" accept="image/*" multiple
+                 style="display:none" onchange="subirImagenes(event)">
+        </div>
+      `);
+    }
+  }
 
-        // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', async () => {
-            await cargarDatos();
-            cargarFormAdmin();
-            renderAdminCategorias();
-            renderAdminProductos();
-            mostrarLinkTienda();
-        });
-    </script>
+  grid.innerHTML = slots.join('');
+  document.getElementById('img-count-label').textContent =
+    `${imagenesProducto.length}/${MAX_IMAGENES} fotos`;
+}
+
+function triggerUpload(idx) {
+  document.getElementById(`file-input-${idx}`)?.click();
+}
+
+async function subirImagenes(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+
+  const libres = MAX_IMAGENES - imagenesProducto.length;
+  const aSubir = files.slice(0, libres);
+
+  for (const file of aSubir) {
+    const ext  = file.name.split('.').pop();
+    const path = `prod_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+
+    // Mostrar placeholder mientras sube
+    const tempUrl = URL.createObjectURL(file);
+    const tempIdx = imagenesProducto.length;
+    imagenesProducto.push({ url: tempUrl, path: null, uploading: true });
+    renderImgGrid();
+
+    const { error } = await db.storage.from('productos').upload(path, file);
+    if (error) {
+      imagenesProducto.splice(tempIdx, 1);
+      toast('Error al subir imagen', 'error');
+    } else {
+      const url = getImageUrl(path, 'productos');
+      imagenesProducto[tempIdx] = { url, path };
+    }
+    renderImgGrid();
+  }
+}
+
+function quitarImagen(i, e) {
+  e.stopPropagation();
+  // Nota: no borramos de Storage aquí para evitar complicaciones; se puede agregar
+  imagenesProducto.splice(i, 1);
+  renderImgGrid();
+}
+
+// ── Guardar / Eliminar ──
+async function guardarProducto() {
+  const id     = document.getElementById('prod-id').value;
+  const nombre = document.getElementById('prod-nombre').value.trim();
+  if (!nombre) { toast('Escribe un nombre', 'error'); return; }
+
+  const payload = {
+    nombre,
+    categoria_id: document.getElementById('prod-categoria').value || null,
+    precio:       parseFloat(document.getElementById('prod-precio').value) || 0,
+    tallas:       tallasSeleccionadas,
+    imagenes:     imagenesProducto.map(x => x.url),
+    activo:       document.getElementById('prod-activo').checked,
+  };
+
+  let error;
+  if (id) {
+    ({ error } = await db.from('productos').update(payload).eq('id', id));
+  } else {
+    payload.orden = productos.length;
+    ({ error } = await db.from('productos').insert(payload));
+  }
+
+  if (error) { toast('Error al guardar', 'error'); console.error(error); return; }
+
+  cerrarModal();
+  await cargarProductos();
+  toast('Producto guardado ✓', 'success');
+}
+
+async function eliminarProducto() {
+  const id = document.getElementById('prod-id').value;
+  if (!id || !confirm('¿Eliminar este producto?')) return;
+  const { error } = await db.from('productos').delete().eq('id', id);
+  if (error) { toast('Error al eliminar', 'error'); return; }
+  cerrarModal();
+  await cargarProductos();
+  toast('Producto eliminado');
+}
+
+// ══════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════
+let toastTimer;
+function toast(msg, tipo = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className   = 'toast show' + (tipo ? ' ' + tipo : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+</script>
 </body>
 </html>
