@@ -453,39 +453,15 @@
 <!-- ═══ TAB: CONFIG ═══ -->
 <div id="tab-config" class="section">
 
-  <!-- Logo y portada arriba, estilo Linktree -->
-  <div class="card" style="padding:0;">
-    <div style="overflow:hidden;border-radius:14px 14px 0 0;">
-      <div id="portada-preview-wrap" style="position:relative;height:130px;background:linear-gradient(135deg,var(--brand-lt),var(--brand));">
-        <img id="portada-preview" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
-        <div id="portada-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:rgba(255,255,255,.85);">
-          <span style="font-size:1.6rem;">🖼️</span>
-          <span style="font-size:.7rem;font-weight:600;">Sin portada</span>
-        </div>
-        <button class="btn-edit-portada" onclick="document.getElementById('portada-input').click()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-          Editar portada
-        </button>
-        <input type="file" id="portada-input" accept="image/*" onchange="subirImagenConfig('portada')" style="display:none;">
-      </div>
-    </div>
-    <div style="display:flex;justify-content:center;margin-top:-36px;position:relative;z-index:2;">
-      <div id="logo-preview-wrap" style="position:relative;">
-        <div id="logo-preview-circle" style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#fff,#f5f0ea);border:3px solid #fff;box-shadow:0 3px 14px rgba(0,0,0,.18);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.7rem;">🏪</div>
-        <img id="logo-preview" src="" style="display:none;">
-        <button class="btn-cambiar-logo" onclick="document.getElementById('logo-input').click()" title="Cambiar logo">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-        </button>
-        <input type="file" id="logo-input" accept="image/*" onchange="subirImagenConfig('logo')" style="display:none;">
-      </div>
-    </div>
-    <div style="padding:16px;padding-top:14px;">
-      <label style="margin-top:0;">Nombre de la tienda</label>
-      <input type="text" id="cfg-nombre" placeholder="Mi Tienda">
+  <!-- Info de la tienda -->
+  <div class="card">
+    <div class="card-title">Info de la tienda</div>
 
-      <label>Descripción</label>
-      <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes"></textarea>
-    </div>
+    <label>Nombre de la tienda</label>
+    <input type="text" id="cfg-nombre" placeholder="Mi Tienda">
+
+    <label>Descripción</label>
+    <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes"></textarea>
   </div>
 
   <!-- Contacto compacto -->
@@ -516,6 +492,25 @@
         <span class="toggle-slider"></span>
       </label>
     </div>
+  </div>
+
+  <!-- Logo y portada -->
+  <div class="card">
+    <div class="card-title">Logo y portada</div>
+
+    <label>Logo de la tienda</label>
+    <div id="logo-preview-wrap-old" style="margin:8px 0;">
+      <img id="logo-preview" src="" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:none;border:2px solid var(--border);">
+    </div>
+    <input type="file" id="logo-input" accept="image/*" onchange="subirImagenConfig('logo')" style="display:none;">
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-input').click()">📷 Cambiar logo</button>
+
+    <label style="margin-top:14px;">Imagen de portada</label>
+    <div style="margin:8px 0;">
+      <img id="portada-preview" src="" style="width:100%;height:120px;object-fit:cover;border-radius:10px;display:none;">
+    </div>
+    <input type="file" id="portada-input" accept="image/*" onchange="subirImagenConfig('portada')" style="display:none;">
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('portada-input').click()">📷 Cambiar portada</button>
   </div>
 
   <!-- Color -->
@@ -809,12 +804,10 @@ async function cargarConfig() {
   if (data.logo_url) {
     const img = document.getElementById('logo-preview');
     img.src = data.logo_url; img.style.display = 'block';
-    document.getElementById('logo-preview-circle').style.display = 'none';
   }
   if (data.portada_url) {
     const img = document.getElementById('portada-preview');
     img.src = data.portada_url; img.style.display = 'block';
-    document.getElementById('portada-placeholder').style.display = 'none';
   }
 }
 
@@ -857,8 +850,6 @@ async function subirImagenConfig(tipo) {
 
   const img = document.getElementById(tipo + '-preview');
   img.src = url; img.style.display = 'block';
-  if (tipo === 'logo') document.getElementById('logo-preview-circle').style.display = 'none';
-  if (tipo === 'portada') document.getElementById('portada-placeholder').style.display = 'none';
   toast('Imagen actualizada ✓', 'success');
 }
 
