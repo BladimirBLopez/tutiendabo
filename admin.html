@@ -182,6 +182,14 @@
       transition:box-shadow .2s;
     }
     .product-item:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); }
+    .btn-duplicar {
+      width:30px; height:30px; border-radius:8px; flex-shrink:0;
+      background:var(--brand-lt); color:var(--brand-dk); border:none;
+      font-size:1rem; cursor:pointer; display:flex;
+      align-items:center; justify-content:center;
+      transition:background .2s;
+    }
+    .btn-duplicar:hover { background:#f0d5b8; }
     .product-thumb {
       width:58px; height:58px; object-fit:cover;
       border-radius:10px; flex-shrink:0;
@@ -938,6 +946,7 @@ function renderProductos() {
           <div class="product-meta">${catName} · ${p.tallas && p.tallas.length ? p.tallas.join(', ') : 'Sin tallas'}</div>
           <div style="margin-top:4px;">${badge}</div>
         </div>
+        <button class="btn-duplicar" onclick="event.stopPropagation(); duplicarProducto('${p.id}')" title="Duplicar producto">⎘</button>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
     `;
@@ -1146,6 +1155,30 @@ async function eliminarProducto() {
   cerrarModal();
   await cargarProductos();
   toast('Producto eliminado');
+}
+
+async function duplicarProducto(id) {
+  const original = productos.find(x => x.id === id);
+  if (!original) return;
+
+  const copia = {
+    tienda_id:    tiendaId,
+    nombre:       original.nombre + ' (copia)',
+    descripcion:  original.descripcion || '',
+    precio:       original.precio || 0,
+    categoria_id: original.categoria_id || null,
+    tallas:       original.tallas || [],
+    imagenes:     original.imagenes || [],
+    estado:       original.estado || 'normal',
+    activo:       original.activo,
+    orden:        productos.length,
+  };
+
+  const { error } = await db.from('productos').insert(copia);
+  if (error) { toast('Error al duplicar', 'error'); console.error(error); return; }
+
+  await cargarProductos();
+  toast(`"${original.nombre}" duplicado ✓`, 'success');
 }
 
 function elegirEstado(val) {
