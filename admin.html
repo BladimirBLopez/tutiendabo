@@ -372,7 +372,7 @@
     </div>
 
     <button class="btn-login" onclick="verificarClave()">Entrar</button>
-    <p class="login-hint">Clave predeterminada: <strong>admin123</strong><br>Cámbiala en el código antes de publicar.</p>
+    <p class="login-hint" id="debug-slug">Detectando tienda...</p>
   </div>
 </div>
 
@@ -598,23 +598,34 @@ async function verificarClave() {
   const btn = document.querySelector('.btn-login');
   btn.disabled = true; btn.textContent = 'Verificando...';
 
-  const { data: tienda } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
+  try {
+    const { data: tienda, error } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
 
-  btn.disabled = false; btn.textContent = 'Entrar';
+    if (error) {
+      alert('Error de Supabase: ' + error.message);
+      btn.disabled = false; btn.textContent = 'Entrar';
+      return;
+    }
 
-  if (tienda && tienda.clave_admin === val && tienda.activa) {
-    tiendaId = tienda.id;
-    sessionStorage.setItem('admin_ok_' + tiendaSlug, '1');
-    document.getElementById('pantalla-login').style.display = 'none';
-    document.getElementById('contenido-admin').style.display = 'flex';
-    document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
-    iniciarAdmin();
-  } else {
-    const err = document.getElementById('login-error');
-    err.style.display = 'block';
-    document.getElementById('login-input').value = '';
-    document.getElementById('login-input').focus();
-    setTimeout(() => err.style.display = 'none', 3000);
+    btn.disabled = false; btn.textContent = 'Entrar';
+
+    if (tienda && tienda.clave_admin === val && tienda.activa) {
+      tiendaId = tienda.id;
+      sessionStorage.setItem('admin_ok_' + tiendaSlug, '1');
+      document.getElementById('pantalla-login').style.display = 'none';
+      document.getElementById('contenido-admin').style.display = 'flex';
+      document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
+      iniciarAdmin();
+    } else {
+      const err = document.getElementById('login-error');
+      err.style.display = 'block';
+      document.getElementById('login-input').value = '';
+      document.getElementById('login-input').focus();
+      setTimeout(() => err.style.display = 'none', 3000);
+    }
+  } catch (e) {
+    alert('Error inesperado: ' + e.message);
+    btn.disabled = false; btn.textContent = 'Entrar';
   }
 }
 
@@ -628,6 +639,9 @@ function toggleVerClave() {
 // Verificar slug de la tienda y sesión activa
 window.addEventListener('DOMContentLoaded', async () => {
   tiendaSlug = getShopSlug();
+  console.log('Slug detectado:', tiendaSlug);
+  const debugEl = document.getElementById('debug-slug');
+  if (debugEl) debugEl.textContent = 'Tienda detectada: ' + (tiendaSlug || '(ninguna)');
 
   if (!tiendaSlug) {
     document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Poppins',sans-serif;"><div><div style="font-size:3rem;">🏪</div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
