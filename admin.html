@@ -338,6 +338,24 @@
     }
     .estado-chip.active { background:var(--brand); border-color:var(--brand); color:#fff; }
 
+    .btn-cambiar-foto {
+      background:rgba(0,0,0,.5); color:#fff; border:none;
+      padding:6px 12px; border-radius:20px; font-size:.7rem; font-weight:600;
+      cursor:pointer; backdrop-filter:blur(4px); font-family:'Poppins',sans-serif;
+    }
+    #logo-preview-wrap img#logo-preview {
+      width:68px; height:68px; border-radius:50%; object-fit:cover;
+      border:3px solid #fff; box-shadow:0 2px 10px rgba(0,0,0,.15);
+      position:absolute; top:0; left:0;
+    }
+    .btn-cambiar-logo {
+      position:absolute; bottom:-2px; right:-2px;
+      width:26px; height:26px; border-radius:50%;
+      background:var(--brand); color:#fff; border:2px solid #fff;
+      font-size:.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      padding:0;
+    }
+
     .fuente-card {
       display:flex; align-items:center; justify-content:space-between;
       padding:14px 16px; border-radius:12px;
@@ -428,31 +446,64 @@
 
 <!-- ═══ TAB: CONFIG ═══ -->
 <div id="tab-config" class="section">
+
+  <!-- Logo y portada arriba, estilo Linktree -->
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div id="portada-preview-wrap" style="position:relative;height:110px;background:var(--brand-lt);">
+      <img id="portada-preview" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
+      <button class="btn-cambiar-foto" onclick="document.getElementById('portada-input').click()" style="position:absolute;bottom:8px;right:8px;">📷 Portada</button>
+      <input type="file" id="portada-input" accept="image/*" onchange="subirImagenConfig('portada')" style="display:none;">
+    </div>
+    <div style="display:flex;justify-content:center;margin-top:-34px;position:relative;z-index:2;">
+      <div id="logo-preview-wrap" style="position:relative;">
+        <div id="logo-preview-circle" style="width:68px;height:68px;border-radius:50%;background:#fff;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.15);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.6rem;">🏪</div>
+        <img id="logo-preview" src="" style="display:none;">
+        <button class="btn-cambiar-logo" onclick="document.getElementById('logo-input').click()">📷</button>
+        <input type="file" id="logo-input" accept="image/*" onchange="subirImagenConfig('logo')" style="display:none;">
+      </div>
+    </div>
+    <div style="padding:16px;padding-top:10px;">
+      <label style="margin-top:0;">Nombre de la tienda</label>
+      <input type="text" id="cfg-nombre" placeholder="Mi Tienda">
+
+      <label>Descripción</label>
+      <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes"></textarea>
+    </div>
+  </div>
+
+  <!-- Contacto compacto -->
   <div class="card">
-    <div class="card-title">Info de la tienda</div>
-
-    <label>Nombre de la tienda</label>
-    <input type="text" id="cfg-nombre" placeholder="Mi Tienda">
-
-    <label>Descripción</label>
-    <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes"></textarea>
+    <div class="card-title">📞 Contacto y redes</div>
 
     <label>WhatsApp (con código de país, sin +)</label>
     <input type="text" id="cfg-whatsapp" placeholder="59169356292">
 
-    <label>Facebook (URL completa)</label>
-    <input type="text" id="cfg-facebook" placeholder="https://facebook.com/...">
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <div style="flex:1;">
+        <label style="display:flex;align-items:center;gap:4px;">📘 Facebook</label>
+        <input type="text" id="cfg-facebook" placeholder="URL del perfil">
+      </div>
+      <div style="flex:1;">
+        <label style="display:flex;align-items:center;gap:4px;">🎵 TikTok</label>
+        <input type="text" id="cfg-tiktok" placeholder="URL del perfil">
+      </div>
+    </div>
 
-    <label>TikTok (URL completa)</label>
-    <input type="text" id="cfg-tiktok" placeholder="https://tiktok.com/@...">
+    <div class="toggle-row" style="margin-top:10px;">
+      <div class="toggle-info">
+        <span class="toggle-label">Mostrar redes sociales</span>
+        <span class="toggle-desc">Botones de Facebook, TikTok y WhatsApp</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="cfg-mostrar-redes" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
 
-    <label>Moneda</label>
-    <input type="text" id="cfg-moneda" placeholder="Bs.">
-
-    <label>Horario de atención</label>
-    <textarea id="cfg-horario" placeholder="ej. Lunes a Viernes: 9am - 7pm&#10;Sábados: 9am - 2pm&#10;Domingos: Cerrado" style="min-height:80px;"></textarea>
-
-    <label style="margin-top:14px;">🎨 Color principal de la tienda</label>
+  <!-- Color -->
+  <div class="card">
+    <label style="margin-top:0;">🎨 Color principal de la tienda</label>
     <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap;">
       <input type="color" id="cfg-color-principal" value="#c27e4a"
         style="width:48px;height:48px;border:none;border-radius:10px;cursor:pointer;padding:2px;"
@@ -478,6 +529,7 @@
     </div>
   </div>
 
+  <!-- Tipografía -->
   <div class="card">
     <div class="card-title">🔤 Tipografía</div>
     <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">Elige el estilo de letra para el nombre de tu tienda y productos</p>
@@ -501,8 +553,9 @@
     </div>
   </div>
 
+  <!-- Opciones generales -->
   <div class="card">
-    <div class="card-title">Opciones</div>
+    <div class="card-title">⚙️ Opciones</div>
     <div class="toggle-row">
       <div class="toggle-info">
         <span class="toggle-label">Mostrar precios</span>
@@ -513,34 +566,9 @@
         <span class="toggle-slider"></span>
       </label>
     </div>
-    <div class="toggle-row">
-      <div class="toggle-info">
-        <span class="toggle-label">Mostrar redes sociales</span>
-        <span class="toggle-desc">Muestra botones de Facebook, TikTok y WhatsApp</span>
-      </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="cfg-mostrar-redes" checked>
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
-  </div>
 
-  <div class="card">
-    <div class="card-title">Logo y portada</div>
-
-    <label>Logo de la tienda</label>
-    <div id="logo-preview-wrap" style="margin:8px 0;">
-      <img id="logo-preview" src="" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:none;border:2px solid var(--border);">
-    </div>
-    <input type="file" id="logo-input" accept="image/*" onchange="subirImagenConfig('logo')" style="display:none;">
-    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-input').click()">📷 Cambiar logo</button>
-
-    <label style="margin-top:14px;">Imagen de portada</label>
-    <div id="portada-preview-wrap" style="margin:8px 0;">
-      <img id="portada-preview" src="" style="width:100%;height:120px;object-fit:cover;border-radius:10px;display:none;">
-    </div>
-    <input type="file" id="portada-input" accept="image/*" onchange="subirImagenConfig('portada')" style="display:none;">
-    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('portada-input').click()">📷 Cambiar portada</button>
+    <label style="margin-top:6px;">Horario de atención</label>
+    <textarea id="cfg-horario" placeholder="ej. Lunes a Viernes: 9am - 7pm&#10;Sábados: 9am - 2pm&#10;Domingos: Cerrado" style="min-height:80px;"></textarea>
   </div>
 
   <div class="bottom-bar">
@@ -747,7 +775,6 @@ async function cargarConfig() {
   document.getElementById('cfg-whatsapp').value     = data.whatsapp     || '';
   document.getElementById('cfg-facebook').value     = data.facebook     || '';
   document.getElementById('cfg-tiktok').value       = data.tiktok       || '';
-  document.getElementById('cfg-moneda').value       = data.moneda       || 'Bs.';
   document.getElementById('cfg-horario').value      = data.horario      || '';
   document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
   document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
@@ -765,6 +792,7 @@ async function cargarConfig() {
   if (data.logo_url) {
     const img = document.getElementById('logo-preview');
     img.src = data.logo_url; img.style.display = 'block';
+    document.getElementById('logo-preview-circle').style.display = 'none';
   }
   if (data.portada_url) {
     const img = document.getElementById('portada-preview');
@@ -779,7 +807,7 @@ async function guardarConfig() {
     whatsapp:        document.getElementById('cfg-whatsapp').value.trim(),
     facebook:        document.getElementById('cfg-facebook').value.trim(),
     tiktok:          document.getElementById('cfg-tiktok').value.trim(),
-    moneda:          document.getElementById('cfg-moneda').value.trim() || 'Bs.',
+    moneda:          'Bs.',
     horario:         document.getElementById('cfg-horario').value.trim(),
     mostrar_precios: document.getElementById('cfg-mostrar-precios').checked,
     mostrar_redes:   document.getElementById('cfg-mostrar-redes').checked,
@@ -811,6 +839,7 @@ async function subirImagenConfig(tipo) {
 
   const img = document.getElementById(tipo + '-preview');
   img.src = url; img.style.display = 'block';
+  if (tipo === 'logo') document.getElementById('logo-preview-circle').style.display = 'none';
   toast('Imagen actualizada ✓', 'success');
 }
 
