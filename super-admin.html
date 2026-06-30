@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TuTiendaBo — Super Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --brand:#6c3fc5; --brand-dk:#4a2a8a; --brand-lt:#f0ebff;
+      --bg:#f8f7ff; --card:#fff; --text:#1a1a1a;
+      --muted:#888; --border:#e4dff5; --success:#27ae60;
+      --danger:#e74c3c; --radius:14px;
+    }
+    body{font-family:'Poppins',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
+
+    /* Login */
+    #pantalla-login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;}
+    .login-card{background:var(--card);border-radius:24px;border:1px solid var(--border);padding:36px 28px;width:100%;max-width:340px;box-shadow:0 8px 40px rgba(108,63,197,.12);text-align:center;}
+    .login-logo{font-size:2.5rem;margin-bottom:8px;}
+    .login-title{font-size:1.2rem;font-weight:700;color:var(--brand-dk);margin-bottom:2px;}
+    .login-sub{font-size:.78rem;color:var(--muted);margin-bottom:24px;}
+    .login-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-family:'Poppins',sans-serif;font-size:.9rem;text-align:center;letter-spacing:2px;margin-bottom:12px;}
+    .login-input:focus{outline:none;border-color:var(--brand);}
+    .login-error{background:#fdecea;color:var(--danger);border-radius:10px;padding:8px 14px;font-size:.78rem;font-weight:600;margin-bottom:12px;display:none;}
+    .btn-login{width:100%;padding:13px;border-radius:12px;border:none;background:var(--brand);color:#fff;font-family:'Poppins',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;}
+
+    /* Header */
+    .header{background:var(--brand);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,63,197,.3);}
+    .header-left{display:flex;align-items:center;gap:10px;}
+    .header-logo{font-size:1.6rem;}
+    .header-title{color:#fff;font-size:1rem;font-weight:700;}
+    .header-sub{color:rgba(255,255,255,.7);font-size:.72rem;}
+    .btn-logout{background:rgba(255,255,255,.2);border:none;color:#fff;padding:7px 14px;border-radius:20px;font-family:'Poppins',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;}
+
+    /* Content */
+    .content{max-width:600px;margin:0 auto;padding:20px 16px 80px;}
+
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+    .stat-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:14px;text-align:center;}
+    .stat-num{font-size:1.6rem;font-weight:700;color:var(--brand);}
+    .stat-label{font-size:.7rem;color:var(--muted);font-weight:500;}
+
+    /* Cards */
+    .section-title{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+    .card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+    .card-title{font-size:.85rem;font-weight:700;color:var(--brand-dk);margin-bottom:14px;}
+
+    label{display:block;font-size:.75rem;font-weight:600;color:var(--muted);margin:10px 0 4px;}
+    input[type=text],input[type=password]{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:.85rem;background:#fafafa;}
+    input:focus{outline:none;border-color:var(--brand);background:#fff;}
+
+    .slug-preview{font-size:.75rem;color:var(--muted);margin-top:4px;}
+    .slug-preview span{color:var(--brand);font-weight:600;}
+
+    /* Botones */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border-radius:10px;border:none;font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;}
+    .btn-primary{background:var(--brand);color:#fff;width:100%;}
+    .btn-primary:hover{background:var(--brand-dk);}
+    .btn-sm{padding:6px 12px;font-size:.75rem;}
+    .btn-danger{background:#fdecea;color:var(--danger);}
+
+    /* Lista tiendas */
+    .tienda-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+    .tienda-avatar{width:44px;height:44px;border-radius:50%;background:var(--brand-lt);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;overflow:hidden;}
+    .tienda-avatar img{width:100%;height:100%;object-fit:cover;}
+    .tienda-info{flex:1;min-width:0;}
+    .tienda-nombre{font-size:.88rem;font-weight:700;}
+    .tienda-slug{font-size:.72rem;color:var(--brand);font-weight:500;}
+    .tienda-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+    .badge-activa{background:#e8f8ee;color:var(--success);padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;}
+    .badge-inactiva{background:#f5f5f5;color:var(--muted);padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;}
+
+    /* Links copiables */
+    .link-row{display:flex;align-items:center;gap:8px;background:#f8f7ff;border-radius:10px;padding:8px 12px;margin-top:6px;}
+    .link-text{flex:1;font-size:.72rem;color:var(--brand);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .btn-copy{background:var(--brand-lt);border:none;border-radius:8px;padding:5px 10px;font-size:.7rem;font-weight:600;color:var(--brand-dk);cursor:pointer;}
+
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+    .modal-overlay.open{display:flex;}
+    .modal-sheet{background:#fff;width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:24px 20px 40px;animation:slideUp .25s ease;}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .modal-handle{width:40px;height:4px;background:#e0e0e0;border-radius:4px;margin:0 auto 20px;}
+    .modal-title{font-size:1rem;font-weight:700;margin-bottom:16px;}
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;border-radius:20px;padding:10px 22px;font-size:.82rem;font-weight:500;z-index:9999;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none;}
+    .toast.show{opacity:1;}
+    .toast.success{background:var(--success);}
+    .toast.error{background:var(--danger);}
+
+    .loading{text-align:center;padding:30px;color:var(--muted);font-size:.85rem;}
+    .spinner{display:inline-block;width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .empty-state{text-align:center;padding:30px;color:var(--muted);}
+    .empty-icon{font-size:2.5rem;margin-bottom:8px;}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="pantalla-login">
+  <div class="login-card">
+    <div class="login-logo">🏪</div>
+    <div class="login-title">TuTiendaBo</div>
+    <div class="login-sub">Panel maestro — solo administradores</div>
+    <div class="login-error" id="login-error">Clave incorrecta</div>
+    <input type="password" class="login-input" id="login-input" placeholder="Clave maestra"
+      onkeydown="if(event.key==='Enter')verificarLogin()">
+    <button class="btn-login" onclick="verificarLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header" id="app" style="display:none;">
+  <div class="header-left">
+    <span class="header-logo">🏪</span>
+    <div>
+      <div class="header-title">TuTiendaBo</div>
+      <div class="header-sub">Panel Super Admin</div>
+    </div>
+  </div>
+  <button class="btn-logout" onclick="logout()">Salir</button>
+</div>
+
+<div class="content" id="content" style="display:none;">
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-total">—</div>
+      <div class="stat-label">Tiendas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-activas">—</div>
+      <div class="stat-label">Activas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-productos">—</div>
+      <div class="stat-label">Productos</div>
+    </div>
+  </div>
+
+  <!-- Nueva tienda -->
+  <div class="card">
+    <div class="card-title">➕ Nueva tienda</div>
+
+    <label>Nombre del cliente / tienda</label>
+    <input type="text" id="nueva-nombre" placeholder="ej. Lopez Style"
+      oninput="generarSlug()">
+
+    <label>URL de la tienda</label>
+    <input type="text" id="nueva-slug" placeholder="lopez-style">
+    <div class="slug-preview">tutiendabo.com/<span id="slug-preview">lopez-style</span></div>
+
+    <label>Clave de acceso del admin</label>
+    <input type="password" id="nueva-clave" placeholder="Mínimo 6 caracteres">
+
+    <br><br>
+    <button class="btn btn-primary" onclick="crearTienda()">🚀 Crear tienda</button>
+  </div>
+
+  <!-- Lista de tiendas -->
+  <div class="section-title">
+    <span>Mis tiendas</span>
+    <button class="btn btn-sm" onclick="cargarTiendas()" style="background:var(--brand-lt);color:var(--brand-dk);border:none;">↻ Actualizar</button>
+  </div>
+  <div id="lista-tiendas">
+    <div class="loading"><div class="spinner"></div></div>
+  </div>
+
+</div>
+
+<!-- MODAL: Links de tienda -->
+<div class="modal-overlay" id="modal-links" onclick="cerrarModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-links-titulo">Links de la tienda</div>
+
+    <label>🌐 Tienda pública</label>
+    <div class="link-row">
+      <span class="link-text" id="link-tienda"></span>
+      <button class="btn-copy" onclick="copiar('link-tienda')">Copiar</button>
+    </div>
+
+    <label style="margin-top:12px;">🔐 Panel admin</label>
+    <div class="link-row">
+      <span class="link-text" id="link-admin"></span>
+      <button class="btn-copy" onclick="copiar('link-admin')">Copiar</button>
+    </div>
+
+    <label style="margin-top:12px;">🔑 Clave admin</label>
+    <div class="link-row">
+      <span class="link-text" id="link-clave">••••••••</span>
+      <button class="btn-copy" onclick="mostrarClave()">Ver</button>
+    </div>
+
+    <div style="margin-top:20px;display:flex;gap:8px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="abrirTienda()">Ver tienda →</button>
+      <button class="btn btn-danger btn-sm" onclick="eliminarTiendaActual()">🗑</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CLAVE_MAESTRA = 'super2024'; // ← CAMBIA ESTO
+
+let tiendas = [];
+let tiendaSeleccionada = null;
+let claveSeleccionada = '';
+
+// ── LOGIN ──
+function verificarLogin() {
+  const val = document.getElementById('login-input').value;
+  if (val === CLAVE_MAESTRA) {
+    sessionStorage.setItem('super_ok', '1');
+    document.getElementById('pantalla-login').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('content').style.display = 'block';
+    iniciar();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-input').value = '';
+    setTimeout(() => document.getElementById('login-error').style.display = 'none', 2500);
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('super_ok');
+  location.reload();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('super_ok') === '1') {
+    document.getElementById('pantalla-login').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('content').style.display = 'block';
+    iniciar();
+  }
+  document.getElementById('login-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') verificarLogin();
+  });
+});
+
+// ── INIT ──
+async function iniciar() {
+  await cargarTiendas();
+  await cargarStats();
+}
+
+// ── STATS ──
+async function cargarStats() {
+  const { data: t } = await db.from('tiendas').select('id, activa');
+  const { data: p } = await db.from('productos').select('id');
+  const total   = t?.length || 0;
+  const activas = t?.filter(x => x.activa).length || 0;
+  document.getElementById('stat-total').textContent    = total;
+  document.getElementById('stat-activas').textContent  = activas;
+  document.getElementById('stat-productos').textContent = p?.length || 0;
+}
+
+// ── TIENDAS ──
+async function cargarTiendas() {
+  const { data } = await db
+    .from('tiendas')
+    .select('*, config_tienda(nombre, logo_url, color_principal)')
+    .order('created_at', { ascending: false });
+  tiendas = data || [];
+  renderTiendas();
+}
+
+function renderTiendas() {
+  const el = document.getElementById('lista-tiendas');
+  if (!tiendas.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏪</div><p>No hay tiendas aún</p></div>`;
+    return;
+  }
+
+  el.innerHTML = tiendas.map(t => {
+    const cfg    = t.config_tienda;
+    const nombre = cfg?.nombre || t.slug;
+    const logo   = cfg?.logo_url || '';
+    const color  = cfg?.color_principal || '#6c3fc5';
+    const base   = window.location.origin;
+
+    return `
+      <div class="tienda-item">
+        <div class="tienda-avatar" style="background:${color}22;">
+          ${logo
+            ? `<img src="${logo}" alt="${nombre}">`
+            : `<span style="font-size:1.2rem;">🏪</span>`}
+        </div>
+        <div class="tienda-info">
+          <div class="tienda-nombre">${nombre}</div>
+          <div class="tienda-slug">${base}/${t.slug}</div>
+          <span class="${t.activa ? 'badge-activa' : 'badge-inactiva'}">${t.activa ? 'Activa' : 'Inactiva'}</span>
+        </div>
+        <div class="tienda-actions">
+          <button class="btn btn-sm" style="background:var(--brand-lt);color:var(--brand-dk);border:none;"
+            onclick="verLinks('${t.id}')">🔗 Links</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── CREAR TIENDA ──
+function generarSlug() {
+  const nombre = document.getElementById('nueva-nombre').value;
+  const slug = nombre.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim().replace(/\s+/g, '-');
+  document.getElementById('nueva-slug').value = slug;
+  document.getElementById('slug-preview').textContent = slug || 'mi-tienda';
+}
+
+async function crearTienda() {
+  const nombre = document.getElementById('nueva-nombre').value.trim();
+  const slug   = document.getElementById('nueva-slug').value.trim().toLowerCase();
+  const clave  = document.getElementById('nueva-clave').value.trim();
+
+  if (!nombre || !slug || !clave) { toast('Completa todos los campos', 'error'); return; }
+  if (clave.length < 6) { toast('La clave debe tener al menos 6 caracteres', 'error'); return; }
+  if (!/^[a-z0-9-]+$/.test(slug)) { toast('El slug solo puede tener letras, números y guiones', 'error'); return; }
+
+  // Verificar que no exista
+  const { data: existe } = await db.from('tiendas').select('id').eq('slug', slug).single();
+  if (existe) { toast('Ese slug ya está en uso', 'error'); return; }
+
+  // Crear tienda
+  const { data: tienda, error } = await db.from('tiendas')
+    .insert({ slug, clave_admin: clave, activa: true })
+    .select().single();
+
+  if (error) { toast('Error al crear tienda', 'error'); console.error(error); return; }
+
+  // Crear config inicial
+  await db.from('config_tienda').insert({
+    tienda_id: tienda.id,
+    nombre,
+    moneda: 'Bs.',
+    color_principal: '#c27e4a'
+  });
+
+  // Limpiar formulario
+  document.getElementById('nueva-nombre').value = '';
+  document.getElementById('nueva-slug').value   = '';
+  document.getElementById('nueva-clave').value  = '';
+  document.getElementById('slug-preview').textContent = 'mi-tienda';
+
+  await cargarTiendas();
+  await cargarStats();
+  toast(`Tienda "${nombre}" creada ✓`, 'success');
+}
+
+// ── LINKS ──
+function verLinks(id) {
+  const t   = tiendas.find(x => x.id === id);
+  if (!t) return;
+  tiendaSeleccionada = t;
+  claveSeleccionada  = t.clave_admin;
+
+  const cfg    = t.config_tienda;
+  const nombre = cfg?.nombre || t.slug;
+  const base   = window.location.origin;
+
+  document.getElementById('modal-links-titulo').textContent = `🔗 ${nombre}`;
+  document.getElementById('link-tienda').textContent = `${base}/${t.slug}`;
+  document.getElementById('link-admin').textContent  = `${base}/${t.slug}/admin`;
+  document.getElementById('link-clave').textContent  = '••••••••';
+  document.getElementById('modal-links').classList.add('open');
+}
+
+function mostrarClave() {
+  const el = document.getElementById('link-clave');
+  el.textContent = el.textContent === '••••••••' ? claveSeleccionada : '••••••••';
+}
+
+function abrirTienda() {
+  if (!tiendaSeleccionada) return;
+  window.open(`${window.location.origin}/${tiendaSeleccionada.slug}`, '_blank');
+}
+
+async function eliminarTiendaActual() {
+  if (!tiendaSeleccionada) return;
+  const cfg    = tiendaSeleccionada.config_tienda;
+  const nombre = cfg?.nombre || tiendaSeleccionada.slug;
+  if (!confirm(`¿Eliminar la tienda "${nombre}"? Se borrarán todos sus productos.`)) return;
+
+  await db.from('tiendas').delete().eq('id', tiendaSeleccionada.id);
+  cerrarModalDirecto();
+  await cargarTiendas();
+  await cargarStats();
+  toast('Tienda eliminada');
+}
+
+function copiar(elId) {
+  const txt = document.getElementById(elId).textContent;
+  navigator.clipboard.writeText(txt).then(() => toast('Copiado ✓', 'success'));
+}
+
+function cerrarModal(e) {
+  if (e.target === document.getElementById('modal-links')) cerrarModalDirecto();
+}
+function cerrarModalDirecto() {
+  document.getElementById('modal-links').classList.remove('open');
+  tiendaSeleccionada = null;
+}
+
+// ── TOAST ──
+let toastTimer;
+function toast(msg, tipo = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (tipo ? ' ' + tipo : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

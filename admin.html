@@ -380,7 +380,7 @@
 <div class="header" id="contenido-admin" style="display:none;">
   <span class="header-logo">🏪</span>
   <h1 id="header-store-name">Panel Admin</h1>
-  <a href="index.html" target="_blank" class="btn-ver-tienda">Ver tienda</a>
+  <a href="#" id="link-ver-tienda" target="_blank" class="btn-ver-tienda">Ver tienda</a>
 </div>
 
 <!-- Tabs -->
@@ -588,14 +588,23 @@
 
 <script>
 // ══════════════════════════════════════════════
-//  LOGIN
+//  LOGIN — verificación contra la base de datos
 // ══════════════════════════════════════════════
-const CLAVE_ADMIN = 'admin123'; // ← cambia esto por la clave de tu cliente
+let tiendaId = null;
+let tiendaSlug = null;
 
-function verificarClave() {
+async function verificarClave() {
   const val = document.getElementById('login-input').value;
-  if (val === CLAVE_ADMIN) {
-    sessionStorage.setItem('admin_ok', '1');
+  const btn = document.querySelector('.btn-login');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+
+  const { data: tienda } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
+
+  btn.disabled = false; btn.textContent = 'Entrar';
+
+  if (tienda && tienda.clave_admin === val && tienda.activa) {
+    tiendaId = tienda.id;
+    sessionStorage.setItem('admin_ok_' + tiendaSlug, '1');
     document.getElementById('pantalla-login').style.display = 'none';
     document.getElementById('contenido-admin').style.display = 'flex';
     document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
@@ -616,9 +625,23 @@ function toggleVerClave() {
   else { inp.type = 'password'; ojo.textContent = '👁'; }
 }
 
-// Verificar si ya está logueado en esta sesión
-window.addEventListener('DOMContentLoaded', () => {
-  if (sessionStorage.getItem('admin_ok') === '1') {
+// Verificar slug de la tienda y sesión activa
+window.addEventListener('DOMContentLoaded', async () => {
+  tiendaSlug = getShopSlug();
+
+  if (!tiendaSlug) {
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Poppins',sans-serif;"><div><div style="font-size:3rem;">🏪</div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
+    return;
+  }
+
+  const { data: tienda } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
+  if (!tienda) {
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Poppins',sans-serif;"><div><div style="font-size:3rem;">😕</div><h2 style="margin:12px 0 6px;">Tienda no encontrada</h2></div></div>`;
+    return;
+  }
+
+  if (sessionStorage.getItem('admin_ok_' + tiendaSlug) === '1') {
+    tiendaId = tienda.id;
     document.getElementById('pantalla-login').style.display = 'none';
     document.getElementById('contenido-admin').style.display = 'flex';
     document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
@@ -642,6 +665,7 @@ const MAX_IMAGENES = 6;
 //  INIT
 // ══════════════════════════════════════════════
 async function iniciarAdmin() {
+  document.getElementById('link-ver-tienda').href = `${window.location.origin}/${tiendaSlug}`;
   initTabs();
   await cargarConfig();
   await cargarCategorias();
@@ -666,7 +690,7 @@ function initTabs() {
 //  CONFIG
 // ══════════════════════════════════════════════
 async function cargarConfig() {
-  const { data, error } = await db.from('config_tienda').select('*').eq('id', 1).single();
+  const { data, error } = await db.from('config_tienda').select('*').eq('tienda_id', tiendaId).single();
   if (error) return;
   config = data;
 
@@ -711,7 +735,7 @@ async function guardarConfig() {
     color_principal: document.getElementById('cfg-color-principal').value,
   };
 
-  const { error } = await db.from('config_tienda').update(payload).eq('id', 1);
+  const { error } = await db.from('config_tienda').update(payload).eq('tienda_id', tiendaId);
   if (error) { toast('Error al guardar', 'error'); return; }
   document.getElementById('header-store-name').textContent = payload.nombre;
   toast('Configuración guardada ✓', 'success');
@@ -723,7 +747,7 @@ async function subirImagenConfig(tipo) {
   if (!file) return;
 
   const ext    = file.name.split('.').pop();
-  const path   = `${tipo}_${Date.now()}.${ext}`;
+  const path   = `${tiendaSlug}_${tipo}_${Date.now()}.${ext}`;
 
   toast('Subiendo imagen…');
   const { error } = await db.storage.from('config').upload(path, file, { upsert: true });
@@ -731,7 +755,7 @@ async function subirImagenConfig(tipo) {
 
   const url = getImageUrl(path, 'config');
   const campo = tipo === 'logo' ? 'logo_url' : 'portada_url';
-  await db.from('config_tienda').update({ [campo]: url }).eq('id', 1);
+  await db.from('config_tienda').update({ [campo]: url }).eq('tienda_id', tiendaId);
 
   const img = document.getElementById(tipo + '-preview');
   img.src = url; img.style.display = 'block';
@@ -742,7 +766,7 @@ async function subirImagenConfig(tipo) {
 //  CATEGORÍAS
 // ══════════════════════════════════════════════
 async function cargarCategorias() {
-  const { data } = await db.from('categorias').select('*').order('orden');
+  const { data } = await db.from('categorias').select('*').eq('tienda_id', tiendaId).order('orden');
   categorias = data || [];
   renderCategorias();
   actualizarSelectCategorias();
@@ -774,7 +798,7 @@ function actualizarSelectCategorias() {
 async function crearCategoria() {
   const nombre = document.getElementById('nueva-cat-nombre').value.trim();
   if (!nombre) { toast('Escribe un nombre', 'error'); return; }
-  const { error } = await db.from('categorias').insert({ nombre, orden: categorias.length });
+  const { error } = await db.from('categorias').insert({ nombre, orden: categorias.length, tienda_id: tiendaId });
   if (error) { toast('Error al crear', 'error'); return; }
   document.getElementById('nueva-cat-nombre').value = '';
   await cargarCategorias();
@@ -795,6 +819,7 @@ async function cargarProductos() {
   const { data } = await db
     .from('productos')
     .select('*, categorias(nombre)')
+    .eq('tienda_id', tiendaId)
     .order('orden');
   productos = data || [];
   renderProductos();
@@ -962,7 +987,7 @@ async function subirImagenes(event) {
 
   for (const file of aSubir) {
     const ext  = file.name.split('.').pop();
-    const path = `prod_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const path = `${tiendaSlug}_prod_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
 
     // Mostrar placeholder mientras sube
     const tempUrl = URL.createObjectURL(file);
@@ -1011,6 +1036,7 @@ async function guardarProducto() {
     ({ error } = await db.from('productos').update(payload).eq('id', id));
   } else {
     payload.orden = productos.length;
+    payload.tienda_id = tiendaId;
     ({ error } = await db.from('productos').insert(payload));
   }
 

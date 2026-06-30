@@ -571,11 +571,25 @@ let lbImagenes = [];
 let lbIndex = 0;
 let categoriaActiva = '';
 let moneda = 'Bs.';
+let tiendaId = null;
 
 // ══════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
+  const slug = getShopSlug();
+  if (!slug) {
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Poppins',sans-serif;"><div><div style="font-size:3rem;">🏪</div><h2 style="margin:12px 0 6px;">TuTiendaBo</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu tienda</p></div></div>`;
+    return;
+  }
+
+  const { data: tienda } = await db.from('tiendas').select('*').eq('slug', slug).single();
+  if (!tienda || !tienda.activa) {
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Poppins',sans-serif;"><div><div style="font-size:3rem;">😕</div><h2 style="margin:12px 0 6px;">Tienda no encontrada</h2><p style="color:#888;font-size:.85rem;">Verifica el link e intenta de nuevo</p></div></div>`;
+    return;
+  }
+  tiendaId = tienda.id;
+
   actualizarContadorCarrito();
   await cargarConfig();
   await cargarCategorias();
@@ -586,7 +600,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 //  CONFIG
 // ══════════════════════════════════════════════
 async function cargarConfig() {
-  const { data } = await db.from('config_tienda').select('*').eq('id', 1).single();
+  const { data } = await db.from('config_tienda').select('*').eq('tienda_id', tiendaId).single();
   if (!data) return;
   configTienda = data;
   moneda = data.moneda || 'Bs.';
@@ -643,7 +657,7 @@ async function cargarConfig() {
 //  CATEGORÍAS
 // ══════════════════════════════════════════════
 async function cargarCategorias() {
-  const { data } = await db.from('categorias').select('*').order('orden');
+  const { data } = await db.from('categorias').select('*').eq('tienda_id', tiendaId).order('orden');
   categorias = data || [];
   const lista = document.getElementById('lista-categorias');
 
@@ -671,6 +685,7 @@ async function cargarProductos() {
   const { data } = await db
     .from('productos')
     .select('*, categorias(nombre)')
+    .eq('tienda_id', tiendaId)
     .eq('activo', true)
     .order('orden');
   productos = data || [];
