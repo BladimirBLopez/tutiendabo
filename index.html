@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <meta name="theme-color" content="#c27e4a">
   <title>Mi Tienda</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&family=Baloo+2:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/supabase.js"></script>
   <style>
@@ -55,7 +55,7 @@
 
     .description-section { text-align:center; margin-bottom:12px; }
     .description-section h2 {
-      font-family:'Playfair Display',serif; font-size:1.4rem;
+      font-family:var(--font-titulo, 'Playfair Display', serif); font-size:1.4rem;
       font-weight:600; color:var(--text); margin-bottom:4px;
     }
     .description-section p { color:var(--muted); font-size:.8rem; line-height:1.5; }
@@ -145,6 +145,7 @@
       display:flex; flex-direction:column; flex:1;
     }
     .product-name {
+      font-family:var(--font-titulo, 'Poppins', sans-serif);
       font-size:.82rem; font-weight:700; color:var(--text);
       line-height:1.3; margin-bottom:3px;
       display:-webkit-box; -webkit-line-clamp:2;
@@ -614,6 +615,16 @@ async function cargarConfig() {
     document.getElementById('horario-texto').textContent = data.horario;
     document.getElementById('horario-wrap').style.display = 'block';
   }
+
+  // Fuente del título
+  const FUENTES = {
+    elegante: "'Playfair Display', serif",
+    moderna:  "'Poppins', sans-serif",
+    divertida: "'Baloo 2', cursive",
+    clasica:  "'Montserrat', sans-serif"
+  };
+  const fuente = FUENTES[data.fuente] || FUENTES.elegante;
+  document.documentElement.style.setProperty('--font-titulo', fuente);
   if (data.color_principal) {
     const c = data.color_principal;
     const r = parseInt(c.slice(1,3),16);

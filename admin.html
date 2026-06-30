@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Tu Tienda</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600&family=Baloo+2:wght@600&family=Montserrat:wght@600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/supabase.js"></script>
   <style>
@@ -338,6 +338,17 @@
     }
     .estado-chip.active { background:var(--brand); border-color:var(--brand); color:#fff; }
 
+    .fuente-card {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px; border-radius:12px;
+      border:1.5px solid var(--border); background:#fafafa;
+      cursor:pointer; transition:all .2s;
+    }
+    .fuente-card.active { border-color:var(--brand); background:var(--brand-lt); }
+    .fuente-preview { font-size:1.1rem; color:var(--text); }
+    .fuente-label { font-size:.72rem; font-weight:600; color:var(--muted); }
+    .fuente-card.active .fuente-label { color:var(--brand-dk); }
+
     .color-palette {
       width:34px; height:34px; border-radius:50%; cursor:pointer;
       border:3px solid transparent; transition:all .2s;
@@ -464,6 +475,29 @@
       <div class="color-palette" style="background:#e91e8c;" onclick="elegirColor('#e91e8c')" title="Rosa"></div>
       <div class="color-palette" style="background:#34495e;" onclick="elegirColor('#34495e')" title="Gris oscuro"></div>
       <div class="color-palette" style="background:#000000;" onclick="elegirColor('#000000')" title="Negro"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔤 Tipografía</div>
+    <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">Elige el estilo de letra para el nombre de tu tienda y productos</p>
+    <div id="fuente-opciones" style="display:flex;flex-direction:column;gap:8px;">
+      <div class="fuente-card" data-val="elegante" onclick="elegirFuente('elegante')">
+        <div class="fuente-preview" style="font-family:'Playfair Display',serif;">Mi Tienda</div>
+        <div class="fuente-label">Elegante</div>
+      </div>
+      <div class="fuente-card" data-val="moderna" onclick="elegirFuente('moderna')">
+        <div class="fuente-preview" style="font-family:'Poppins',sans-serif;">Mi Tienda</div>
+        <div class="fuente-label">Moderna</div>
+      </div>
+      <div class="fuente-card" data-val="divertida" onclick="elegirFuente('divertida')">
+        <div class="fuente-preview" style="font-family:'Baloo 2',cursive;">Mi Tienda</div>
+        <div class="fuente-label">Divertida</div>
+      </div>
+      <div class="fuente-card" data-val="clasica" onclick="elegirFuente('clasica')">
+        <div class="fuente-preview" style="font-family:'Montserrat',sans-serif;">Mi Tienda</div>
+        <div class="fuente-label">Clásica</div>
+      </div>
     </div>
   </div>
 
@@ -723,6 +757,9 @@ async function cargarConfig() {
   document.getElementById('cfg-color-principal').value = color;
   document.getElementById('preview-color-bar').style.background = color;
 
+  // Fuente
+  elegirFuente(data.fuente || 'elegante');
+
   document.getElementById('header-store-name').textContent = data.nombre || 'Panel Admin';
 
   if (data.logo_url) {
@@ -747,6 +784,7 @@ async function guardarConfig() {
     mostrar_precios: document.getElementById('cfg-mostrar-precios').checked,
     mostrar_redes:   document.getElementById('cfg-mostrar-redes').checked,
     color_principal: document.getElementById('cfg-color-principal').value,
+    fuente:          document.querySelector('.fuente-card.active')?.dataset.val || 'elegante',
   };
 
   const { error } = await db.from('config_tienda').update(payload).eq('tienda_id', tiendaId);
@@ -1080,6 +1118,12 @@ function elegirEstado(val) {
 // ══════════════════════════════════════════════
 //  COLORES
 // ══════════════════════════════════════════════
+function elegirFuente(val) {
+  document.querySelectorAll('.fuente-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.val === val);
+  });
+}
+
 function previsualizarColor() {
   const color = document.getElementById('cfg-color-principal').value;
   document.getElementById('preview-color-bar').style.background = color;
