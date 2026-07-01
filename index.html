@@ -755,10 +755,16 @@ function renderProductos(lista) {
     if (imgs.length > 1) {
       const imgEl = card.querySelector('.product-img');
       let startX = 0;
-      imgEl.addEventListener('touchstart', e => startX = e.touches[0].clientX, {passive:true});
+      let startY = 0;
+      imgEl.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, {passive:true});
       imgEl.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - startX;
-        if (Math.abs(dx) > 40) abrirLightbox(p.id, 0);
+        const dx = Math.abs(e.changedTouches[0].clientX - startX);
+        const dy = Math.abs(e.changedTouches[0].clientY - startY);
+        // Solo abrir lightbox si el swipe es claramente horizontal
+        if (dx > 40 && dx > dy * 2) abrirLightbox(p.id, 0);
       }, {passive:true});
     }
   });
