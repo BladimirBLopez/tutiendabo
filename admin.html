@@ -616,6 +616,9 @@
 
     <label>Precio</label>
     <input type="number" id="prod-precio" placeholder="0" min="0" step="0.5">
+    <div id="aviso-precio" style="display:none;background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:8px 12px;margin-top:6px;font-size:.75rem;color:#7a5c00;">
+      ⚠️ Los precios no se muestran en tu tienda. Actívalos en <strong>⚙️ Tienda → Mostrar precios</strong> para que sean visibles.
+    </div>
 
     <div class="toggle-row" style="margin-top:10px;">
       <div class="toggle-info">
@@ -991,6 +994,9 @@ function abrirCrear() {
   tallasSeleccionadas = [];
   imagenesProducto    = [];
   elegirEstado('normal');
+  // Aviso de precios
+  const mostrarPrecios = document.getElementById('cfg-mostrar-precios')?.checked;
+  document.getElementById('aviso-precio').style.display = mostrarPrecios ? 'none' : 'block';
   renderTallasChips();
   renderImgGrid();
   document.getElementById('modal-producto').classList.add('open');
@@ -1015,6 +1021,9 @@ function abrirEditar(id) {
   tallasSeleccionadas = p.tallas || [];
   imagenesProducto    = (p.imagenes || []).map(url => ({ url, path: null }));
   elegirEstado(p.estado || 'normal');
+  // Aviso de precios
+  const mostrarPrecios = document.getElementById('cfg-mostrar-precios')?.checked;
+  document.getElementById('aviso-precio').style.display = mostrarPrecios ? 'none' : 'block';
   renderTallasChips();
   renderImgGrid();
   document.getElementById('modal-producto').classList.add('open');
