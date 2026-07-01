@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <meta name="theme-color" content="#c27e4a">
+  <meta name="theme-color" content="#c27e4a" id="meta-theme-color">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Mi Tienda" id="meta-app-title">
+  <link rel="manifest" id="pwa-manifest" href="">
+  <link rel="apple-touch-icon" id="apple-icon" href="">
   <title>Mi Tienda</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&family=Baloo+2:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -630,6 +636,40 @@ async function cargarConfig() {
     document.documentElement.style.setProperty('--brand', c);
     document.documentElement.style.setProperty('--brand-dk', dk);
     document.documentElement.style.setProperty('--brand-lt', lt);
+    document.getElementById('meta-theme-color').content = c;
+  }
+
+  // PWA — nombre y manifest dinámico
+  const nombre = data.nombre || 'Mi Tienda';
+  const color  = data.color_principal || '#c27e4a';
+  const logo   = data.logo_url || '';
+  const slug   = getShopSlug();
+
+  document.getElementById('meta-app-title').content = nombre;
+
+  const manifest = {
+    name: nombre,
+    short_name: nombre,
+    start_url: `/${slug}`,
+    display: 'standalone',
+    background_color: '#fef8f0',
+    theme_color: color,
+    icons: logo ? [
+      { src: logo, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+      { src: logo, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+    ] : [
+      { src: '/icon-192.png', sizes: '192x192', type: 'image/png' }
+    ]
+  };
+
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const manifestUrl = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = manifestUrl;
+  if (logo) document.getElementById('apple-icon').href = logo;
+
+  // Registrar service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 
   if (data.logo_url) {
