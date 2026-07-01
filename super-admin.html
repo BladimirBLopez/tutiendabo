@@ -212,25 +212,37 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const CLAVE_MAESTRA = 'super2024'; // ← CAMBIA ESTO
-
 let tiendas = [];
 let tiendaSeleccionada = null;
 let claveSeleccionada = '';
 
 // ── LOGIN ──
-function verificarLogin() {
+async function verificarLogin() {
   const val = document.getElementById('login-input').value;
-  if (val === CLAVE_MAESTRA) {
-    sessionStorage.setItem('super_ok', '1');
-    document.getElementById('pantalla-login').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    document.getElementById('content').style.display = 'block';
-    iniciar();
-  } else {
-    document.getElementById('login-error').style.display = 'block';
-    document.getElementById('login-input').value = '';
-    setTimeout(() => document.getElementById('login-error').style.display = 'none', 2500);
+  const btn = document.querySelector('.btn-login');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+
+  try {
+    const { data, error } = await db.from('sistema').select('clave').eq('id', 1).single();
+    btn.disabled = false; btn.textContent = 'Entrar';
+
+    if (error) { alert('Error de conexión: ' + error.message); return; }
+
+    if (data && data.clave === val) {
+      sessionStorage.setItem('super_ok', '1');
+      document.getElementById('pantalla-login').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('content').style.display = 'block';
+      iniciar();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('login-input').value = '';
+      document.getElementById('login-input').focus();
+      setTimeout(() => document.getElementById('login-error').style.display = 'none', 2500);
+    }
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Entrar';
+    alert('Error inesperado: ' + e.message);
   }
 }
 
