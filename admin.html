@@ -617,6 +617,23 @@
     <label>Precio</label>
     <input type="number" id="prod-precio" placeholder="0" min="0" step="0.5">
 
+    <div class="toggle-row" style="margin-top:10px;">
+      <div class="toggle-info">
+        <span class="toggle-label">¿Tiene descuento?</span>
+        <span class="toggle-desc">Muestra el precio original tachado</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="prod-en-descuento" onchange="toggleDescuento()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div id="precio-original-wrap" style="display:none;margin-top:6px;">
+      <label>Precio original (antes del descuento)</label>
+      <input type="number" id="prod-precio-original" placeholder="0" min="0" step="0.5">
+      <p style="font-size:.72rem;color:var(--muted);margin-top:4px;">En la tienda se verá: <s>Bs. [precio original]</s> → Bs. [precio con descuento]</p>
+    </div>
+
     <label>Descripción <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
     <textarea id="prod-descripcion" placeholder="ej. Short deportivo con bolsillos laterales, tela fresca y cómoda..."></textarea>
 
@@ -964,6 +981,9 @@ function abrirCrear() {
   document.getElementById('prod-nombre').value = '';
   document.getElementById('prod-categoria').value = '';
   document.getElementById('prod-precio').value = '';
+  document.getElementById('prod-precio-original').value = '';
+  document.getElementById('prod-en-descuento').checked = false;
+  document.getElementById('precio-original-wrap').style.display = 'none';
   document.getElementById('prod-descripcion').value = '';
   document.getElementById('prod-activo').checked = true;
   document.getElementById('btn-eliminar').style.display = 'none';
@@ -985,6 +1005,9 @@ function abrirEditar(id) {
   document.getElementById('prod-nombre').value           = p.nombre;
   document.getElementById('prod-categoria').value        = p.categoria_id || '';
   document.getElementById('prod-precio').value           = p.precio || '';
+  document.getElementById('prod-precio-original').value  = p.precio_original || '';
+  document.getElementById('prod-en-descuento').checked   = p.en_descuento || false;
+  document.getElementById('precio-original-wrap').style.display = p.en_descuento ? 'block' : 'none';
   document.getElementById('prod-descripcion').value      = p.descripcion || '';
   document.getElementById('prod-activo').checked         = p.activo;
   document.getElementById('btn-eliminar').style.display  = 'inline-flex';
@@ -1123,7 +1146,9 @@ async function guardarProducto() {
   const payload = {
     nombre,
     categoria_id: document.getElementById('prod-categoria').value || null,
-    precio:       parseFloat(document.getElementById('prod-precio').value) || 0,
+    precio:          parseFloat(document.getElementById('prod-precio').value) || 0,
+    precio_original: parseFloat(document.getElementById('prod-precio-original').value) || 0,
+    en_descuento:    document.getElementById('prod-en-descuento').checked,
     descripcion:  document.getElementById('prod-descripcion').value.trim(),
     tallas:       tallasSeleccionadas,
     imagenes:     imagenesProducto.map(x => x.url),
@@ -1166,6 +1191,8 @@ async function duplicarProducto(id) {
     nombre:       original.nombre + ' (copia)',
     descripcion:  original.descripcion || '',
     precio:       original.precio || 0,
+    precio_original: original.precio_original || 0,
+    en_descuento: original.en_descuento || false,
     categoria_id: original.categoria_id || null,
     tallas:       original.tallas || [],
     imagenes:     original.imagenes || [],
@@ -1179,6 +1206,11 @@ async function duplicarProducto(id) {
 
   await cargarProductos();
   toast(`"${original.nombre}" duplicado ✓`, 'success');
+}
+
+function toggleDescuento() {
+  const activo = document.getElementById('prod-en-descuento').checked;
+  document.getElementById('precio-original-wrap').style.display = activo ? 'block' : 'none';
 }
 
 function elegirEstado(val) {

@@ -773,7 +773,16 @@ function renderProductos(lista) {
       <div class="product-info">
         <div class="product-name">${p.nombre}</div>
         ${p.descripcion ? `<div class="product-desc">${p.descripcion}</div>` : ''}
-        ${mostrarPrecio ? `<div class="product-price">${moneda} ${p.precio.toFixed(2)}</div>` : ''}
+        ${mostrarPrecio ? `
+          <div class="product-price">
+            ${p.en_descuento && p.precio_original > 0
+              ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.75rem;font-weight:500;margin-right:4px;">${moneda} ${p.precio_original.toFixed(2)}</span>`
+              : ''}
+            ${moneda} ${p.precio.toFixed(2)}
+            ${p.en_descuento && p.precio_original > 0
+              ? `<span style="background:#e74c3c;color:#fff;font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:20px;margin-left:4px;">-${Math.round((1-p.precio/p.precio_original)*100)}%</span>`
+              : ''}
+          </div>` : ''}
         ${tallas.length > 0
           ? `<div class="product-tallas">${tallas.map(t => `<span class="talla-badge">${t}</span>`).join('')}</div>`
           : ''}
@@ -828,7 +837,16 @@ function pedirProducto(prodId) {
   document.getElementById('popup-nombre').textContent = p.nombre;
   document.getElementById('popup-desc').textContent   = p.descripcion || '';
   const mostrarPrecio = configTienda.mostrar_precios && p.precio > 0;
-  document.getElementById('popup-precio').textContent = mostrarPrecio ? `${moneda} ${p.precio.toFixed(2)}` : '';
+  if (mostrarPrecio) {
+    const descuento = p.en_descuento && p.precio_original > 0;
+    document.getElementById('popup-precio').innerHTML = descuento
+      ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.8rem;margin-right:4px;">${moneda} ${p.precio_original.toFixed(2)}</span>
+         ${moneda} ${p.precio.toFixed(2)}
+         <span style="background:#e74c3c;color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:4px;">-${Math.round((1-p.precio/p.precio_original)*100)}%</span>`
+      : `${moneda} ${p.precio.toFixed(2)}`;
+  } else {
+    document.getElementById('popup-precio').textContent = '';
+  }
 
   // Tallas
   const tallas = p.tallas || [];
