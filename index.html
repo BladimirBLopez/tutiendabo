@@ -568,12 +568,15 @@ let configTienda = {};
 let categorias = [];
 let productos = [];
 let productosFiltrados = [];
-let carrito = JSON.parse(localStorage.getItem('carrito_items') || '[]');
 let lbImagenes = [];
 let lbIndex = 0;
 let categoriaActiva = '';
 let moneda = 'Bs.';
 let tiendaId = null;
+
+// Carrito separado por tienda
+const carritoKey = () => `carrito_${getShopSlug() || 'default'}`;
+let carrito = JSON.parse(localStorage.getItem(carritoKey()) || '[]');
 
 // ══════════════════════════════════════════════
 //  INIT
@@ -929,7 +932,7 @@ function cerrarPopupDirecto() {
 //  CARRITO
 // ══════════════════════════════════════════════
 function guardarCarrito() {
-  localStorage.setItem('carrito_items', JSON.stringify(carrito));
+  localStorage.setItem(carritoKey(), JSON.stringify(carrito));
 }
 
 function actualizarContadorCarrito() {
