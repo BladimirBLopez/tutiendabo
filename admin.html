@@ -70,120 +70,45 @@
     .btn-login:hover { background:var(--brand-dk); }
     .login-hint { font-size:.72rem; color:var(--muted); margin-top:16px; }
 
-    /* ── Header moderno con degradado ── */
+    /* ── Header ── */
     .header {
-      background:linear-gradient(135deg, var(--brand) 0%, var(--brand-dk) 100%);
-      padding:14px 20px;
+      background:var(--card);
+      border-bottom:1px solid var(--border);
+      padding:16px 20px;
       display:flex; align-items:center; justify-content:space-between;
       position:sticky; top:0; z-index:100;
-      box-shadow:0 4px 20px rgba(0,0,0,.15);
+      box-shadow:0 2px 12px rgba(0,0,0,.06);
     }
-    .header-left { display:flex; align-items:center; gap:10px; }
-    .header-logo-img {
-      width:38px; height:38px; border-radius:50%;
-      object-fit:cover; border:2px solid rgba(255,255,255,.4);
-      background:rgba(255,255,255,.2);
-      display:flex; align-items:center; justify-content:center;
-      font-size:1.2rem; overflow:hidden; flex-shrink:0;
-    }
-    .header-logo-img img { width:100%; height:100%; object-fit:cover; }
-    .header-store-name { color:#fff; font-size:.95rem; font-weight:700; }
-    .header-store-sub  { color:rgba(255,255,255,.7); font-size:.68rem; }
-    .btn-menu {
-      background:rgba(255,255,255,.2); border:none; color:#fff;
-      width:38px; height:38px; border-radius:12px;
-      font-size:1.1rem; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      backdrop-filter:blur(4px); transition:background .2s;
-    }
-    .btn-menu:hover { background:rgba(255,255,255,.3); }
+    .header h1 { font-size:.95rem; font-weight:700; color:var(--brand-dk); }
+    .header-logo { font-size:1.4rem; }
     .btn-ver-tienda {
-      font-size:.72rem; font-weight:600; color:#fff;
-      text-decoration:none; border:1.5px solid rgba(255,255,255,.5);
-      padding:5px 12px; border-radius:20px; transition:all .2s;
-      background:rgba(255,255,255,.15); backdrop-filter:blur(4px);
+      font-size:.75rem; font-weight:600; color:var(--brand);
+      text-decoration:none; border:1.5px solid var(--brand);
+      padding:5px 12px; border-radius:20px;
+      transition:all .2s;
     }
-    .btn-ver-tienda:hover { background:rgba(255,255,255,.3); }
+    .btn-ver-tienda:hover { background:var(--brand); color:#fff; }
 
-    /* ── Menú lateral deslizable ── */
-    .sidebar-overlay {
-      display:none; position:fixed; inset:0;
-      background:rgba(0,0,0,.5); z-index:200;
-      backdrop-filter:blur(3px);
+    /* ── Tabs ── */
+    .tabs {
+      display:flex; background:var(--card);
+      border-bottom:1px solid var(--border);
+      overflow-x:auto; -webkit-overflow-scrolling:touch;
     }
-    .sidebar-overlay.open { display:block; }
-    .sidebar {
-      position:fixed; top:0; left:-280px; bottom:0;
-      width:280px; background:#fff; z-index:201;
-      transition:left .3s cubic-bezier(.32,1,.32,1);
-      display:flex; flex-direction:column;
-      box-shadow:4px 0 30px rgba(0,0,0,.12);
+    .tab {
+      flex:1; min-width:80px;
+      padding:12px 8px;
+      font-size:.78rem; font-weight:600;
+      color:var(--muted); border:none; background:none;
+      cursor:pointer; border-bottom:2px solid transparent;
+      transition:all .2s; white-space:nowrap;
+      font-family:'Poppins',sans-serif;
     }
-    .sidebar.open { left:0; }
+    .tab.active { color:var(--brand); border-bottom-color:var(--brand); }
 
-    .sidebar-header {
-      background:linear-gradient(135deg, var(--brand) 0%, var(--brand-dk) 100%);
-      padding:28px 20px 20px;
-    }
-    .sidebar-logo {
-      width:60px; height:60px; border-radius:50%;
-      border:3px solid rgba(255,255,255,.4);
-      background:rgba(255,255,255,.2);
-      display:flex; align-items:center; justify-content:center;
-      font-size:1.6rem; margin-bottom:10px; overflow:hidden;
-    }
-    .sidebar-logo img { width:100%; height:100%; object-fit:cover; }
-    .sidebar-store-name { color:#fff; font-size:1rem; font-weight:700; }
-    .sidebar-store-url  { color:rgba(255,255,255,.65); font-size:.72rem; margin-top:2px; }
-
-    .sidebar-nav { flex:1; padding:12px 0; overflow-y:auto; }
-    .nav-item {
-      display:flex; align-items:center; gap:14px;
-      padding:14px 20px; cursor:pointer;
-      transition:all .15s; border:none; background:none;
-      width:100%; text-align:left; font-family:'Poppins',sans-serif;
-      color:var(--muted); font-size:.88rem; font-weight:500;
-      border-left:3px solid transparent;
-    }
-    .nav-item:hover { background:var(--brand-lt); color:var(--brand-dk); }
-    .nav-item.active { background:var(--brand-lt); color:var(--brand); font-weight:700; border-left-color:var(--brand); }
-    .nav-icon { font-size:1.2rem; width:28px; text-align:center; flex-shrink:0; }
-    .nav-label { flex:1; }
-    .nav-badge {
-      background:var(--brand); color:#fff;
-      font-size:.65rem; font-weight:700;
-      padding:2px 7px; border-radius:20px; min-width:20px; text-align:center;
-    }
-
-    .sidebar-footer {
-      padding:16px 20px;
-      border-top:1px solid var(--border);
-    }
-    .btn-ver-tienda-sidebar {
-      display:flex; align-items:center; gap:8px;
-      padding:11px 16px; border-radius:12px;
-      background:var(--brand-lt); color:var(--brand-dk);
-      text-decoration:none; font-size:.82rem; font-weight:600;
-      transition:background .2s; width:100%; justify-content:center;
-      border:none; cursor:pointer; font-family:'Poppins',sans-serif;
-    }
-    .btn-ver-tienda-sidebar:hover { background:#f0d5b8; }
-
-    /* ── Tabs ocultos (reemplazados por sidebar) ── */
-    .tabs { display:none !important; }
-
-    /* ── Secciones ── */
+    /* ── Sections ── */
     .section { display:none; padding:16px 16px 100px; max-width:600px; margin:0 auto; }
     .section.visible { display:block; }
-
-    /* ── Título de sección con degradado ── */
-    .section-header {
-      background:linear-gradient(135deg, var(--brand-lt), #fff);
-      border-radius:16px; padding:16px 18px; margin-bottom:16px;
-      border:1px solid var(--border);
-    }
-    .section-header-title { font-size:1rem; font-weight:700; color:var(--brand-dk); }
-    .section-header-sub   { font-size:.75rem; color:var(--muted); margin-top:2px; }
 
     /* ── Cards ── */
     .card {
@@ -499,53 +424,12 @@
 
 <!-- Header -->
 <div class="header" id="contenido-admin" style="display:none;">
-  <div class="header-left">
-    <button class="btn-menu" onclick="abrirSidebar()">☰</button>
-    <div id="header-logo-wrap" class="header-logo-img">🏪</div>
-    <div>
-      <div class="header-store-name" id="header-store-name">Panel Admin</div>
-      <div class="header-store-sub" id="header-store-sub">tutiendabo.com</div>
-    </div>
-  </div>
-  <a href="#" id="link-ver-tienda" target="_blank" class="btn-ver-tienda">Ver tienda ↗</a>
+  <span class="header-logo">🏪</span>
+  <h1 id="header-store-name">Panel Admin</h1>
+  <a href="#" id="link-ver-tienda" target="_blank" class="btn-ver-tienda">Ver tienda</a>
 </div>
 
-<!-- Sidebar overlay -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="cerrarSidebar()"></div>
-
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo" id="sidebar-logo">🏪</div>
-    <div class="sidebar-store-name" id="sidebar-store-name">Mi Tienda</div>
-    <div class="sidebar-store-url" id="sidebar-store-url">tutiendabo.com</div>
-  </div>
-
-  <nav class="sidebar-nav">
-    <button class="nav-item active" data-tab="productos" onclick="navegarA('productos')">
-      <span class="nav-icon">📦</span>
-      <span class="nav-label">Productos</span>
-      <span class="nav-badge" id="badge-productos">0</span>
-    </button>
-    <button class="nav-item" data-tab="categorias" onclick="navegarA('categorias')">
-      <span class="nav-icon">🏷️</span>
-      <span class="nav-label">Categorías</span>
-      <span class="nav-badge" id="badge-categorias">0</span>
-    </button>
-    <button class="nav-item" data-tab="config" onclick="navegarA('config')">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label">Tienda</span>
-    </button>
-  </nav>
-
-  <div class="sidebar-footer">
-    <a href="#" id="link-ver-tienda-sidebar" target="_blank" class="btn-ver-tienda-sidebar">
-      🌐 Ver mi tienda
-    </a>
-  </div>
-</div>
-
-<!-- Tabs (ocultos, reemplazados por sidebar) -->
+<!-- Tabs -->
 <div class="tabs" style="display:none;">
   <button class="tab active" data-tab="productos">📦 Productos</button>
   <button class="tab" data-tab="categorias">🏷️ Categorías</button>
@@ -815,28 +699,27 @@ let tiendaId = null;
 let tiendaSlug = null;
 
 async function verificarClave() {
-  const val  = document.getElementById('login-input').value;
-  const slug = getShopSlug();
-  const btn  = document.querySelector('.btn-login');
-
-  alert(`Debug:\nSlug: ${slug}\nVal: ${val}\ndb: ${typeof db}`);
-
-  if (!slug) { alert('No se detectó la tienda. Verifica el link.'); return; }
-
+  const val = document.getElementById('login-input').value;
+  const btn = document.querySelector('.btn-login');
   btn.disabled = true; btn.textContent = 'Verificando...';
 
   try {
-    const { data: tienda, error } = await db.from('tiendas').select('*').eq('slug', slug).single();
+    const { data: tienda, error } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
+
+    if (error) {
+      alert('Error de Supabase: ' + error.message);
+      btn.disabled = false; btn.textContent = 'Entrar';
+      return;
+    }
 
     btn.disabled = false; btn.textContent = 'Entrar';
 
-    if (error) { alert('Error: ' + error.message); return; }
-
     if (tienda && tienda.clave_admin === val && tienda.activa) {
-      tiendaSlug = slug;
-      tiendaId   = tienda.id;
-      sessionStorage.setItem('admin_ok_' + slug, '1');
-      mostrarAdmin();
+      tiendaId = tienda.id;
+      sessionStorage.setItem('admin_ok_' + tiendaSlug, '1');
+      document.getElementById('pantalla-login').style.display = 'none';
+      document.getElementById('contenido-admin').style.display = 'flex';
+      document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
       iniciarAdmin();
     } else {
       const err = document.getElementById('login-error');
@@ -861,14 +744,14 @@ function toggleVerClave() {
 // Verificar slug de la tienda y sesión activa
 window.addEventListener('DOMContentLoaded', async () => {
   tiendaSlug = getShopSlug();
+  console.log('Slug detectado:', tiendaSlug);
+  const debugEl = document.getElementById('debug-slug');
+  if (debugEl) debugEl.textContent = 'Tienda detectada: ' + (tiendaSlug || '(ninguna)');
 
   if (!tiendaSlug) {
     document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Poppins',sans-serif;"><div><div style="font-size:3rem;">🏪</div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
     return;
   }
-
-  const debugEl = document.getElementById('debug-slug');
-  if (debugEl) debugEl.textContent = `Admin: ${tiendaSlug}`;
 
   const { data: tienda } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
   if (!tienda) {
@@ -878,16 +761,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (sessionStorage.getItem('admin_ok_' + tiendaSlug) === '1') {
     tiendaId = tienda.id;
-    mostrarAdmin();
+    document.getElementById('pantalla-login').style.display = 'none';
+    document.getElementById('contenido-admin').style.display = 'flex';
+    document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
     iniciarAdmin();
   }
 });
-
-function mostrarAdmin() {
-  document.getElementById('pantalla-login').style.display = 'none';
-  document.getElementById('contenido-admin').style.display = 'flex';
-  document.getElementById('tab-productos').classList.add('visible');
-}
 
 // ══════════════════════════════════════════════
 //  ESTADO GLOBAL
@@ -902,41 +781,11 @@ const TALLAS_PREDEFINIDAS = ['XS','S','M','L','XL','XXL','Único'];
 const MAX_IMAGENES = 6;
 
 // ══════════════════════════════════════════════
-//  SIDEBAR NAVEGACIÓN
-// ══════════════════════════════════════════════
-function abrirSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebar-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function cerrarSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebar-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function navegarA(tab) {
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-  document.querySelector(`.nav-item[data-tab="${tab}"]`)?.classList.add('active');
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
-  document.getElementById('tab-' + tab)?.classList.add('visible');
-  cerrarSidebar();
-}
-
-function actualizarBadges() {
-  document.getElementById('badge-productos').textContent  = productos.length;
-  document.getElementById('badge-categorias').textContent = categorias.length;
-}
-
-// ══════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════
 async function iniciarAdmin() {
-  document.getElementById('link-ver-tienda').href         = `${window.location.origin}/${tiendaSlug}`;
-  document.getElementById('link-ver-tienda-sidebar').href = `${window.location.origin}/${tiendaSlug}`;
-  document.getElementById('sidebar-store-url').textContent = `tutiendabo.com/${tiendaSlug}`;
-  document.getElementById('header-store-sub').textContent  = `tutiendabo.com/${tiendaSlug}`;
+  document.getElementById('link-ver-tienda').href = `${window.location.origin}/${tiendaSlug}`;
+  initTabs();
   await cargarConfig();
   await cargarCategorias();
   await cargarProductos();
@@ -981,34 +830,19 @@ async function cargarConfig() {
   // Fuente
   elegirFuente(data.fuente || 'elegante');
 
-  document.getElementById('header-store-name').textContent  = data.nombre || 'Panel Admin';
-  document.getElementById('sidebar-store-name').textContent = data.nombre || 'Mi Tienda';
-
-  // Logo en header y sidebar
-  if (data.logo_url) {
-    document.getElementById('header-logo-wrap').innerHTML = `<img src="${data.logo_url}" alt="logo">`;
-    document.getElementById('sidebar-logo').innerHTML     = `<img src="${data.logo_url}" alt="logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-  }
-
-  // Color principal dinámico
-  if (data.color_principal) {
-    document.documentElement.style.setProperty('--brand', data.color_principal);
-    const r = parseInt(data.color_principal.slice(1,3),16);
-    const g = parseInt(data.color_principal.slice(3,5),16);
-    const b = parseInt(data.color_principal.slice(5,7),16);
-    document.documentElement.style.setProperty('--brand-dk', `rgb(${Math.floor(r*.7)},${Math.floor(g*.7)},${Math.floor(b*.7)})`);
-    document.documentElement.style.setProperty('--brand-lt', `rgba(${r},${g},${b},0.1)`);
-  }
+  document.getElementById('header-store-name').textContent = data.nombre || 'Panel Admin';
 
   if (data.logo_url) {
     const img = document.getElementById('logo-preview');
-    if (img) { img.src = data.logo_url; img.style.display = 'block'; }
+    img.src = data.logo_url; img.style.display = 'block';
   }
   if (data.portada_url) {
     const img = document.getElementById('portada-preview');
-    if (img) { img.src = data.portada_url; img.style.display = 'block'; }
+    img.src = data.portada_url; img.style.display = 'block';
   }
 }
+
+async function guardarConfig() {
   const payload = {
     nombre:          document.getElementById('cfg-nombre').value.trim(),
     descripcion:     document.getElementById('cfg-descripcion').value.trim(),
@@ -1084,7 +918,6 @@ async function cargarCategorias() {
   categorias = data || [];
   renderCategorias();
   actualizarSelectCategorias();
-  actualizarBadges();
 }
 
 function renderCategorias() {
@@ -1138,7 +971,6 @@ async function cargarProductos() {
     .order('orden');
   productos = data || [];
   renderProductos();
-  actualizarBadges();
 }
 
 function renderProductos() {
