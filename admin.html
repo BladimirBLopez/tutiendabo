@@ -819,6 +819,8 @@ async function verificarClave() {
   const slug = getShopSlug();
   const btn  = document.querySelector('.btn-login');
 
+  alert(`Debug:\nSlug: ${slug}\nVal: ${val}\ndb: ${typeof db}`);
+
   if (!slug) { alert('No se detectó la tienda. Verifica el link.'); return; }
 
   btn.disabled = true; btn.textContent = 'Verificando...';
