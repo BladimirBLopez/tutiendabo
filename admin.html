@@ -182,6 +182,9 @@
       transition:box-shadow .2s;
     }
     .product-item:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); }
+    .product-inactivo { opacity:.5; }
+    .product-inactivo .product-thumb,
+    .product-inactivo .product-thumb-empty { filter:grayscale(.6); }
     .btn-duplicar {
       width:30px; height:30px; border-radius:8px; flex-shrink:0;
       background:var(--brand-lt); color:var(--brand-dk); border:none;
@@ -979,19 +982,19 @@ function renderProductos() {
   el.innerHTML = productos.map(p => {
     const thumb   = p.imagenes && p.imagenes[0] ? p.imagenes[0] : null;
     const catName = p.categorias ? p.categorias.nombre : '—';
-    const badge   = p.activo
-      ? `<span class="badge badge-active">Activo</span>`
-      : `<span class="badge badge-inactive">Inactivo</span>`;
     return `
-      <div class="product-item" onclick="abrirEditar('${p.id}')">
+      <div class="product-item ${!p.activo ? 'product-inactivo' : ''}" onclick="abrirEditar('${p.id}')">
         ${thumb
           ? `<img class="product-thumb" src="${thumb}" alt="${p.nombre}" loading="lazy">`
           : `<div class="product-thumb-empty">📷</div>`}
         <div class="product-info">
           <div class="product-name">${p.nombre}</div>
           <div class="product-meta">${catName} · ${p.tallas && p.tallas.length ? p.tallas.join(', ') : 'Sin tallas'}</div>
-          <div style="margin-top:4px;">${badge}</div>
         </div>
+        <label class="toggle-switch" onclick="event.stopPropagation()" title="${p.activo ? 'Desactivar' : 'Activar'} producto">
+          <input type="checkbox" ${p.activo ? 'checked' : ''} onchange="toggleActivo('${p.id}', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
         <button class="btn-duplicar" onclick="event.stopPropagation(); duplicarProducto('${p.id}')" title="Duplicar producto">⎘</button>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -1221,6 +1224,16 @@ async function eliminarProducto() {
   cerrarModal();
   await cargarProductos();
   toast('Producto eliminado');
+}
+
+async function toggleActivo(id, activo) {
+  const { error } = await db.from('productos').update({ activo }).eq('id', id);
+  if (error) { toast('Error al actualizar', 'error'); await cargarProductos(); return; }
+  // Actualizar en memoria sin recargar todo
+  const p = productos.find(x => x.id === id);
+  if (p) p.activo = activo;
+  renderProductos();
+  toast(activo ? 'Producto activado ✓' : 'Producto desactivado', activo ? 'success' : '');
 }
 
 async function duplicarProducto(id) {
