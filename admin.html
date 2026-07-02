@@ -815,24 +815,25 @@ let tiendaId = null;
 let tiendaSlug = null;
 
 async function verificarClave() {
-  const val = document.getElementById('login-input').value;
-  const btn = document.querySelector('.btn-login');
+  const val  = document.getElementById('login-input').value;
+  const slug = getShopSlug();
+  const btn  = document.querySelector('.btn-login');
+
+  if (!slug) { alert('No se detectó la tienda. Verifica el link.'); return; }
+
   btn.disabled = true; btn.textContent = 'Verificando...';
 
   try {
-    const { data: tienda, error } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
-
-    if (error) {
-      alert('Error de Supabase: ' + error.message);
-      btn.disabled = false; btn.textContent = 'Entrar';
-      return;
-    }
+    const { data: tienda, error } = await db.from('tiendas').select('*').eq('slug', slug).single();
 
     btn.disabled = false; btn.textContent = 'Entrar';
 
+    if (error) { alert('Error: ' + error.message); return; }
+
     if (tienda && tienda.clave_admin === val && tienda.activa) {
-      tiendaId = tienda.id;
-      sessionStorage.setItem('admin_ok_' + tiendaSlug, '1');
+      tiendaSlug = slug;
+      tiendaId   = tienda.id;
+      sessionStorage.setItem('admin_ok_' + slug, '1');
       mostrarAdmin();
       iniciarAdmin();
     } else {
