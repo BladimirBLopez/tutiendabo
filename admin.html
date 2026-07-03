@@ -391,6 +391,25 @@
     }
     .color-palette:hover { transform:scale(1.15); border-color:white; box-shadow:0 3px 10px rgba(0,0,0,.25); }
 
+    .color-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0; border-bottom:1px solid var(--border);
+    }
+    .color-row-info { flex:1; }
+    .color-row-label { font-size:.88rem; font-weight:600; color:var(--text); display:block; }
+    .color-row-desc  { font-size:.72rem; color:var(--muted); }
+    .color-picker-wrap {
+      display:flex; align-items:center; gap:10px;
+      background:#f5f5f5; border-radius:12px; padding:8px 14px;
+      cursor:pointer; transition:background .2s; flex-shrink:0;
+    }
+    .color-picker-wrap:hover { background:#eee; }
+    .color-swatch {
+      width:24px; height:24px; border-radius:50%;
+      flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,.2);
+    }
+    .color-hex { font-size:.8rem; font-weight:600; color:var(--text); font-family:monospace; }
+
     @media (min-width:600px) {
       .section { padding:20px 20px 80px; }
       .modal { animation:slideInDesktop .25s ease; border-radius:20px; height:auto; max-height:90vh; margin:auto; }
@@ -526,29 +545,62 @@
 
   <!-- Color -->
   <div class="card">
-    <label style="margin-top:0;">🎨 Color principal de la tienda</label>
-    <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap;">
-      <input type="color" id="cfg-color-principal" value="#c27e4a"
-        style="width:48px;height:48px;border:none;border-radius:10px;cursor:pointer;padding:2px;"
-        oninput="previsualizarColor()">
-      <div style="flex:1;">
-        <div style="font-size:.78rem;font-weight:600;color:var(--muted);">Vista previa</div>
-        <div id="preview-color-bar" style="height:28px;border-radius:8px;margin-top:4px;background:#c27e4a;transition:background .2s;"></div>
+    <div class="card-title">🎨 Colores de la tienda</div>
+
+    <!-- Background -->
+    <div class="color-row">
+      <div class="color-row-info">
+        <span class="color-row-label">Background</span>
+        <span class="color-row-desc">Color de fondo de la tienda</span>
+      </div>
+      <div class="color-picker-wrap" onclick="document.getElementById('cfg-color-fondo').click()">
+        <div class="color-swatch" id="swatch-fondo" style="background:#fef8f0;"></div>
+        <span class="color-hex" id="hex-fondo">#fef8f0</span>
+        <input type="color" id="cfg-color-fondo" value="#fef8f0"
+          oninput="actualizarColor('fondo', this.value)" style="display:none;">
       </div>
     </div>
 
-    <label style="margin-top:12px;">Paletas rápidas</label>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
-      <div class="color-palette" style="background:#c27e4a;" onclick="elegirColor('#c27e4a')" title="Café dorado"></div>
-      <div class="color-palette" style="background:#e74c3c;" onclick="elegirColor('#e74c3c')" title="Rojo"></div>
-      <div class="color-palette" style="background:#9b59b6;" onclick="elegirColor('#9b59b6')" title="Púrpura"></div>
-      <div class="color-palette" style="background:#2980b9;" onclick="elegirColor('#2980b9')" title="Azul"></div>
-      <div class="color-palette" style="background:#27ae60;" onclick="elegirColor('#27ae60')" title="Verde"></div>
-      <div class="color-palette" style="background:#e67e22;" onclick="elegirColor('#e67e22')" title="Naranja"></div>
-      <div class="color-palette" style="background:#1abc9c;" onclick="elegirColor('#1abc9c')" title="Turquesa"></div>
-      <div class="color-palette" style="background:#e91e8c;" onclick="elegirColor('#e91e8c')" title="Rosa"></div>
-      <div class="color-palette" style="background:#34495e;" onclick="elegirColor('#34495e')" title="Gris oscuro"></div>
-      <div class="color-palette" style="background:#000000;" onclick="elegirColor('#000000')" title="Negro"></div>
+    <!-- Buttons -->
+    <div class="color-row">
+      <div class="color-row-info">
+        <span class="color-row-label">Buttons</span>
+        <span class="color-row-desc">Color de los botones</span>
+      </div>
+      <div class="color-picker-wrap" onclick="document.getElementById('cfg-color-boton').click()">
+        <div class="color-swatch" id="swatch-boton" style="background:#c27e4a;"></div>
+        <span class="color-hex" id="hex-boton">#c27e4a</span>
+        <input type="color" id="cfg-color-boton" value="#c27e4a"
+          oninput="actualizarColor('boton', this.value)" style="display:none;">
+      </div>
+    </div>
+
+    <!-- Button text -->
+    <div class="color-row">
+      <div class="color-row-info">
+        <span class="color-row-label">Button text</span>
+        <span class="color-row-desc">Color del texto en botones</span>
+      </div>
+      <div class="color-picker-wrap" onclick="document.getElementById('cfg-color-texto-boton').click()">
+        <div class="color-swatch" id="swatch-texto-boton" style="background:#ffffff;border:1px solid #e0e0e0;"></div>
+        <span class="color-hex" id="hex-texto-boton">#ffffff</span>
+        <input type="color" id="cfg-color-texto-boton" value="#ffffff"
+          oninput="actualizarColor('texto-boton', this.value)" style="display:none;">
+      </div>
+    </div>
+
+    <!-- Page text -->
+    <div class="color-row" style="border-bottom:none;">
+      <div class="color-row-info">
+        <span class="color-row-label">Page text</span>
+        <span class="color-row-desc">Color del texto principal</span>
+      </div>
+      <div class="color-picker-wrap" onclick="document.getElementById('cfg-color-texto').click()">
+        <div class="color-swatch" id="swatch-texto" style="background:#1a1a1a;"></div>
+        <span class="color-hex" id="hex-texto">#1a1a1a</span>
+        <input type="color" id="cfg-color-texto" value="#1a1a1a"
+          oninput="actualizarColor('texto', this.value)" style="display:none;">
+      </div>
     </div>
   </div>
 
@@ -823,9 +875,22 @@ async function cargarConfig() {
   document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
 
   // Colores
-  const color = data.color_principal || '#c27e4a';
-  document.getElementById('cfg-color-principal').value = color;
-  document.getElementById('preview-color-bar').style.background = color;
+  const setColor = (key, val) => {
+    const def = { fondo:'#fef8f0', boton:'#c27e4a', 'texto-boton':'#ffffff', texto:'#1a1a1a' };
+    const v = val || def[key];
+    const id = key === 'texto-boton' ? 'cfg-color-texto-boton' : `cfg-color-${key}`;
+    document.getElementById(id).value = v;
+    document.getElementById(`swatch-${key}`).style.background = v;
+    document.getElementById(`hex-${key}`).textContent = v;
+  };
+  setColor('fondo',        data.color_fondo);
+  setColor('boton',        data.color_boton || data.color_principal);
+  setColor('texto-boton',  data.color_texto_boton);
+  setColor('texto',        data.color_texto);
+
+  // Color principal legacy (para compatibilidad)
+  const colorPrincipal = data.color_boton || data.color_principal || '#c27e4a';
+  document.getElementById('preview-color-bar')?.style && (document.getElementById('preview-color-bar').style.background = colorPrincipal);
 
   // Fuente
   elegirFuente(data.fuente || 'elegante');
@@ -853,7 +918,11 @@ async function guardarConfig() {
     horario:         document.getElementById('cfg-horario').value.trim(),
     mostrar_precios: document.getElementById('cfg-mostrar-precios').checked,
     mostrar_redes:   document.getElementById('cfg-mostrar-redes').checked,
-    color_principal: document.getElementById('cfg-color-principal').value,
+    color_principal:    document.getElementById('cfg-color-boton').value,
+    color_fondo:        document.getElementById('cfg-color-fondo').value,
+    color_boton:        document.getElementById('cfg-color-boton').value,
+    color_texto_boton:  document.getElementById('cfg-color-texto-boton').value,
+    color_texto:        document.getElementById('cfg-color-texto').value,
     fuente:          document.querySelector('.fuente-card.active')?.dataset.val || 'elegante',
   };
 
@@ -1282,14 +1351,17 @@ function elegirFuente(val) {
   });
 }
 
+function actualizarColor(key, val) {
+  document.getElementById(`swatch-${key}`).style.background = val;
+  document.getElementById(`hex-${key}`).textContent = val;
+}
+
 function previsualizarColor() {
-  const color = document.getElementById('cfg-color-principal').value;
-  document.getElementById('preview-color-bar').style.background = color;
+  // legacy - no usado
 }
 
 function elegirColor(color) {
-  document.getElementById('cfg-color-principal').value = color;
-  document.getElementById('preview-color-bar').style.background = color;
+  // legacy - no usado
 }
 
 // Función para calcular color oscuro automáticamente
