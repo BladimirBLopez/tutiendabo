@@ -7,6 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600&family=Baloo+2:wght@600&family=Montserrat:wght@600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/supabase.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -393,7 +395,7 @@
 
     .color-row {
       display:flex; align-items:center; justify-content:space-between;
-      padding:14px 0; border-bottom:1px solid var(--border);
+      padding:16px 0; border-bottom:1px solid var(--border);
     }
     .color-row-info { flex:1; }
     .color-row-label { font-size:.88rem; font-weight:600; color:var(--text); display:block; }
@@ -401,14 +403,20 @@
     .color-picker-wrap {
       display:flex; align-items:center; gap:10px;
       background:#f5f5f5; border-radius:12px; padding:8px 14px;
-      cursor:pointer; transition:background .2s; flex-shrink:0;
+      cursor:pointer; flex-shrink:0;
     }
-    .color-picker-wrap:hover { background:#eee; }
-    .color-swatch {
-      width:24px; height:24px; border-radius:50%;
-      flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,.2);
+    .color-hex { font-size:.8rem; font-weight:600; color:var(--text); font-family:monospace; min-width:62px; }
+    .pickr { display:flex !important; align-items:center; }
+    .pickr .pcr-button {
+      width:28px !important; height:28px !important;
+      border-radius:50% !important; border:none !important;
+      box-shadow:0 1px 6px rgba(0,0,0,.25) !important;
     }
-    .color-hex { font-size:.8rem; font-weight:600; color:var(--text); font-family:monospace; }
+    .pcr-app { border-radius:18px !important; box-shadow:0 8px 40px rgba(0,0,0,.18) !important; z-index:99999 !important; }
+    .pcr-app .pcr-interaction .pcr-save {
+      background:var(--brand) !important; border-radius:8px !important;
+      color:#fff !important; font-family:'Poppins',sans-serif !important;
+    }
 
     @media (min-width:600px) {
       .section { padding:20px 20px 80px; }
@@ -547,59 +555,47 @@
   <div class="card">
     <div class="card-title">🎨 Colores de la tienda</div>
 
-    <!-- Background -->
     <div class="color-row">
       <div class="color-row-info">
         <span class="color-row-label">Background</span>
         <span class="color-row-desc">Color de fondo de la tienda</span>
       </div>
-      <div class="color-picker-wrap" onclick="document.getElementById('cfg-color-fondo').click()">
-        <div class="color-swatch" id="swatch-fondo" style="background:#fef8f0;"></div>
+      <div class="color-picker-wrap">
+        <div id="pickr-fondo"></div>
         <span class="color-hex" id="hex-fondo">#fef8f0</span>
-        <input type="color" id="cfg-color-fondo" value="#fef8f0"
-          oninput="actualizarColor('fondo', this.value)" style="display:none;">
       </div>
     </div>
 
-    <!-- Buttons -->
     <div class="color-row">
       <div class="color-row-info">
         <span class="color-row-label">Buttons</span>
         <span class="color-row-desc">Color de los botones</span>
       </div>
-      <div class="color-picker-wrap" onclick="document.getElementById('cfg-color-boton').click()">
-        <div class="color-swatch" id="swatch-boton" style="background:#c27e4a;"></div>
+      <div class="color-picker-wrap">
+        <div id="pickr-boton"></div>
         <span class="color-hex" id="hex-boton">#c27e4a</span>
-        <input type="color" id="cfg-color-boton" value="#c27e4a"
-          oninput="actualizarColor('boton', this.value)" style="display:none;">
       </div>
     </div>
 
-    <!-- Button text -->
     <div class="color-row">
       <div class="color-row-info">
         <span class="color-row-label">Button text</span>
         <span class="color-row-desc">Color del texto en botones</span>
       </div>
-      <div class="color-picker-wrap" onclick="document.getElementById('cfg-color-texto-boton').click()">
-        <div class="color-swatch" id="swatch-texto-boton" style="background:#ffffff;border:1px solid #e0e0e0;"></div>
+      <div class="color-picker-wrap">
+        <div id="pickr-texto-boton"></div>
         <span class="color-hex" id="hex-texto-boton">#ffffff</span>
-        <input type="color" id="cfg-color-texto-boton" value="#ffffff"
-          oninput="actualizarColor('texto-boton', this.value)" style="display:none;">
       </div>
     </div>
 
-    <!-- Page text -->
     <div class="color-row" style="border-bottom:none;">
       <div class="color-row-info">
         <span class="color-row-label">Page text</span>
         <span class="color-row-desc">Color del texto principal</span>
       </div>
-      <div class="color-picker-wrap" onclick="document.getElementById('cfg-color-texto').click()">
-        <div class="color-swatch" id="swatch-texto" style="background:#1a1a1a;"></div>
+      <div class="color-picker-wrap">
+        <div id="pickr-texto"></div>
         <span class="color-hex" id="hex-texto">#1a1a1a</span>
-        <input type="color" id="cfg-color-texto" value="#1a1a1a"
-          oninput="actualizarColor('texto', this.value)" style="display:none;">
       </div>
     </div>
   </div>
@@ -874,23 +870,8 @@ async function cargarConfig() {
   document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
   document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
 
-  // Colores
-  const setColor = (key, val) => {
-    const def = { fondo:'#fef8f0', boton:'#c27e4a', 'texto-boton':'#ffffff', texto:'#1a1a1a' };
-    const v = val || def[key];
-    const id = key === 'texto-boton' ? 'cfg-color-texto-boton' : `cfg-color-${key}`;
-    document.getElementById(id).value = v;
-    document.getElementById(`swatch-${key}`).style.background = v;
-    document.getElementById(`hex-${key}`).textContent = v;
-  };
-  setColor('fondo',        data.color_fondo);
-  setColor('boton',        data.color_boton || data.color_principal);
-  setColor('texto-boton',  data.color_texto_boton);
-  setColor('texto',        data.color_texto);
-
-  // Color principal legacy (para compatibilidad)
-  const colorPrincipal = data.color_boton || data.color_principal || '#c27e4a';
-  document.getElementById('preview-color-bar')?.style && (document.getElementById('preview-color-bar').style.background = colorPrincipal);
+  // Colores con Pickr
+  iniciarPickrs(data);
 
   // Fuente
   elegirFuente(data.fuente || 'elegante');
@@ -918,11 +899,11 @@ async function guardarConfig() {
     horario:         document.getElementById('cfg-horario').value.trim(),
     mostrar_precios: document.getElementById('cfg-mostrar-precios').checked,
     mostrar_redes:   document.getElementById('cfg-mostrar-redes').checked,
-    color_principal:    document.getElementById('cfg-color-boton').value,
-    color_fondo:        document.getElementById('cfg-color-fondo').value,
-    color_boton:        document.getElementById('cfg-color-boton').value,
-    color_texto_boton:  document.getElementById('cfg-color-texto-boton').value,
-    color_texto:        document.getElementById('cfg-color-texto').value,
+    color_principal:   pickrs['pickr-boton']?.getColor()?.toHEXA()?.toString() || '#c27e4a',
+    color_fondo:       pickrs['pickr-fondo']?.getColor()?.toHEXA()?.toString() || '#fef8f0',
+    color_boton:       pickrs['pickr-boton']?.getColor()?.toHEXA()?.toString() || '#c27e4a',
+    color_texto_boton: pickrs['pickr-texto-boton']?.getColor()?.toHEXA()?.toString() || '#ffffff',
+    color_texto:       pickrs['pickr-texto']?.getColor()?.toHEXA()?.toString() || '#1a1a1a',
     fuente:          document.querySelector('.fuente-card.active')?.dataset.val || 'elegante',
   };
 
@@ -1351,18 +1332,55 @@ function elegirFuente(val) {
   });
 }
 
-function actualizarColor(key, val) {
-  document.getElementById(`swatch-${key}`).style.background = val;
-  document.getElementById(`hex-${key}`).textContent = val;
+// ══════════════════════════════════════════════
+//  PICKR — Selectores de color estilo Linktree
+// ══════════════════════════════════════════════
+const pickrs = {};
+
+function crearPickr(elId, colorInicial, onChange) {
+  const p = Pickr.create({
+    el: '#' + elId,
+    theme: 'nano',
+    default: colorInicial,
+    swatches: [
+      '#2A152F','#F1B7FF','#c27e4a','#e74c3c',
+      '#9b59b6','#2980b9','#27ae60','#e67e22',
+      '#1abc9c','#e91e8c','#1a1a1a','#ffffff'
+    ],
+    components: {
+      preview: true, opacity: false, hue: true,
+      interaction: { hex: true, input: true, save: true }
+    },
+    i18n: { 'btn:save': 'Guardar' }
+  });
+  p.on('save', color => { onChange(color.toHEXA().toString()); p.hide(); });
+  p.on('change', color => { onChange(color.toHEXA().toString()); });
+  return p;
 }
 
-function previsualizarColor() {
-  // legacy - no usado
+function iniciarPickrs(cfg) {
+  const defs = {
+    'pickr-fondo':       cfg.color_fondo       || '#fef8f0',
+    'pickr-boton':       cfg.color_boton        || cfg.color_principal || '#c27e4a',
+    'pickr-texto-boton': cfg.color_texto_boton  || '#ffffff',
+    'pickr-texto':       cfg.color_texto        || '#1a1a1a',
+  };
+  const hexIds = {
+    'pickr-fondo': 'hex-fondo',
+    'pickr-boton': 'hex-boton',
+    'pickr-texto-boton': 'hex-texto-boton',
+    'pickr-texto': 'hex-texto',
+  };
+  Object.entries(defs).forEach(([elId, color]) => {
+    if (pickrs[elId]) { pickrs[elId].setColor(color); return; }
+    pickrs[elId] = crearPickr(elId, color, hex => {
+      document.getElementById(hexIds[elId]).textContent = hex;
+    });
+  });
 }
 
-function elegirColor(color) {
-  // legacy - no usado
-}
+function previsualizarColor() {}
+function elegirColor(color) {}
 
 // Función para calcular color oscuro automáticamente
 function oscurecerColor(hex, factor = 0.7) {
