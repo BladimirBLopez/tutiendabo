@@ -849,6 +849,11 @@ function initTabs() {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
       tab.classList.add('active');
       document.getElementById('tab-' + tab.dataset.tab).classList.add('visible');
+
+      // Inicializar Pickr cuando se abre el tab de config
+      if (tab.dataset.tab === 'config' && config) {
+        setTimeout(() => iniciarPickrs(config), 50);
+      }
     });
   });
 }
@@ -870,8 +875,11 @@ async function cargarConfig() {
   document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
   document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
 
-  // Colores con Pickr
-  iniciarPickrs(data);
+  // Fuente
+  elegirFuente(data.fuente || 'elegante');
+
+  // Colores — se inicializan cuando el tab sea visible
+  // (Pickr no funciona en elementos ocultos)
 
   // Fuente
   elegirFuente(data.fuente || 'elegante');
