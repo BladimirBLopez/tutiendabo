@@ -1372,7 +1372,13 @@ function iniciarPickrs(cfg) {
     'pickr-texto': 'hex-texto',
   };
   Object.entries(defs).forEach(([elId, color]) => {
-    if (pickrs[elId]) { pickrs[elId].setColor(color); return; }
+    // Actualizar hex label siempre
+    document.getElementById(hexIds[elId]).textContent = color;
+    if (pickrs[elId]) {
+      // Destruir y recrear para evitar bugs con el elemento
+      try { pickrs[elId].destroyAndRemove(); } catch(e) {}
+      pickrs[elId] = null;
+    }
     pickrs[elId] = crearPickr(elId, color, hex => {
       document.getElementById(hexIds[elId]).textContent = hex;
     });
