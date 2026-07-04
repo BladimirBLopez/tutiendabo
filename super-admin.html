@@ -88,6 +88,14 @@
     @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .modal-handle{width:40px;height:4px;background:#e0e0e0;border-radius:4px;margin:0 auto 20px;}
     .modal-title{font-size:1rem;font-weight:700;margin-bottom:16px;}
+    .modal-sheet{overflow-y:auto;max-height:90vh;}
+
+    .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+    .toggle-switch input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;background:#ddd;border-radius:24px;transition:.3s;cursor:pointer;}
+    .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;left:3px;top:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+    input:checked + .toggle-slider{background:var(--brand);}
+    input:checked + .toggle-slider:before{transform:translateX(20px);}
 
     /* Toast */
     .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;border-radius:20px;padding:10px 22px;font-size:.82rem;font-weight:500;z-index:9999;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none;}
@@ -182,8 +190,9 @@
 <div class="modal-overlay" id="modal-links" onclick="cerrarModal(event)">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="modal-links-titulo">Links de la tienda</div>
+    <div class="modal-title" id="modal-links-titulo">Gestionar tienda</div>
 
+    <!-- Links -->
     <label>🌐 Tienda pública</label>
     <div class="link-row">
       <span class="link-text" id="link-tienda"></span>
@@ -196,13 +205,47 @@
       <button class="btn-copy" onclick="copiar('link-admin')">Copiar</button>
     </div>
 
+    <!-- Clave con edición -->
     <label style="margin-top:12px;">🔑 Clave admin</label>
     <div class="link-row">
-      <span class="link-text" id="link-clave">••••••••</span>
-      <button class="btn-copy" onclick="mostrarClave()">Ver</button>
+      <input type="password" id="input-clave" style="flex:1;border:none;background:none;font-family:'Poppins',sans-serif;font-size:.82rem;color:var(--text);outline:none;" placeholder="••••••••">
+      <button class="btn-copy" onclick="toggleClave()" id="btn-toggle-clave">Ver</button>
+      <button class="btn-copy" style="background:var(--brand);color:#fff;" onclick="guardarClave()">Guardar</button>
     </div>
 
-    <div style="margin-top:20px;display:flex;gap:8px;">
+    <!-- Estado activa/inactiva -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--border);margin-top:14px;">
+      <div>
+        <div style="font-size:.88rem;font-weight:600;">Estado de la tienda</div>
+        <div style="font-size:.72rem;color:var(--muted);">Desactivar bloquea el acceso</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggle-activa" onchange="toggleActivaTienda()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- Fecha de vencimiento -->
+    <div style="padding-bottom:14px;border-bottom:1px solid var(--border);">
+      <label style="margin-top:0;">📅 Fecha de vencimiento</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="date" id="input-vencimiento"
+          style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:.82rem;">
+        <button class="btn-copy" style="background:var(--brand);color:#fff;" onclick="guardarVencimiento()">Guardar</button>
+      </div>
+      <div id="vencimiento-aviso" style="font-size:.72rem;margin-top:4px;"></div>
+    </div>
+
+    <!-- Notas internas -->
+    <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+      <label style="margin-top:0;">📝 Notas internas</label>
+      <textarea id="input-notas" placeholder="Teléfono, precio cobrado, observaciones..."
+        style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:.82rem;min-height:70px;resize:vertical;background:#fafafa;"></textarea>
+      <button class="btn btn-primary" style="margin-top:8px;" onclick="guardarNotas()">💾 Guardar notas</button>
+    </div>
+
+    <!-- Acciones -->
+    <div style="display:flex;gap:8px;margin-top:14px;">
       <button class="btn btn-primary" style="flex:1;" onclick="abrirTienda()">Ver tienda →</button>
       <button class="btn btn-danger btn-sm" onclick="eliminarTiendaActual()">🗑</button>
     </div>
@@ -304,6 +347,14 @@ function renderTiendas() {
     const color  = cfg?.color_principal || '#6c3fc5';
     const base   = window.location.origin;
 
+    // Badge vencimiento
+    let vencBadge = '';
+    if (t.fecha_vencimiento) {
+      const dias = Math.ceil((new Date(t.fecha_vencimiento) - new Date()) / (1000*60*60*24));
+      if (dias < 0)       vencBadge = `<span style="background:#fdecea;color:#e74c3c;padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;">⛔ Vencida</span>`;
+      else if (dias <= 7) vencBadge = `<span style="background:#fff3e0;color:#e67e22;padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;">⚠️ ${dias}d</span>`;
+    }
+
     return `
       <div class="tienda-item">
         <div class="tienda-avatar" style="background:${color}22;">
@@ -314,11 +365,14 @@ function renderTiendas() {
         <div class="tienda-info">
           <div class="tienda-nombre">${nombre}</div>
           <div class="tienda-slug">${base}/${t.slug}</div>
-          <span class="${t.activa ? 'badge-activa' : 'badge-inactiva'}">${t.activa ? 'Activa' : 'Inactiva'}</span>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">
+            <span class="${t.activa ? 'badge-activa' : 'badge-inactiva'}">${t.activa ? 'Activa' : 'Inactiva'}</span>
+            ${vencBadge}
+          </div>
         </div>
         <div class="tienda-actions">
           <button class="btn btn-sm" style="background:var(--brand-lt);color:var(--brand-dk);border:none;"
-            onclick="verLinks('${t.id}')">🔗 Links</button>
+            onclick="verLinks('${t.id}')">⚙️ Gestionar</button>
         </div>
       </div>
     `;
@@ -386,16 +440,83 @@ function verLinks(id) {
   const nombre = cfg?.nombre || t.slug;
   const base   = window.location.origin;
 
-  document.getElementById('modal-links-titulo').textContent = `🔗 ${nombre}`;
+  document.getElementById('modal-links-titulo').textContent = `🏪 ${nombre}`;
   document.getElementById('link-tienda').textContent = `${base}/${t.slug}`;
   document.getElementById('link-admin').textContent  = `${base}/${t.slug}/admin`;
-  document.getElementById('link-clave').textContent  = '••••••••';
+
+  // Clave
+  document.getElementById('input-clave').value = t.clave_admin || '';
+  document.getElementById('input-clave').type  = 'password';
+  document.getElementById('btn-toggle-clave').textContent = 'Ver';
+
+  // Estado activa
+  document.getElementById('toggle-activa').checked = t.activa;
+
+  // Fecha vencimiento
+  document.getElementById('input-vencimiento').value = t.fecha_vencimiento || '';
+  actualizarAvisoVencimiento(t.fecha_vencimiento);
+
+  // Notas
+  document.getElementById('input-notas').value = t.notas || '';
+
   document.getElementById('modal-links').classList.add('open');
 }
 
-function mostrarClave() {
-  const el = document.getElementById('link-clave');
-  el.textContent = el.textContent === '••••••••' ? claveSeleccionada : '••••••••';
+function toggleClave() {
+  const inp = document.getElementById('input-clave');
+  const btn = document.getElementById('btn-toggle-clave');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Ocultar'; }
+  else { inp.type = 'password'; btn.textContent = 'Ver'; }
+}
+
+async function guardarClave() {
+  if (!tiendaSeleccionada) return;
+  const nuevaClave = document.getElementById('input-clave').value.trim();
+  if (!nuevaClave || nuevaClave.length < 4) { toast('La clave debe tener al menos 4 caracteres', 'error'); return; }
+  const { error } = await db.from('tiendas').update({ clave_admin: nuevaClave }).eq('id', tiendaSeleccionada.id);
+  if (error) { toast('Error al guardar clave', 'error'); return; }
+  tiendaSeleccionada.clave_admin = nuevaClave;
+  toast('Clave actualizada ✓', 'success');
+}
+
+async function toggleActivaTienda() {
+  if (!tiendaSeleccionada) return;
+  const activa = document.getElementById('toggle-activa').checked;
+  const { error } = await db.from('tiendas').update({ activa }).eq('id', tiendaSeleccionada.id);
+  if (error) { toast('Error al actualizar', 'error'); return; }
+  tiendaSeleccionada.activa = activa;
+  await cargarTiendas();
+  toast(activa ? 'Tienda activada ✓' : 'Tienda desactivada', activa ? 'success' : '');
+}
+
+function actualizarAvisoVencimiento(fecha) {
+  const el = document.getElementById('vencimiento-aviso');
+  if (!fecha) { el.textContent = ''; return; }
+  const hoy  = new Date();
+  const venc = new Date(fecha);
+  const dias = Math.ceil((venc - hoy) / (1000 * 60 * 60 * 24));
+  if (dias < 0)       { el.textContent = `⛔ Vencida hace ${Math.abs(dias)} días`; el.style.color = '#e74c3c'; }
+  else if (dias <= 7) { el.textContent = `⚠️ Vence en ${dias} días`; el.style.color = '#e67e22'; }
+  else                { el.textContent = `✅ Vigente — ${dias} días restantes`; el.style.color = '#27ae60'; }
+}
+
+async function guardarVencimiento() {
+  if (!tiendaSeleccionada) return;
+  const fecha = document.getElementById('input-vencimiento').value;
+  const { error } = await db.from('tiendas').update({ fecha_vencimiento: fecha || null }).eq('id', tiendaSeleccionada.id);
+  if (error) { toast('Error al guardar', 'error'); return; }
+  tiendaSeleccionada.fecha_vencimiento = fecha;
+  actualizarAvisoVencimiento(fecha);
+  await cargarTiendas();
+  toast('Fecha guardada ✓', 'success');
+}
+
+async function guardarNotas() {
+  if (!tiendaSeleccionada) return;
+  const notas = document.getElementById('input-notas').value.trim();
+  const { error } = await db.from('tiendas').update({ notas }).eq('id', tiendaSeleccionada.id);
+  if (error) { toast('Error al guardar', 'error'); return; }
+  toast('Notas guardadas ✓', 'success');
 }
 
 function abrirTienda() {
