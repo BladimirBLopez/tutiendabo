@@ -884,7 +884,7 @@ function pedirProducto(prodId) {
 
   // Consultar link
   const wa = configTienda.whatsapp || '';
-  const msg = `Hola! Me interesa este producto: *${p.nombre}*. ¿Me pueden dar más información?`;
+  const msg = `Hola! Me interesa este producto:  *${p.nombre}*. ¿Me pueden dar más información?`;
   document.getElementById('btn-popup-consultar').href = wa
     ? `https://wa.me/${wa}?text=${encodeURIComponent(msg)}`
     : '#';
