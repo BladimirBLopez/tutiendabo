@@ -919,8 +919,9 @@ async function guardarConfig() {
     fuente:          document.querySelector('.fuente-card.active')?.dataset.val || 'elegante',
   };
 
-  const { error } = await db.from('config_tienda').update(payload).eq('tienda_id', tiendaId);
-  if (error) { toast('Error al guardar', 'error'); return; }
+  payload.tienda_id = tiendaId;
+  const { error } = await db.from('config_tienda').upsert(payload, { onConflict: 'tienda_id' });
+  if (error) { toast('Error al guardar', 'error'); console.error(error); return; }
   document.getElementById('header-store-name').textContent = payload.nombre;
   toast('Configuración guardada ✓', 'success');
 }
