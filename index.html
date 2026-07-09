@@ -611,8 +611,7 @@ async function cargarConfig() {
   configTienda = data;
   moneda = data.moneda || 'Bs.';
 
-  document.getElementById('tienda-nombre').textContent = data.nombre || 'Mi
-  Tienda';
+  document.getElementById('tienda-nombre').textContent = data.nombre || 'Mi Tienda';
   document.getElementById('tienda-descripcion').textContent = data.descripcion || '';
   document.title = data.nombre || 'Mi Tienda';
 
