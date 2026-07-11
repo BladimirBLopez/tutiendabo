@@ -507,29 +507,36 @@
   <div class="card">
     <div class="card-title">📞 Contacto y redes</div>
 
-    <label>WhatsApp (con código de país, sin +)</label>
+    <label>WhatsApp para pedidos (con código de país, sin +)</label>
     <input type="text" id="cfg-whatsapp" placeholder="59169356292">
 
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <div style="flex:1;">
-        <label style="display:flex;align-items:center;gap:4px;">📘 Facebook</label>
-        <input type="text" id="cfg-facebook" placeholder="URL del perfil">
-      </div>
-      <div style="flex:1;">
-        <label style="display:flex;align-items:center;gap:4px;">🎵 TikTok</label>
-        <input type="text" id="cfg-tiktok" placeholder="URL del perfil">
-      </div>
-    </div>
+    <label style="margin-top:14px;">Redes sociales</label>
+    <div id="social-icons-row" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;"></div>
 
-    <div class="toggle-row" style="margin-top:10px;">
+    <div class="toggle-row" style="margin-top:14px;">
       <div class="toggle-info">
         <span class="toggle-label">Mostrar redes sociales</span>
-        <span class="toggle-desc">Botones de Facebook, TikTok y WhatsApp</span>
+        <span class="toggle-desc">Botones de redes en tu tienda</span>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="cfg-mostrar-redes" checked>
         <span class="toggle-slider"></span>
       </label>
+    </div>
+  </div>
+
+  <!-- Modal agregar/editar red social -->
+  <div class="modal-overlay" id="modal-red-social">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-red-titulo">Agregar red</span>
+        <button class="btn-close-modal" onclick="cerrarModalRed()">✕</button>
+      </div>
+      <label id="modal-red-label">Enlace</label>
+      <input type="text" id="modal-red-input" placeholder="">
+      <p id="modal-red-ejemplo" style="font-size:.78rem; color:var(--muted); margin-top:6px;"></p>
+      <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="guardarRedSocial()">Guardar</button>
+      <button class="btn btn-secondary" id="btn-quitar-red" style="width:100%; margin-top:8px; display:none;" onclick="quitarRedSocial()">Quitar</button>
     </div>
   </div>
 
@@ -873,11 +880,18 @@ async function cargarConfig() {
   document.getElementById('cfg-nombre').value       = data.nombre       || '';
   document.getElementById('cfg-descripcion').value  = data.descripcion  || '';
   document.getElementById('cfg-whatsapp').value     = data.whatsapp     || '';
-  document.getElementById('cfg-facebook').value     = data.facebook     || '';
-  document.getElementById('cfg-tiktok').value       = data.tiktok       || '';
   document.getElementById('cfg-horario').value      = data.horario      || '';
   document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
   document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
+
+  redesSociales = {
+    tiktok:          data.tiktok          || '',
+    instagram:       data.instagram       || '',
+    facebook:        data.facebook        || '',
+    whatsapp:        data.whatsapp        || '',
+    whatsapp_grupo:  data.whatsapp_grupo  || '',
+  };
+  renderSocialIcons();
 
   // Fuente
   elegirFuente(data.fuente || 'elegante');
@@ -905,8 +919,10 @@ async function guardarConfig() {
     nombre:          document.getElementById('cfg-nombre').value.trim(),
     descripcion:     document.getElementById('cfg-descripcion').value.trim(),
     whatsapp:        document.getElementById('cfg-whatsapp').value.trim(),
-    facebook:        document.getElementById('cfg-facebook').value.trim(),
-    tiktok:          document.getElementById('cfg-tiktok').value.trim(),
+    facebook:        redesSociales.facebook || '',
+    tiktok:          redesSociales.tiktok || '',
+    instagram:       redesSociales.instagram || '',
+    whatsapp_grupo:  redesSociales.whatsapp_grupo || '',
     moneda:          'Bs.',
     horario:         document.getElementById('cfg-horario').value.trim(),
     mostrar_precios: document.getElementById('cfg-mostrar-precios').checked,
@@ -924,6 +940,91 @@ async function guardarConfig() {
   if (error) { toast('Error al guardar', 'error'); console.error(error); return; }
   document.getElementById('header-store-name').textContent = payload.nombre;
   toast('Configuración guardada ✓', 'success');
+}
+
+// ══════════════════════════════════════════════
+//  REDES SOCIALES (estilo Linktree)
+// ══════════════════════════════════════════════
+let redesSociales = { tiktok:'', instagram:'', facebook:'', whatsapp_grupo:'' };
+let redEditando = null;
+
+const TIPOS_RED = {
+  tiktok: {
+    label:'TikTok', placeholder:'https://tiktok.com/@tutienda', ejemplo:'Pega el enlace a tu perfil de TikTok',
+    bg:'#000000',
+    svg:'<svg viewBox="0 0 24 24" fill="#fff" width="24" height="24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>'
+  },
+  instagram: {
+    label:'Instagram', placeholder:'https://instagram.com/tutienda', ejemplo:'Pega el enlace a tu perfil de Instagram',
+    bg:'linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)',
+    svg:'<svg viewBox="0 0 24 24" fill="#fff" width="24" height="24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.02-3.58.07-4.85c.15-3.23 1.67-4.77 4.92-4.92 1.27-.06 1.65-.07 4.85-.07zM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95C23.72 2.7 21.3.27 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm6.41-10.85a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44z"/></svg>'
+  },
+  facebook: {
+    label:'Facebook', placeholder:'https://facebook.com/tutienda', ejemplo:'Pega el enlace a tu página de Facebook',
+    bg:'#1877F2',
+    svg:'<svg viewBox="0 0 24 24" fill="#fff" width="24" height="24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>'
+  },
+  whatsapp_grupo: {
+    label:'Grupo de WhatsApp', placeholder:'https://chat.whatsapp.com/xxxxx', ejemplo:'Pega el enlace de invitación al grupo',
+    bg:'#25D366',
+    svg:'<svg viewBox="0 0 24 24" fill="#fff" width="24" height="24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>'
+  },
+};
+
+function renderSocialIcons() {
+  const row = document.getElementById('social-icons-row');
+  row.innerHTML = '';
+  Object.keys(TIPOS_RED).forEach(tipo => {
+    const info = TIPOS_RED[tipo];
+    const activo = !!redesSociales[tipo];
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.onclick = () => abrirModalRed(tipo);
+    btn.style.cssText = `
+      position:relative; width:52px; height:52px; border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid var(--border); cursor:pointer;
+      background:${info.bg}; opacity:${activo ? '1' : '.35'};
+    `;
+    btn.title = info.label;
+    btn.innerHTML = info.svg + (activo
+      ? '<span style="position:absolute; bottom:-4px; right:-4px; background:#22c55e; color:#fff; border-radius:50%; width:17px; height:17px; font-size:.65rem; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg,#fff);">✓</span>'
+      : '<span style="position:absolute; bottom:-4px; right:-4px; background:var(--brand); color:#fff; border-radius:50%; width:17px; height:17px; font-size:.75rem; display:flex; align-items:center; justify-content:center; line-height:1; border:2px solid var(--bg,#fff);">+</span>');
+    row.appendChild(btn);
+  });
+}
+
+function abrirModalRed(tipo) {
+  redEditando = tipo;
+  const info = TIPOS_RED[tipo];
+  document.getElementById('modal-red-titulo').textContent = redesSociales[tipo] ? `Editar ${info.label}` : `Agregar ${info.label}`;
+  document.getElementById('modal-red-label').textContent = info.label;
+  document.getElementById('modal-red-input').placeholder = info.placeholder;
+  document.getElementById('modal-red-input').value = redesSociales[tipo] || '';
+  document.getElementById('modal-red-ejemplo').textContent = info.ejemplo;
+  document.getElementById('btn-quitar-red').style.display = redesSociales[tipo] ? 'block' : 'none';
+  document.getElementById('modal-red-social').classList.add('open');
+}
+
+function cerrarModalRed() {
+  document.getElementById('modal-red-social').classList.remove('open');
+  redEditando = null;
+}
+
+function guardarRedSocial() {
+  if (!redEditando) return;
+  const valor = document.getElementById('modal-red-input').value.trim();
+  redesSociales[redEditando] = valor;
+  renderSocialIcons();
+  cerrarModalRed();
+  toast('Agregado, no olvides tocar "Guardar configuración"', 'success');
+}
+
+function quitarRedSocial() {
+  if (!redEditando) return;
+  redesSociales[redEditando] = '';
+  renderSocialIcons();
+  cerrarModalRed();
 }
 
 // ══════════════════════════════════════════════
