@@ -511,43 +511,6 @@
     <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes"></textarea>
   </div>
 
-  <!-- Contacto compacto -->
-  <div class="card">
-    <div class="card-title">📞 Contacto y redes</div>
-
-    <label>WhatsApp para pedidos (con código de país, sin +)</label>
-    <input type="text" id="cfg-whatsapp" placeholder="59169356292">
-
-    <label style="margin-top:14px;">Redes sociales</label>
-    <div id="social-icons-row" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;"></div>
-
-    <div class="toggle-row" style="margin-top:14px;">
-      <div class="toggle-info">
-        <span class="toggle-label">Mostrar redes sociales</span>
-        <span class="toggle-desc">Botones de redes en tu tienda</span>
-      </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="cfg-mostrar-redes" checked>
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
-  </div>
-
-  <!-- Modal agregar/editar red social -->
-  <div class="modal-overlay" id="modal-red-social">
-    <div class="modal">
-      <div class="modal-header">
-        <span class="modal-title" id="modal-red-titulo">Agregar red</span>
-        <button class="btn-close-modal" onclick="cerrarModalRed()">✕</button>
-      </div>
-      <label id="modal-red-label">Enlace</label>
-      <input type="text" id="modal-red-input" placeholder="">
-      <p id="modal-red-ejemplo" style="font-size:.78rem; color:var(--muted); margin-top:6px;"></p>
-      <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="guardarRedSocial()">Guardar</button>
-      <button class="btn btn-secondary" id="btn-quitar-red" style="width:100%; margin-top:8px; display:none;" onclick="quitarRedSocial()">Quitar</button>
-    </div>
-  </div>
-
   <!-- Logo y portada -->
   <div class="card">
     <div class="card-title">Logo y portada</div>
@@ -637,6 +600,43 @@
         <div class="fuente-preview" style="font-family:'Montserrat',sans-serif;">Mi Tienda</div>
         <div class="fuente-label">Clásica</div>
       </div>
+    </div>
+  </div>
+
+  <!-- Contacto compacto -->
+  <div class="card">
+    <div class="card-title">📞 Contacto y redes</div>
+
+    <label>WhatsApp para pedidos (con código de país, sin +)</label>
+    <input type="text" id="cfg-whatsapp" placeholder="59169356292">
+
+    <label style="margin-top:14px;">Redes sociales</label>
+    <div id="social-icons-row" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;"></div>
+
+    <div class="toggle-row" style="margin-top:14px;">
+      <div class="toggle-info">
+        <span class="toggle-label">Mostrar redes sociales</span>
+        <span class="toggle-desc">Botones de redes en tu tienda</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="cfg-mostrar-redes" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Modal agregar/editar red social -->
+  <div class="modal-overlay" id="modal-red-social">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-red-titulo">Agregar red</span>
+        <button class="btn-close-modal" onclick="cerrarModalRed()">✕</button>
+      </div>
+      <label id="modal-red-label">Enlace</label>
+      <input type="text" id="modal-red-input" placeholder="">
+      <p id="modal-red-ejemplo" style="font-size:.78rem; color:var(--muted); margin-top:6px;"></p>
+      <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="guardarRedSocial()">Guardar</button>
+      <button class="btn btn-secondary" id="btn-quitar-red" style="width:100%; margin-top:8px; display:none;" onclick="quitarRedSocial()">Quitar</button>
     </div>
   </div>
 
