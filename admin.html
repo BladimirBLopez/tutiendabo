@@ -262,6 +262,14 @@
       margin-bottom:8px;
     }
     .cat-name { flex:1; font-size:.88rem; font-weight:500; }
+    .cat-reorder { display:flex; flex-direction:column; gap:2px; }
+    .btn-reorder {
+      width:22px; height:18px; border:none; border-radius:4px;
+      background:var(--brand-lt); color:var(--brand-dk);
+      font-size:.6rem; line-height:1; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .btn-reorder:disabled { opacity:.3; cursor:default; }
 
     /* ── Modal ── */
     .modal-overlay {
@@ -1098,13 +1106,48 @@ function renderCategorias() {
     el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏷️</div><p>No hay categorías aún</p></div>`;
     return;
   }
-  el.innerHTML = categorias.map(c => `
+  el.innerHTML = categorias.map((c, i) => `
     <div class="cat-item">
-      <span class="drag-handle">⠿</span>
+      <div class="cat-reorder">
+        <button class="btn-reorder" onclick="moverCategoria('${c.id}', -1)" ${i === 0 ? 'disabled' : ''}>▲</button>
+        <button class="btn-reorder" onclick="moverCategoria('${c.id}', 1)" ${i === categorias.length - 1 ? 'disabled' : ''}>▼</button>
+      </div>
       <span class="cat-name">${c.nombre}</span>
+      <button class="btn btn-secondary btn-sm" onclick="editarCategoria('${c.id}')">✏️</button>
       <button class="btn btn-danger btn-sm" onclick="eliminarCategoria('${c.id}')">🗑</button>
     </div>
   `).join('');
+}
+
+async function moverCategoria(id, dir) {
+  const idx = categorias.findIndex(c => c.id === id);
+  const swapIdx = idx + dir;
+  if (swapIdx < 0 || swapIdx >= categorias.length) return;
+  const temp = categorias[idx];
+  categorias[idx] = categorias[swapIdx];
+  categorias[swapIdx] = temp;
+  renderCategorias();
+  actualizarSelectCategorias();
+  // Reescribe el orden de todas para evitar huecos o duplicados
+  const resultados = await Promise.all(
+    categorias.map((c, i) => db.from('categorias').update({ orden: i }).eq('id', c.id))
+  );
+  const fallo = resultados.find(r => r.error);
+  if (fallo) { toast('Error al guardar el orden', 'error'); await cargarCategorias(); return; }
+  toast('Orden actualizado ✓', 'success');
+}
+
+async function editarCategoria(id) {
+  const cat = categorias.find(c => c.id === id);
+  if (!cat) return;
+  const nuevoNombre = prompt('Nombre de la categoría', cat.nombre);
+  if (nuevoNombre === null) return;
+  const nombre = nuevoNombre.trim();
+  if (!nombre) { toast('El nombre no puede quedar vacío', 'error'); return; }
+  const { error } = await db.from('categorias').update({ nombre }).eq('id', id);
+  if (error) { toast('Error al editar', 'error'); return; }
+  await cargarCategorias();
+  toast('Categoría actualizada ✓', 'success');
 }
 
 function actualizarSelectCategorias() {
