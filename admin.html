@@ -433,14 +433,44 @@
       @keyframes slideInDesktop { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
       .modal-overlay { align-items:center; justify-content:center; }
     }
+
+    /* ── Iconos SVG (estilo línea, sin emojis) ── */
+    svg.icon { width:18px; height:18px; stroke:currentColor; stroke-width:1.8; fill:none; stroke-linecap:round; stroke-linejoin:round; vertical-align:-4px; flex-shrink:0; }
+    .icon-circle {
+      width:38px; height:38px; min-width:38px; border-radius:50%;
+      background:var(--brand-lt); color:var(--brand-dk);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .icon-circle svg.icon { width:19px; height:19px; vertical-align:middle; }
+    .card-title { display:flex; align-items:center; gap:10px; }
+    .tab svg.icon { width:16px; height:16px; }
   </style>
 </head>
 <body>
 
+<!-- Sprite de iconos (definidos una sola vez, se usan con <use>) -->
+<svg style="display:none" aria-hidden="true">
+  <symbol id="ic-box" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></symbol>
+  <symbol id="ic-tag" viewBox="0 0 24 24"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2.41 12.41a2 2 0 0 1 0-2.83L9.59 2.41A2 2 0 0 1 11 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-.41 1.41z"/><line x1="7" y1="7" x2="7.01" y2="7"/></symbol>
+  <symbol id="ic-settings" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="ic-store" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="ic-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="ic-palette" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0 0 20 2 2 0 0 0 1.4-3.4 2 2 0 0 1 1.4-3.4H17a3 3 0 0 0 3-3 8 8 0 0 0-8-10z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.5" cy="10.5" r="1"/><circle cx="8" cy="15" r="1"/></symbol>
+  <symbol id="ic-type" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></symbol>
+  <symbol id="ic-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="ic-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ic-pencil" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="ic-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
+</svg>
+
 <!-- ═══ PANTALLA LOGIN ═══ -->
 <div id="pantalla-login">
   <div class="login-card">
-    <div class="login-icon">🔐</div>
+    <div class="login-icon"><svg class="icon" style="width:32px;height:32px;"><use href="#ic-lock"/></svg></div>
     <div class="login-title">Panel Admin</div>
     <div class="login-subtitle">Ingresa tu clave para continuar</div>
 
@@ -450,7 +480,7 @@
       <input type="password" id="login-input" class="login-input"
         placeholder="••••••••"
         onkeydown="if(event.key==='Enter') verificarClave()">
-      <button class="btn-toggle-pass" onclick="toggleVerClave()" id="btn-ojo">👁</button>
+      <button class="btn-toggle-pass" onclick="toggleVerClave()" id="btn-ojo"><svg class="icon"><use href="#ic-eye"/></svg></button>
     </div>
 
     <button class="btn-login" onclick="verificarClave()">Entrar</button>
@@ -460,16 +490,16 @@
 
 <!-- Header -->
 <div class="header" id="contenido-admin" style="display:none;">
-  <span class="header-logo">🏪</span>
+  <span class="header-logo"><svg class="icon" style="width:22px;height:22px;"><use href="#ic-store"/></svg></span>
   <h1 id="header-store-name">Panel Admin</h1>
   <a href="#" id="link-ver-tienda" target="_blank" class="btn-ver-tienda">Ver tienda</a>
 </div>
 
 <!-- Tabs -->
 <div class="tabs" style="display:none;">
-  <button class="tab active" data-tab="productos">📦 Productos</button>
-  <button class="tab" data-tab="categorias">🏷️ Categorías</button>
-  <button class="tab" data-tab="config">⚙️ Tienda</button>
+  <button class="tab active" data-tab="productos"><svg class="icon"><use href="#ic-box"/></svg> Productos</button>
+  <button class="tab" data-tab="categorias"><svg class="icon"><use href="#ic-tag"/></svg> Categorías</button>
+  <button class="tab" data-tab="config"><svg class="icon"><use href="#ic-settings"/></svg> Tienda</button>
 </div>
 
 <!-- ═══ TAB: PRODUCTOS ═══ -->
@@ -502,7 +532,7 @@
 
   <!-- Info de la tienda -->
   <div class="card">
-    <div class="card-title">Info de la tienda</div>
+    <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-store"/></svg></span> Info de la tienda</div>
 
     <label>Nombre de la tienda</label>
     <input type="text" id="cfg-nombre" placeholder="Mi Tienda">
@@ -513,26 +543,26 @@
 
   <!-- Logo y portada -->
   <div class="card">
-    <div class="card-title">Logo y portada</div>
+    <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-camera"/></svg></span> Logo y portada</div>
 
     <label>Logo de la tienda</label>
     <div id="logo-preview-wrap-old" style="margin:8px 0;">
       <img id="logo-preview" src="" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:none;border:2px solid var(--border);">
     </div>
     <input type="file" id="logo-input" accept="image/*" onchange="subirImagenConfig('logo')" style="display:none;">
-    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-input').click()">📷 Cambiar logo</button>
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-input').click()"><svg class="icon" style="width:15px;height:15px;"><use href="#ic-camera"/></svg> Cambiar logo</button>
 
     <label style="margin-top:14px;">Imagen de portada</label>
     <div style="margin:8px 0;">
       <img id="portada-preview" src="" style="width:100%;height:120px;object-fit:cover;border-radius:10px;display:none;">
     </div>
     <input type="file" id="portada-input" accept="image/*" onchange="subirImagenConfig('portada')" style="display:none;">
-    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('portada-input').click()">📷 Cambiar portada</button>
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('portada-input').click()"><svg class="icon" style="width:15px;height:15px;"><use href="#ic-camera"/></svg> Cambiar portada</button>
   </div>
 
   <!-- Color -->
   <div class="card">
-    <div class="card-title">🎨 Colores de la tienda</div>
+    <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-palette"/></svg></span> Colores de la tienda</div>
 
     <div class="color-row">
       <div class="color-row-info">
@@ -581,7 +611,7 @@
 
   <!-- Tipografía -->
   <div class="card">
-    <div class="card-title">🔤 Tipografía</div>
+    <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-type"/></svg></span> Tipografía</div>
     <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">Elige el estilo de letra para el nombre de tu tienda y productos</p>
     <div id="fuente-opciones" style="display:flex;flex-direction:column;gap:8px;">
       <div class="fuente-card" data-val="elegante" onclick="elegirFuente('elegante')">
@@ -605,7 +635,7 @@
 
   <!-- Contacto compacto -->
   <div class="card">
-    <div class="card-title">📞 Contacto y redes</div>
+    <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-phone"/></svg></span> Contacto y redes</div>
 
     <label>WhatsApp para pedidos (con código de país, sin +)</label>
     <input type="text" id="cfg-whatsapp" placeholder="59169356292">
@@ -642,7 +672,7 @@
 
   <!-- Opciones generales -->
   <div class="card">
-    <div class="card-title">⚙️ Opciones</div>
+    <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-settings"/></svg></span> Opciones</div>
     <div class="toggle-row">
       <div class="toggle-info">
         <span class="toggle-label">Mostrar precios</span>
@@ -659,7 +689,7 @@
   </div>
 
   <div class="bottom-bar">
-    <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar configuración</button>
+    <button class="btn btn-primary" onclick="guardarConfig()"><svg class="icon" style="width:16px;height:16px;"><use href="#ic-save"/></svg> Guardar configuración</button>
   </div>
 </div>
 
@@ -684,7 +714,7 @@
     <label>Precio</label>
     <input type="number" id="prod-precio" placeholder="0" min="0" step="0.5">
     <div id="aviso-precio" style="display:none;background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:8px 12px;margin-top:6px;font-size:.75rem;color:#7a5c00;">
-      ⚠️ Los precios no se muestran en tu tienda. Actívalos en <strong>⚙️ Tienda → Mostrar precios</strong> para que sean visibles.
+      <svg class="icon" style="width:15px;height:15px;"><use href="#ic-alert"/></svg> Los precios no se muestran en tu tienda. Actívalos en <strong>Tienda → Mostrar precios</strong> para que sean visibles.
     </div>
 
     <div class="toggle-row" style="margin-top:10px;">
@@ -749,8 +779,8 @@
     </div>
 
     <div style="display:flex;gap:8px;margin-top:20px;">
-      <button class="btn btn-primary" style="flex:1" onclick="guardarProducto()">💾 Guardar</button>
-      <button class="btn btn-danger btn-sm" id="btn-eliminar" style="display:none" onclick="eliminarProducto()">🗑</button>
+      <button class="btn btn-primary" style="flex:1" onclick="guardarProducto()"><svg class="icon" style="width:16px;height:16px;"><use href="#ic-save"/></svg> Guardar</button>
+      <button class="btn btn-danger btn-sm" id="btn-eliminar" style="display:none" onclick="eliminarProducto()"><svg class="icon" style="width:14px;height:14px;"><use href="#ic-trash"/></svg></button>
     </div>
   </div>
 </div>
@@ -804,8 +834,8 @@ async function verificarClave() {
 function toggleVerClave() {
   const inp = document.getElementById('login-input');
   const ojo = document.getElementById('btn-ojo');
-  if (inp.type === 'password') { inp.type = 'text'; ojo.textContent = '🙈'; }
-  else { inp.type = 'password'; ojo.textContent = '👁'; }
+  if (inp.type === 'password') { inp.type = 'text'; ojo.innerHTML = '<svg class="icon"><use href="#ic-eye-off"/></svg>'; }
+  else { inp.type = 'password'; ojo.innerHTML = '<svg class="icon"><use href="#ic-eye"/></svg>'; }
 }
 
 // Verificar slug de la tienda y sesión activa
@@ -816,13 +846,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (debugEl) debugEl.textContent = 'Tienda detectada: ' + (tiendaSlug || '(ninguna)');
 
   if (!tiendaSlug) {
-    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="font-size:3rem;">🏪</div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;stroke:#B25A28;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
     return;
   }
 
   const { data: tienda } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
   if (!tienda) {
-    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="font-size:3rem;">😕</div><h2 style="margin:12px 0 6px;">Tienda no encontrada</h2></div></div>`;
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;stroke:#B25A28;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h2 style="margin:12px 0 6px;">Tienda no encontrada</h2></div></div>`;
     return;
   }
 
@@ -1103,7 +1133,7 @@ async function cargarCategorias() {
 function renderCategorias() {
   const el = document.getElementById('lista-categorias');
   if (!categorias.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏷️</div><p>No hay categorías aún</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="icon" style="width:2rem;height:2rem;"><use href="#ic-tag"/></svg></div><p>No hay categorías aún</p></div>`;
     return;
   }
   el.innerHTML = categorias.map((c, i) => `
@@ -1113,8 +1143,8 @@ function renderCategorias() {
         <button class="btn-reorder" onclick="moverCategoria('${c.id}', 1)" ${i === categorias.length - 1 ? 'disabled' : ''}>▼</button>
       </div>
       <span class="cat-name">${c.nombre}</span>
-      <button class="btn btn-secondary btn-sm" onclick="editarCategoria('${c.id}')">✏️</button>
-      <button class="btn btn-danger btn-sm" onclick="eliminarCategoria('${c.id}')">🗑</button>
+      <button class="btn btn-secondary btn-sm" onclick="editarCategoria('${c.id}')"><svg class="icon" style="width:14px;height:14px;"><use href="#ic-pencil"/></svg></button>
+      <button class="btn btn-danger btn-sm" onclick="eliminarCategoria('${c.id}')"><svg class="icon" style="width:14px;height:14px;"><use href="#ic-trash"/></svg></button>
     </div>
   `).join('');
 }
@@ -1191,7 +1221,7 @@ async function cargarProductos() {
 function renderProductos() {
   const el = document.getElementById('lista-productos');
   if (!productos.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><p>No hay productos aún.<br>Toca <strong>＋</strong> para agregar el primero.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="icon" style="width:2rem;height:2rem;"><use href="#ic-box"/></svg></div><p>No hay productos aún.<br>Toca <strong>＋</strong> para agregar el primero.</p></div>`;
     return;
   }
   el.innerHTML = productos.map(p => {
@@ -1201,7 +1231,7 @@ function renderProductos() {
       <div class="product-item ${!p.activo ? 'product-inactivo' : ''}" onclick="abrirEditar('${p.id}')">
         ${thumb
           ? `<img class="product-thumb" src="${thumb}" alt="${p.nombre}" loading="lazy">`
-          : `<div class="product-thumb-empty">📷</div>`}
+          : `<div class="product-thumb-empty"><svg class="icon" style="width:1.4rem;height:1.4rem;"><use href="#ic-camera"/></svg></div>`}
         <div class="product-info">
           <div class="product-name">${p.nombre}</div>
           <div class="product-meta">${catName} · ${p.tallas && p.tallas.length ? p.tallas.join(', ') : 'Sin tallas'}</div>
@@ -1337,7 +1367,7 @@ function renderImgGrid() {
     if (i === 0) { // solo el primer slot vacío es clickeable
       slots.push(`
         <div class="img-slot" onclick="triggerUpload(${idx})">
-          <span class="img-slot-icon">📷</span>
+          <span class="img-slot-icon"><svg class="icon" style="width:1.4rem;height:1.4rem;"><use href="#ic-camera"/></svg></span>
           <input type="file" id="file-input-${idx}" accept="image/*" multiple
                  style="display:none" onchange="subirImagenes(event)">
         </div>
