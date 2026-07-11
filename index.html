@@ -38,7 +38,7 @@
     /* ── PÁGINA TIENDA ── */
     #pagina-tienda { padding-bottom:90px; }
 
-    .portada-full { width:100%; background:var(--brand); }
+    .portada-full { width:100%; background:var(--brand); min-height:150px; }
     .portada-img { width:100%; max-height:220px; object-fit:cover; display:block; }
 
     .logo-wrapper {
@@ -50,6 +50,12 @@
       width:110px; height:110px; object-fit:cover;
       border-radius:50%; background:white;
       border:4px solid white; box-shadow:0 4px 20px rgba(0,0,0,.15);
+    }
+    .logo-placeholder {
+      width:110px; height:110px; border-radius:50%;
+      background:white; border:4px solid white; box-shadow:0 4px 20px rgba(0,0,0,.15);
+      display:flex; align-items:center; justify-content:center;
+      font-size:2.2rem;
     }
 
     .content-card {
@@ -418,6 +424,7 @@
 
   <!-- Logo -->
   <div class="logo-wrapper">
+    <div class="logo-placeholder" id="logo-placeholder">🏬</div>
     <img id="logo-img" src="" alt="Logo" class="logo-img" style="display:none;">
   </div>
 
@@ -692,6 +699,7 @@ async function cargarConfig() {
   }
 
   if (data.logo_url) {
+    document.getElementById('logo-placeholder').style.display = 'none';
     const img = document.getElementById('logo-img');
     img.src = data.logo_url; img.style.display = 'block';
   }
