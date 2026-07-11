@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Tu Tienda</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600&family=Baloo+2:wght@600&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600&family=Baloo+2:wght@600&family=Montserrat:wght@600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/supabase.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css">
@@ -13,20 +13,20 @@
     * { margin:0; padding:0; box-sizing:border-box; }
 
     :root {
-      --brand:   #c27e4a;
-      --brand-dk: #8b4513;
-      --brand-lt: #fff3e8;
-      --bg:      #fef8f0;
+      --brand:   #B25A28;
+      --brand-dk: #7A3C18;
+      --brand-lt: #FBEEE3;
+      --bg:      #F6F5F3;
       --card:    #ffffff;
-      --text:    #1a1a1a;
-      --muted:   #888;
-      --border:  #e8ddd2;
-      --danger:  #e74c3c;
-      --success: #27ae60;
-      --radius:  14px;
+      --text:    #1C1B1A;
+      --muted:   #6F6B67;
+      --border:  #E4E1DC;
+      --danger:  #DC2626;
+      --success: #16A34A;
+      --radius:  12px;
     }
 
-    body { font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; letter-spacing:-.01em; }
 
     /* ── Login ── */
     #pantalla-login {
@@ -48,7 +48,7 @@
     .login-input {
       width:100%; padding:12px 44px 12px 14px;
       border:1.5px solid var(--border); border-radius:12px;
-      font-family:'Poppins',sans-serif; font-size:.9rem;
+      font-family:'Inter',sans-serif; font-size:.9rem;
       background:#fafafa; text-align:center;
       letter-spacing:3px; font-weight:600;
     }
@@ -66,7 +66,7 @@
     .btn-login {
       width:100%; padding:13px; border-radius:12px; border:none;
       background:var(--brand); color:#fff;
-      font-family:'Poppins',sans-serif; font-size:.9rem; font-weight:700;
+      font-family:'Inter',sans-serif; font-size:.9rem; font-weight:700;
       cursor:pointer; transition:background .2s;
     }
     .btn-login:hover { background:var(--brand-dk); }
@@ -81,7 +81,7 @@
       position:sticky; top:0; z-index:100;
       box-shadow:0 2px 12px rgba(0,0,0,.06);
     }
-    .header h1 { font-size:.95rem; font-weight:700; color:var(--brand-dk); }
+    .header h1 { font-size:.95rem; font-weight:700; color:var(--brand-dk); letter-spacing:-.01em; }
     .header-logo { font-size:1.4rem; }
     .btn-ver-tienda {
       font-size:.75rem; font-weight:600; color:var(--brand);
@@ -105,7 +105,7 @@
       color:var(--muted); border:none; background:none;
       cursor:pointer; border-bottom:2px solid transparent;
       transition:all .2s; white-space:nowrap;
-      font-family:'Poppins',sans-serif;
+      font-family:'Inter',sans-serif;
     }
     .tab.active { color:var(--brand); border-bottom-color:var(--brand); }
 
@@ -127,7 +127,7 @@
     input[type=text], input[type=number], textarea, select {
       width:100%; padding:10px 12px;
       border:1.5px solid var(--border); border-radius:10px;
-      font-family:'Poppins',sans-serif; font-size:.85rem;
+      font-family:'Inter',sans-serif; font-size:.85rem;
       background:#fafafa; color:var(--text);
       transition:border-color .2s;
     }
@@ -162,7 +162,7 @@
     .btn {
       display:inline-flex; align-items:center; justify-content:center; gap:6px;
       padding:11px 20px; border-radius:10px; border:none;
-      font-family:'Poppins',sans-serif; font-size:.85rem; font-weight:600;
+      font-family:'Inter',sans-serif; font-size:.85rem; font-weight:600;
       cursor:pointer; transition:all .2s; text-decoration:none;
     }
     .btn-primary   { background:var(--brand); color:#fff; width:100%; }
@@ -320,7 +320,7 @@
       width:56px; height:56px; border-radius:50%;
       background:var(--brand); color:#fff; border:none;
       font-size:1.5rem; cursor:pointer;
-      box-shadow:0 4px 20px rgba(194,126,74,.5);
+      box-shadow:0 4px 20px rgba(178,90,40,.35);
       display:flex; align-items:center; justify-content:center;
       z-index:200; transition:all .2s;
     }
@@ -357,7 +357,7 @@
       display:flex; align-items:center; gap:5px;
       background:rgba(0,0,0,.55); color:#fff; border:none;
       padding:7px 13px; border-radius:20px; font-size:.72rem; font-weight:600;
-      cursor:pointer; backdrop-filter:blur(6px); font-family:'Poppins',sans-serif;
+      cursor:pointer; backdrop-filter:blur(6px); font-family:'Inter',sans-serif;
       transition:background .2s;
     }
     .btn-edit-portada:hover { background:rgba(0,0,0,.7); }
@@ -416,7 +416,7 @@
     .pcr-app { border-radius:18px !important; box-shadow:0 8px 40px rgba(0,0,0,.18) !important; z-index:99999 !important; }
     .pcr-app .pcr-interaction .pcr-save {
       background:var(--brand) !important; border-radius:8px !important;
-      color:#fff !important; font-family:'Poppins',sans-serif !important;
+      color:#fff !important; font-family:'Inter',sans-serif !important;
     }
 
     @media (min-width:600px) {
@@ -808,13 +808,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (debugEl) debugEl.textContent = 'Tienda detectada: ' + (tiendaSlug || '(ninguna)');
 
   if (!tiendaSlug) {
-    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Poppins',sans-serif;"><div><div style="font-size:3rem;">🏪</div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="font-size:3rem;">🏪</div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
     return;
   }
 
   const { data: tienda } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
   if (!tienda) {
-    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Poppins',sans-serif;"><div><div style="font-size:3rem;">😕</div><h2 style="margin:12px 0 6px;">Tienda no encontrada</h2></div></div>`;
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="font-size:3rem;">😕</div><h2 style="margin:12px 0 6px;">Tienda no encontrada</h2></div></div>`;
     return;
   }
 
@@ -951,23 +951,19 @@ let redEditando = null;
 const TIPOS_RED = {
   tiktok: {
     label:'TikTok', placeholder:'https://tiktok.com/@tutienda', ejemplo:'Pega el enlace a tu perfil de TikTok',
-    bg:'#000000',
-    svg:'<svg viewBox="0 0 24 24" fill="#fff" width="24" height="24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>'
+    svg:'<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>'
   },
   instagram: {
     label:'Instagram', placeholder:'https://instagram.com/tutienda', ejemplo:'Pega el enlace a tu perfil de Instagram',
-    bg:'linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)',
-    svg:'<svg viewBox="0 0 24 24" fill="#fff" width="24" height="24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.02-3.58.07-4.85c.15-3.23 1.67-4.77 4.92-4.92 1.27-.06 1.65-.07 4.85-.07zM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95C23.72 2.7 21.3.27 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm6.41-10.85a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44z"/></svg>'
+    svg:'<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.02-3.58.07-4.85c.15-3.23 1.67-4.77 4.92-4.92 1.27-.06 1.65-.07 4.85-.07zM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95C23.72 2.7 21.3.27 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm6.41-10.85a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44z"/></svg>'
   },
   facebook: {
     label:'Facebook', placeholder:'https://facebook.com/tutienda', ejemplo:'Pega el enlace a tu página de Facebook',
-    bg:'#1877F2',
-    svg:'<svg viewBox="0 0 24 24" fill="#fff" width="24" height="24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>'
+    svg:'<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>'
   },
   whatsapp_grupo: {
     label:'Grupo de WhatsApp', placeholder:'https://chat.whatsapp.com/xxxxx', ejemplo:'Pega el enlace de invitación al grupo',
-    bg:'#25D366',
-    svg:'<svg viewBox="0 0 24 24" fill="#fff" width="24" height="24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>'
+    svg:'<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>'
   },
 };
 
@@ -977,20 +973,32 @@ function renderSocialIcons() {
   Object.keys(TIPOS_RED).forEach(tipo => {
     const info = TIPOS_RED[tipo];
     const activo = !!redesSociales[tipo];
+    const item = document.createElement('div');
+    item.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:5px; width:64px;';
+
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.onclick = () => abrirModalRed(tipo);
+    btn.title = info.label;
     btn.style.cssText = `
       position:relative; width:52px; height:52px; border-radius:14px;
       display:flex; align-items:center; justify-content:center;
-      border:1px solid var(--border); cursor:pointer;
-      background:${info.bg}; opacity:${activo ? '1' : '.35'};
+      border:1.5px solid ${activo ? 'var(--brand)' : 'var(--border)'};
+      background:${activo ? 'var(--brand-lt)' : 'var(--card)'};
+      color:${activo ? 'var(--brand-dk)' : 'var(--muted)'};
+      cursor:pointer; transition:border-color .15s, background .15s;
     `;
-    btn.title = info.label;
     btn.innerHTML = info.svg + (activo
-      ? '<span style="position:absolute; bottom:-4px; right:-4px; background:#22c55e; color:#fff; border-radius:50%; width:17px; height:17px; font-size:.65rem; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg,#fff);">✓</span>'
-      : '<span style="position:absolute; bottom:-4px; right:-4px; background:var(--brand); color:#fff; border-radius:50%; width:17px; height:17px; font-size:.75rem; display:flex; align-items:center; justify-content:center; line-height:1; border:2px solid var(--bg,#fff);">+</span>');
-    row.appendChild(btn);
+      ? '<span style="position:absolute; bottom:-4px; right:-4px; background:var(--brand); color:#fff; border-radius:50%; width:17px; height:17px; font-size:.6rem; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg);">✓</span>'
+      : '<span style="position:absolute; bottom:-4px; right:-4px; background:var(--card); color:var(--brand); border:1.5px solid var(--border); border-radius:50%; width:17px; height:17px; font-size:.75rem; display:flex; align-items:center; justify-content:center; line-height:1;">+</span>');
+
+    const label = document.createElement('span');
+    label.textContent = info.label === 'Grupo de WhatsApp' ? 'Grupo WA' : info.label;
+    label.style.cssText = 'font-size:.68rem; color:var(--muted); text-align:center; line-height:1.1;';
+
+    item.appendChild(btn);
+    item.appendChild(label);
+    row.appendChild(item);
   });
 }
 
