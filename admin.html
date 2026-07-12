@@ -692,37 +692,6 @@
     </div>
   </div>
 
-  <!-- Modal agregar/editar red social -->
-  <div class="modal-overlay" id="modal-red-social">
-    <div class="modal">
-      <div class="modal-header">
-        <span class="modal-title" id="modal-red-titulo">Agregar red</span>
-        <button class="btn-close-modal" onclick="cerrarModalRed()">✕</button>
-      </div>
-      <label id="modal-red-label">Enlace</label>
-      <input type="text" id="modal-red-input" placeholder="">
-      <p id="modal-red-ejemplo" style="font-size:.78rem; color:var(--muted); margin-top:6px;"></p>
-      <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="guardarRedSocial()">Guardar</button>
-      <button class="btn btn-secondary" id="btn-quitar-red" style="width:100%; margin-top:8px; display:none;" onclick="quitarRedSocial()">Quitar</button>
-    </div>
-  </div>
-
-  <!-- Modal genérico: confirmar / pedir texto -->
-  <div class="modal-overlay" id="modal-generico">
-    <div class="modal">
-      <div class="modal-header">
-        <span class="modal-title" id="mg-titulo">Confirmar</span>
-        <button class="btn-close-modal" onclick="mgCerrar(null)">✕</button>
-      </div>
-      <p id="mg-mensaje" style="font-size:.85rem; color:var(--text); line-height:1.5;"></p>
-      <input type="text" id="mg-input" style="display:none; margin-top:10px;">
-      <div style="display:flex; gap:10px; margin-top:18px;">
-        <button class="btn btn-secondary" style="flex:1;" onclick="mgCerrar(null)">Cancelar</button>
-        <button class="btn btn-primary" id="mg-btn-ok" style="flex:1;" onclick="mgConfirmarClick()">Aceptar</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Opciones generales -->
   <div class="card">
     <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-settings"/></svg></span> Opciones</div>
@@ -743,6 +712,37 @@
 
   <div class="bottom-bar">
     <button class="btn btn-primary" onclick="guardarConfig()"><svg class="icon" style="width:16px;height:16px;"><use href="#ic-save"/></svg> Guardar configuración</button>
+  </div>
+</div>
+
+<!-- Modal agregar/editar red social (fuera de las pestañas: debe verse desde cualquier tab) -->
+<div class="modal-overlay" id="modal-red-social">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-red-titulo">Agregar red</span>
+      <button class="btn-close-modal" onclick="cerrarModalRed()">✕</button>
+    </div>
+    <label id="modal-red-label">Enlace</label>
+    <input type="text" id="modal-red-input" placeholder="">
+    <p id="modal-red-ejemplo" style="font-size:.78rem; color:var(--muted); margin-top:6px;"></p>
+    <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="guardarRedSocial()">Guardar</button>
+    <button class="btn btn-secondary" id="btn-quitar-red" style="width:100%; margin-top:8px; display:none;" onclick="quitarRedSocial()">Quitar</button>
+  </div>
+</div>
+
+<!-- Modal genérico: confirmar / pedir texto (fuera de las pestañas: debe verse desde cualquier tab) -->
+<div class="modal-overlay" id="modal-generico">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="mg-titulo">Confirmar</span>
+      <button class="btn-close-modal" onclick="mgCerrar(null)">✕</button>
+    </div>
+    <p id="mg-mensaje" style="font-size:.85rem; color:var(--text); line-height:1.5;"></p>
+    <input type="text" id="mg-input" style="display:none; margin-top:10px;">
+    <div style="display:flex; gap:10px; margin-top:18px;">
+      <button class="btn btn-secondary" style="flex:1;" onclick="mgCerrar(null)">Cancelar</button>
+      <button class="btn btn-primary" id="mg-btn-ok" style="flex:1;" onclick="mgConfirmarClick()">Aceptar</button>
+    </div>
   </div>
 </div>
 
@@ -1248,7 +1248,7 @@ function renderCategorias() {
 }
 
 async function moverCategoria(id, dir) {
-  const idx = categorias.findIndex(c => c.id === id);
+  const idx = categorias.findIndex(c => String(c.id) === String(id));
   const swapIdx = idx + dir;
   if (swapIdx < 0 || swapIdx >= categorias.length) return;
   const temp = categorias[idx];
@@ -1266,7 +1266,7 @@ async function moverCategoria(id, dir) {
 }
 
 async function editarCategoria(id) {
-  const cat = categorias.find(c => c.id === id);
+  const cat = categorias.find(c => String(c.id) === String(id));
   if (!cat) return;
   const nuevoNombre = await promptModal('Nombre de la categoría', cat.nombre);
   if (nuevoNombre === null) return;
@@ -1351,7 +1351,7 @@ function renderProductos() {
 }
 
 async function moverProducto(id, dir) {
-  const idx = productos.findIndex(p => p.id === id);
+  const idx = productos.findIndex(p => String(p.id) === String(id));
   const swapIdx = idx + dir;
   if (swapIdx < 0 || swapIdx >= productos.length) return;
   const temp = productos[idx];
@@ -1449,7 +1449,7 @@ function abrirCrear() {
 }
 
 function abrirEditar(id) {
-  const p = productos.find(x => x.id === id);
+  const p = productos.find(x => String(x.id) === String(id));
   if (!p) return;
 
   document.getElementById('modal-titulo').textContent    = 'Editar producto';
@@ -1649,14 +1649,14 @@ async function toggleActivo(id, activo) {
   const { error } = await db.from('productos').update({ activo }).eq('id', id);
   if (error) { toast('Error al actualizar', 'error'); await cargarProductos(); return; }
   // Actualizar en memoria sin recargar todo
-  const p = productos.find(x => x.id === id);
+  const p = productos.find(x => String(x.id) === String(id));
   if (p) p.activo = activo;
   renderProductos();
   toast(activo ? 'Producto activado ✓' : 'Producto desactivado', activo ? 'success' : '');
 }
 
 async function duplicarProducto(id) {
-  const original = productos.find(x => x.id === id);
+  const original = productos.find(x => String(x.id) === String(id));
   if (!original) return;
 
   const copia = {
