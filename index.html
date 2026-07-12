@@ -658,10 +658,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   tiendaId = tienda.id;
 
   actualizarContadorCarrito();
+  incrementarVisita(); // no se espera, no debe bloquear la carga de la tienda
   await cargarConfig();
   await cargarCategorias();
   await cargarProductos();
 });
+
+// Cuenta una visita a la tienda (silencioso, no crítico si falla)
+async function incrementarVisita() {
+  try {
+    const { data: row } = await db.from('config_tienda').select('visitas').eq('tienda_id', tiendaId).single();
+    const actual = (row && row.visitas) || 0;
+    await db.from('config_tienda').update({ visitas: actual + 1 }).eq('tienda_id', tiendaId);
+  } catch (e) { /* no interrumpir la tienda si esto falla */ }
+}
 
 // ══════════════════════════════════════════════
 //  CONFIG

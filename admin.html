@@ -178,7 +178,7 @@
 
     /* ── Product list ── */
     .product-item {
-      display:flex; align-items:center; gap:12px;
+      display:flex; align-items:center; gap:8px;
       padding:12px; background:var(--card);
       border:1px solid var(--border); border-radius:var(--radius);
       margin-bottom:10px; cursor:pointer;
@@ -262,6 +262,22 @@
       margin-bottom:8px;
     }
     .cat-name { flex:1; font-size:.88rem; font-weight:500; }
+    .search-bar {
+      display:flex; align-items:center; gap:8px;
+      background:var(--card); border:1px solid var(--border); border-radius:10px;
+      padding:9px 12px; margin-bottom:12px;
+    }
+    .search-bar input {
+      border:none; outline:none; flex:1; font-size:.85rem; font-family:inherit;
+      background:transparent; color:var(--text);
+    }
+    .bulk-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--brand-lt); border:1px solid var(--brand);
+      border-radius:10px; padding:10px 12px; margin-bottom:12px;
+      font-size:.8rem; font-weight:600; color:var(--brand-dk);
+    }
+    .chk-bulk { width:17px; height:17px; flex-shrink:0; accent-color:var(--brand); }
     .cat-reorder { display:flex; flex-direction:column; gap:2px; }
     .btn-reorder {
       width:22px; height:18px; border:none; border-radius:4px;
@@ -464,6 +480,7 @@
   <symbol id="ic-pencil" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></symbol>
   <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="ic-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
   <symbol id="ic-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
 </svg>
 
@@ -504,6 +521,21 @@
 
 <!-- ═══ TAB: PRODUCTOS ═══ -->
 <div id="tab-productos" class="section visible">
+
+  <div class="search-bar">
+    <svg class="icon" style="width:16px;height:16px;color:var(--muted);"><use href="#ic-search"/></svg>
+    <input type="text" id="buscador-productos" placeholder="Buscar producto..." oninput="filtrarProductos(this.value)">
+  </div>
+
+  <div class="bulk-bar" id="bulk-bar" style="display:none;">
+    <span id="bulk-count">0 seleccionados</span>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-secondary btn-sm" onclick="bulkActivar(true)">Activar</button>
+      <button class="btn btn-secondary btn-sm" onclick="bulkActivar(false)">Desactivar</button>
+      <button class="btn btn-danger btn-sm" onclick="bulkEliminar()">Eliminar</button>
+    </div>
+  </div>
+
   <div id="lista-productos">
     <div class="loading"><div class="spinner"></div></div>
   </div>
@@ -539,6 +571,11 @@
 
     <label>Descripción</label>
     <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes"></textarea>
+
+    <div style="display:flex; align-items:center; gap:6px; margin-top:12px; color:var(--muted); font-size:.78rem;">
+      <svg class="icon" style="width:14px;height:14px;"><use href="#ic-eye"/></svg>
+      <span id="cfg-visitas">0 visitas</span>
+    </div>
   </div>
 
   <!-- Logo y portada -->
@@ -667,6 +704,22 @@
       <p id="modal-red-ejemplo" style="font-size:.78rem; color:var(--muted); margin-top:6px;"></p>
       <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="guardarRedSocial()">Guardar</button>
       <button class="btn btn-secondary" id="btn-quitar-red" style="width:100%; margin-top:8px; display:none;" onclick="quitarRedSocial()">Quitar</button>
+    </div>
+  </div>
+
+  <!-- Modal genérico: confirmar / pedir texto -->
+  <div class="modal-overlay" id="modal-generico">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="mg-titulo">Confirmar</span>
+        <button class="btn-close-modal" onclick="mgCerrar(null)">✕</button>
+      </div>
+      <p id="mg-mensaje" style="font-size:.85rem; color:var(--text); line-height:1.5;"></p>
+      <input type="text" id="mg-input" style="display:none; margin-top:10px;">
+      <div style="display:flex; gap:10px; margin-top:18px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="mgCerrar(null)">Cancelar</button>
+        <button class="btn btn-primary" id="mg-btn-ok" style="flex:1;" onclick="mgConfirmarClick()">Aceptar</button>
+      </div>
     </div>
   </div>
 
@@ -921,6 +974,7 @@ async function cargarConfig() {
   document.getElementById('cfg-horario').value      = data.horario      || '';
   document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
   document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
+  document.getElementById('cfg-visitas').textContent = `${data.visitas || 0} visita${data.visitas === 1 ? '' : 's'}`;
 
   redesSociales = {
     tiktok:          data.tiktok          || '',
@@ -980,6 +1034,50 @@ async function guardarConfig() {
   toast('Configuración guardada ✓', 'success');
 }
 
+// ══════════════════════════════════════════════
+//  MODAL GENÉRICO (reemplaza confirm()/prompt() nativos)
+// ══════════════════════════════════════════════
+let mgResolver = null;
+
+function confirmarModal(mensaje, tituloBtn = 'Eliminar') {
+  return new Promise(resolve => {
+    mgResolver = resolve;
+    document.getElementById('mg-titulo').textContent = 'Confirmar';
+    document.getElementById('mg-mensaje').textContent = mensaje;
+    document.getElementById('mg-input').style.display = 'none';
+    document.getElementById('mg-btn-ok').textContent = tituloBtn;
+    document.getElementById('mg-btn-ok').className = tituloBtn === 'Eliminar' ? 'btn btn-danger' : 'btn btn-primary';
+    document.getElementById('mg-btn-ok').style.flex = '1';
+    document.getElementById('modal-generico').classList.add('open');
+  });
+}
+
+function promptModal(mensaje, valorInicial = '') {
+  return new Promise(resolve => {
+    mgResolver = resolve;
+    document.getElementById('mg-titulo').textContent = mensaje;
+    document.getElementById('mg-mensaje').textContent = '';
+    const input = document.getElementById('mg-input');
+    input.style.display = 'block';
+    input.value = valorInicial;
+    document.getElementById('mg-btn-ok').textContent = 'Guardar';
+    document.getElementById('mg-btn-ok').className = 'btn btn-primary';
+    document.getElementById('mg-btn-ok').style.flex = '1';
+    document.getElementById('modal-generico').classList.add('open');
+    setTimeout(() => input.focus(), 100);
+  });
+}
+
+function mgConfirmarClick() {
+  const input = document.getElementById('mg-input');
+  const valor = input.style.display === 'block' ? input.value.trim() : true;
+  mgCerrar(valor);
+}
+
+function mgCerrar(valor) {
+  document.getElementById('modal-generico').classList.remove('open');
+  if (mgResolver) { mgResolver(valor); mgResolver = null; }
+}
 // ══════════════════════════════════════════════
 //  REDES SOCIALES (estilo Linktree)
 // ══════════════════════════════════════════════
@@ -1170,7 +1268,7 @@ async function moverCategoria(id, dir) {
 async function editarCategoria(id) {
   const cat = categorias.find(c => c.id === id);
   if (!cat) return;
-  const nuevoNombre = prompt('Nombre de la categoría', cat.nombre);
+  const nuevoNombre = await promptModal('Nombre de la categoría', cat.nombre);
   if (nuevoNombre === null) return;
   const nombre = nuevoNombre.trim();
   if (!nombre) { toast('El nombre no puede quedar vacío', 'error'); return; }
@@ -1199,7 +1297,8 @@ async function crearCategoria() {
 }
 
 async function eliminarCategoria(id) {
-  if (!confirm('¿Eliminar esta categoría?')) return;
+  const ok = await confirmarModal('¿Eliminar esta categoría?');
+  if (!ok) return;
   await db.from('categorias').delete().eq('id', id);
   await cargarCategorias();
   toast('Categoría eliminada');
@@ -1224,11 +1323,16 @@ function renderProductos() {
     el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="icon" style="width:2rem;height:2rem;"><use href="#ic-box"/></svg></div><p>No hay productos aún.<br>Toca <strong>＋</strong> para agregar el primero.</p></div>`;
     return;
   }
-  el.innerHTML = productos.map(p => {
+  el.innerHTML = productos.map((p, i) => {
     const thumb   = p.imagenes && p.imagenes[0] ? p.imagenes[0] : null;
     const catName = p.categorias ? p.categorias.nombre : '—';
     return `
-      <div class="product-item ${!p.activo ? 'product-inactivo' : ''}" onclick="abrirEditar('${p.id}')">
+      <div class="product-item ${!p.activo ? 'product-inactivo' : ''}" data-nombre="${(p.nombre || '').toLowerCase()}" onclick="abrirEditar('${p.id}')">
+        <div class="cat-reorder" onclick="event.stopPropagation()">
+          <button class="btn-reorder" onclick="moverProducto('${p.id}', -1)" ${i === 0 ? 'disabled' : ''}>▲</button>
+          <button class="btn-reorder" onclick="moverProducto('${p.id}', 1)" ${i === productos.length - 1 ? 'disabled' : ''}>▼</button>
+        </div>
+        <input type="checkbox" class="chk-bulk" data-id="${p.id}" onclick="event.stopPropagation()" onchange="actualizarBarraSeleccion()">
         ${thumb
           ? `<img class="product-thumb" src="${thumb}" alt="${p.nombre}" loading="lazy">`
           : `<div class="product-thumb-empty"><svg class="icon" style="width:1.4rem;height:1.4rem;"><use href="#ic-camera"/></svg></div>`}
@@ -1241,10 +1345,78 @@ function renderProductos() {
           <span class="toggle-slider"></span>
         </label>
         <button class="btn-duplicar" onclick="event.stopPropagation(); duplicarProducto('${p.id}')" title="Duplicar producto">⎘</button>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
     `;
   }).join('');
+}
+
+async function moverProducto(id, dir) {
+  const idx = productos.findIndex(p => p.id === id);
+  const swapIdx = idx + dir;
+  if (swapIdx < 0 || swapIdx >= productos.length) return;
+  const temp = productos[idx];
+  productos[idx] = productos[swapIdx];
+  productos[swapIdx] = temp;
+  renderProductos();
+  const resultados = await Promise.all(
+    productos.map((p, i) => db.from('productos').update({ orden: i }).eq('id', p.id))
+  );
+  const fallo = resultados.find(r => r.error);
+  if (fallo) { toast('Error al guardar el orden', 'error'); await cargarProductos(); return; }
+  toast('Orden actualizado ✓', 'success');
+}
+
+// ══════════════════════════════════════════════
+//  BUSCADOR DE PRODUCTOS
+// ══════════════════════════════════════════════
+function filtrarProductos(texto) {
+  const q = texto.trim().toLowerCase();
+  document.querySelectorAll('#lista-productos .product-item').forEach(item => {
+    const coincide = !q || item.dataset.nombre.includes(q);
+    item.style.display = coincide ? 'flex' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════
+//  SELECCIÓN MÚLTIPLE (BULK ACTIONS)
+// ══════════════════════════════════════════════
+function idsSeleccionados() {
+  return [...document.querySelectorAll('.chk-bulk:checked')].map(chk => chk.dataset.id);
+}
+
+function actualizarBarraSeleccion() {
+  const ids = idsSeleccionados();
+  const bar = document.getElementById('bulk-bar');
+  if (ids.length > 0) {
+    bar.style.display = 'flex';
+    document.getElementById('bulk-count').textContent = `${ids.length} seleccionado${ids.length === 1 ? '' : 's'}`;
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+async function bulkActivar(activo) {
+  const ids = idsSeleccionados();
+  if (!ids.length) return;
+  const resultados = await Promise.all(ids.map(id => db.from('productos').update({ activo }).eq('id', id)));
+  const fallo = resultados.find(r => r.error);
+  if (fallo) { toast('Error al actualizar', 'error'); return; }
+  await cargarProductos();
+  document.getElementById('bulk-bar').style.display = 'none';
+  toast(`${ids.length} producto(s) ${activo ? 'activados' : 'desactivados'} ✓`, 'success');
+}
+
+async function bulkEliminar() {
+  const ids = idsSeleccionados();
+  if (!ids.length) return;
+  const ok = await confirmarModal(`¿Eliminar ${ids.length} producto(s)? Esta acción no se puede deshacer.`);
+  if (!ok) return;
+  const resultados = await Promise.all(ids.map(id => db.from('productos').delete().eq('id', id)));
+  const fallo = resultados.find(r => r.error);
+  if (fallo) { toast('Error al eliminar', 'error'); return; }
+  await cargarProductos();
+  document.getElementById('bulk-bar').style.display = 'none';
+  toast(`${ids.length} producto(s) eliminados`, 'success');
 }
 
 // ══════════════════════════════════════════════
@@ -1463,7 +1635,9 @@ async function guardarProducto() {
 
 async function eliminarProducto() {
   const id = document.getElementById('prod-id').value;
-  if (!id || !confirm('¿Eliminar este producto?')) return;
+  if (!id) return;
+  const ok = await confirmarModal('¿Eliminar este producto?');
+  if (!ok) return;
   const { error } = await db.from('productos').delete().eq('id', id);
   if (error) { toast('Error al eliminar', 'error'); return; }
   cerrarModal();
