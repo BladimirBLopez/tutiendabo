@@ -817,7 +817,7 @@ function filtrarPorCategoria(btn, catId) {
   document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   categoriaActiva = catId;
-  renderProductos(catId ? productos.filter(p => p.categoria_id === catId) : productos);
+  renderProductos(catId ? productos.filter(p => String(p.categoria_id) === String(catId)) : productos);
 }
 
 // ══════════════════════════════════════════════
@@ -917,7 +917,7 @@ let popupProductoActual = null;
 let popupTallaSeleccionada = '';
 
 function pedirProducto(prodId) {
-  const p = productos.find(x => x.id === prodId);
+  const p = productos.find(x => String(x.id) === String(prodId));
   if (!p || p.estado === 'agotado') return;
   popupProductoActual = p;
   popupTallaSeleccionada = '';
@@ -1150,7 +1150,7 @@ function vaciarCarrito() {
 //  LIGHTBOX
 // ══════════════════════════════════════════════
 function abrirLightbox(prodId, index) {
-  const p = productos.find(x => x.id === prodId);
+  const p = productos.find(x => String(x.id) === String(prodId));
   if (!p || !p.imagenes?.length) return;
   lbImagenes = p.imagenes;
   lbIndex = index;

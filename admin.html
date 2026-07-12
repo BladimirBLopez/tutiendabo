@@ -997,9 +997,6 @@ async function cargarConfig() {
   // Colores — se inicializan cuando el tab sea visible
   // (Pickr no funciona en elementos ocultos)
 
-  // Fuente
-  elegirFuente(data.fuente || 'elegante');
-
   document.getElementById('header-store-name').textContent = data.nombre || 'Panel Admin';
 
   if (data.logo_url) {
@@ -1218,7 +1215,8 @@ async function subirImagenConfig(tipo) {
 
   const url = getImageUrl(path, 'config');
   const campo = tipo === 'logo' ? 'logo_url' : 'portada_url';
-  await db.from('config_tienda').update({ [campo]: url }).eq('tienda_id', tiendaId);
+  const { error: errorUpdate } = await db.from('config_tienda').update({ [campo]: url }).eq('tienda_id', tiendaId);
+  if (errorUpdate) { toast('Error al guardar la imagen', 'error'); console.error(errorUpdate); return; }
 
   const img = document.getElementById(tipo + '-preview');
   img.src = url; img.style.display = 'block';
@@ -1323,7 +1321,8 @@ async function crearCategoria() {
 async function eliminarCategoria(id) {
   const ok = await confirmarModal('¿Eliminar esta categoría?');
   if (!ok) return;
-  await db.from('categorias').delete().eq('id', id);
+  const { error } = await db.from('categorias').delete().eq('id', id);
+  if (error) { toast('Error al eliminar', 'error'); console.error(error); return; }
   await cargarCategorias();
   toast('Categoría eliminada');
 }

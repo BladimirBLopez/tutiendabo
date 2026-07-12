@@ -411,12 +411,17 @@ async function crearTienda() {
   if (error) { toast('Error al crear tienda', 'error'); console.error(error); return; }
 
   // Crear config inicial
-  await db.from('config_tienda').insert({
+  const { error: errorConfig } = await db.from('config_tienda').insert({
     tienda_id: tienda.id,
     nombre,
     moneda: 'Bs.',
     color_principal: '#c27e4a'
   });
+
+  if (errorConfig) {
+    toast('Tienda creada, pero falló la configuración inicial. Avisa a soporte.', 'error');
+    console.error(errorConfig);
+  }
 
   // Limpiar formulario
   document.getElementById('nueva-nombre').value = '';
@@ -431,7 +436,7 @@ async function crearTienda() {
 
 // ── LINKS ──
 function verLinks(id) {
-  const t   = tiendas.find(x => x.id === id);
+  const t   = tiendas.find(x => String(x.id) === String(id));
   if (!t) return;
   tiendaSeleccionada = t;
   claveSeleccionada  = t.clave_admin;
@@ -530,7 +535,8 @@ async function eliminarTiendaActual() {
   const nombre = cfg?.nombre || tiendaSeleccionada.slug;
   if (!confirm(`¿Eliminar la tienda "${nombre}"? Se borrarán todos sus productos.`)) return;
 
-  await db.from('tiendas').delete().eq('id', tiendaSeleccionada.id);
+  const { error } = await db.from('tiendas').delete().eq('id', tiendaSeleccionada.id);
+  if (error) { toast('Error al eliminar la tienda', 'error'); console.error(error); return; }
   cerrarModalDirecto();
   await cargarTiendas();
   await cargarStats();
