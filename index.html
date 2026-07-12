@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Mi Tienda" id="meta-app-title">
   <link rel="manifest" id="pwa-manifest" href="">
+  <link rel="icon" id="favicon" href="">
   <link rel="apple-touch-icon" id="apple-icon" href="">
   <title>Mi Tienda</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&family=Baloo+2:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -90,6 +91,31 @@
       gap:8px; width:100%;
     }
     .icon-wa { width:10px; height:10px; background:#333; border-radius:50%; flex-shrink:0; }
+
+    .btn-compartir-tienda {
+      background:var(--brand-lt); color:var(--brand-dk); border:1px solid var(--border);
+      padding:9px 18px; margin:0 0 20px; border-radius:50px; width:100%;
+      font-size:.82rem; font-weight:600; font-family:inherit;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      cursor:pointer;
+    }
+    .btn-compartir-tienda svg { width:15px; height:15px; }
+
+    .share-qr-img { width:170px; height:170px; border-radius:12px; border:1px solid var(--border); margin:0 auto 16px; display:block; }
+    .share-link-box {
+      display:flex; align-items:center; gap:8px; background:#f5f5f5;
+      border-radius:10px; padding:10px 12px; margin-bottom:14px;
+    }
+    .share-link-box span { flex:1; font-size:.78rem; color:#555; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .share-link-box button {
+      background:var(--brand); color:var(--btn-text,#fff); border:none; border-radius:8px;
+      padding:6px 12px; font-size:.75rem; font-weight:600; cursor:pointer; flex-shrink:0;
+    }
+    .btn-share-native {
+      width:100%; background:var(--brand); color:var(--btn-text,#fff); border:none;
+      border-radius:10px; padding:12px; font-size:.85rem; font-weight:600;
+      display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;
+    }
 
     /* ── Categorías ── */
     .categories-wrapper { width:100%; overflow-x:auto; margin-bottom:20px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
@@ -461,6 +487,11 @@
         Pedidos por WhatsApp
       </div>
 
+      <button class="btn-compartir-tienda" onclick="abrirCompartir()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Compartir tienda
+      </button>
+
       <!-- Horario -->
       <div id="horario-wrap" style="display:none;background:var(--brand-lt);border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--border);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -498,6 +529,23 @@
     </div>
     <button class="barra-btn" id="btn-carrito" onclick="mostrarCarrito()">
       🛒 Ver pedido <span class="carrito-count" id="carrito-count">0</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ COMPARTIR TIENDA ═══ -->
+<div class="popup-overlay" id="popup-compartir" onclick="if(event.target===this) cerrarCompartir()">
+  <div class="popup-sheet">
+    <div class="popup-handle"></div>
+    <h3 style="text-align:center; margin-bottom:16px;">Compartir tienda</h3>
+    <img class="share-qr-img" id="share-qr-img" src="" alt="Código QR">
+    <div class="share-link-box">
+      <span id="share-link-text"></span>
+      <button onclick="copiarLinkTienda(event)">Copiar</button>
+    </div>
+    <button class="btn-share-native" onclick="compartirNativo()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Compartir enlace
     </button>
   </div>
 </div>
@@ -691,7 +739,10 @@ async function cargarConfig() {
   const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
   const manifestUrl = URL.createObjectURL(blob);
   document.getElementById('pwa-manifest').href = manifestUrl;
-  if (logo) document.getElementById('apple-icon').href = logo;
+  if (logo) {
+    document.getElementById('apple-icon').href = logo;
+    document.getElementById('favicon').href = logo;
+  }
 
   // Registrar service worker
   if ('serviceWorker' in navigator) {
@@ -958,6 +1009,54 @@ function cerrarPopupDirecto() {
   document.body.style.overflow = '';
   popupProductoActual = null;
   popupTallaSeleccionada = '';
+}
+
+// ══════════════════════════════════════════════
+//  COMPARTIR TIENDA
+// ══════════════════════════════════════════════
+function abrirCompartir() {
+  const url = window.location.href.split('?')[0].split('#')[0];
+  document.getElementById('share-link-text').textContent = url;
+  document.getElementById('share-qr-img').src =
+    `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+  document.getElementById('popup-compartir').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarCompartir() {
+  document.getElementById('popup-compartir').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function copiarLinkTienda(ev) {
+  const url = document.getElementById('share-link-text').textContent;
+  const btn = (ev && ev.target) || document.querySelector('.share-link-box button');
+  const original = btn.textContent;
+  try {
+    await navigator.clipboard.writeText(url);
+    btn.textContent = '¡Listo!';
+  } catch {
+    // Fallback si el navegador bloquea el clipboard
+    const temp = document.createElement('textarea');
+    temp.value = url;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand('copy');
+    document.body.removeChild(temp);
+    btn.textContent = '¡Listo!';
+  }
+  setTimeout(() => { btn.textContent = original; }, 1800);
+}
+
+async function compartirNativo() {
+  const url = document.getElementById('share-link-text').textContent;
+  const nombre = document.getElementById('tienda-nombre').textContent || 'Mi Tienda';
+  if (navigator.share) {
+    try { await navigator.share({ title: nombre, text: `Mira la tienda de ${nombre}`, url }); }
+    catch {} // el usuario canceló, no hacer nada
+  } else {
+    copiarLinkTienda();
+  }
 }
 
 // ══════════════════════════════════════════════
