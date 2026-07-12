@@ -587,14 +587,20 @@
       <img id="logo-preview" src="" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:none;border:2px solid var(--border);">
     </div>
     <input type="file" id="logo-input" accept="image/*" onchange="subirImagenConfig('logo')" style="display:none;">
-    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-input').click()"><svg class="icon" style="width:15px;height:15px;"><use href="#ic-camera"/></svg> Cambiar logo</button>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-input').click()"><svg class="icon" style="width:15px;height:15px;"><use href="#ic-camera"/></svg> Cambiar logo</button>
+      <button class="btn btn-danger btn-sm" id="btn-quitar-logo" style="display:none;" onclick="quitarImagenConfig('logo')"><svg class="icon" style="width:14px;height:14px;"><use href="#ic-trash"/></svg> Quitar</button>
+    </div>
 
     <label style="margin-top:14px;">Imagen de portada</label>
     <div style="margin:8px 0;">
       <img id="portada-preview" src="" style="width:100%;height:120px;object-fit:cover;border-radius:10px;display:none;">
     </div>
     <input type="file" id="portada-input" accept="image/*" onchange="subirImagenConfig('portada')" style="display:none;">
-    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('portada-input').click()"><svg class="icon" style="width:15px;height:15px;"><use href="#ic-camera"/></svg> Cambiar portada</button>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('portada-input').click()"><svg class="icon" style="width:15px;height:15px;"><use href="#ic-camera"/></svg> Cambiar portada</button>
+      <button class="btn btn-danger btn-sm" id="btn-quitar-portada" style="display:none;" onclick="quitarImagenConfig('portada')"><svg class="icon" style="width:14px;height:14px;"><use href="#ic-trash"/></svg> Quitar</button>
+    </div>
   </div>
 
   <!-- Color -->
@@ -999,10 +1005,12 @@ async function cargarConfig() {
   if (data.logo_url) {
     const img = document.getElementById('logo-preview');
     img.src = data.logo_url; img.style.display = 'block';
+    document.getElementById('btn-quitar-logo').style.display = 'inline-flex';
   }
   if (data.portada_url) {
     const img = document.getElementById('portada-preview');
     img.src = data.portada_url; img.style.display = 'block';
+    document.getElementById('btn-quitar-portada').style.display = 'inline-flex';
   }
 }
 
@@ -1216,6 +1224,22 @@ async function subirImagenConfig(tipo) {
   img.src = url; img.style.display = 'block';
   const kb = Math.round(blob.size / 1024);
   toast(`Imagen actualizada ✓ (${kb}KB)`, 'success');
+}
+
+async function quitarImagenConfig(tipo) {
+  const etiqueta = tipo === 'logo' ? 'el logo' : 'la portada';
+  const ok = await confirmarModal(`¿Quitar ${etiqueta} de tu tienda?`, 'Quitar');
+  if (!ok) return;
+
+  const campo = tipo === 'logo' ? 'logo_url' : 'portada_url';
+  const { error } = await db.from('config_tienda').update({ [campo]: '' }).eq('tienda_id', tiendaId);
+  if (error) { toast('Error al quitar la imagen', 'error'); return; }
+
+  const img = document.getElementById(tipo + '-preview');
+  img.src = ''; img.style.display = 'none';
+  document.getElementById('btn-quitar-' + tipo).style.display = 'none';
+  document.getElementById(tipo + '-input').value = '';
+  toast('Imagen quitada ✓', 'success');
 }
 
 // ══════════════════════════════════════════════
