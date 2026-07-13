@@ -722,7 +722,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const { data: tienda } = await db.from('tiendas').select('*').eq('slug', slug).single();
+  let tienda;
+  try {
+    const resultado = await db.from('tiendas').select('*').eq('slug', slug).single();
+    tienda = resultado.data;
+  } catch (e) {
+    clearTimeout(limiteSeguridad);
+    paginaFallback(
+      '<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>',
+      'Problema de conexión',
+      'No se pudo cargar la tienda. Revisa tu conexión a internet e intenta de nuevo.'
+    );
+    return;
+  }
   if (!tienda || !tienda.activa) {
     paginaFallback(
       '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/>',
