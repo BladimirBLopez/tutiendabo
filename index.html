@@ -454,12 +454,24 @@
       border-radius:50%; animation:spin .7s linear infinite;
     }
     @keyframes spin { to { transform:rotate(360deg); } }
+
+    #pantalla-carga-inicial {
+      position:fixed; inset:0; z-index:9999;
+      background:var(--bg); display:flex; align-items:center; justify-content:center;
+    }
+    #pantalla-carga-inicial .spinner { width:34px; height:34px; border-width:3px; }
+    #pantalla-carga-inicial.oculto { display:none; }
   </style>
 </head>
 <body>
 
+<!-- ═══ CARGA INICIAL ═══ -->
+<div id="pantalla-carga-inicial">
+  <div class="spinner"></div>
+</div>
+
 <!-- ═══ TIENDA ═══ -->
-<div id="pagina-tienda">
+<div id="pagina-tienda" style="visibility:hidden;">
 
   <!-- Portada -->
   <div class="portada-full" id="portada-wrap">
@@ -693,6 +705,13 @@ function paginaFallback(iconoSvgPaths, titulo, mensaje) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Red de seguridad: si algo se cuelga sin dar error, no dejar la pantalla de carga pegada para siempre
+  const limiteSeguridad = setTimeout(() => {
+    document.getElementById('pantalla-carga-inicial')?.classList.add('oculto');
+    const pt = document.getElementById('pagina-tienda');
+    if (pt) pt.style.visibility = 'visible';
+  }, 8000);
+
   const slug = getShopSlug();
   if (!slug) {
     paginaFallback(
@@ -714,11 +733,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   tiendaId = tienda.id;
 
-  actualizarContadorCarrito();
-  incrementarVisita(); // no se espera, no debe bloquear la carga de la tienda
-  await cargarConfig();
-  await cargarCategorias();
-  await cargarProductos();
+  try {
+    actualizarContadorCarrito();
+    incrementarVisita(); // no se espera, no debe bloquear la carga de la tienda
+    await cargarConfig();
+    await cargarCategorias();
+    await cargarProductos();
+  } finally {
+    // Pase lo que pase, nunca dejar la pantalla de carga pegada
+    clearTimeout(limiteSeguridad);
+    document.getElementById('pantalla-carga-inicial').classList.add('oculto');
+    document.getElementById('pagina-tienda').style.visibility = 'visible';
+  }
 });
 
 // Cuenta una visita a la tienda (silencioso, no crítico si falla)
