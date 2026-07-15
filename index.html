@@ -119,22 +119,6 @@
     }
 
     /* ── Categorías ── */
-    .tienda-toolbar { display:flex; gap:8px; margin-bottom:14px; }
-    .tienda-search {
-      flex:1; display:flex; align-items:center; gap:8px;
-      background:#fff; border:1px solid var(--border,#e8ddd2); border-radius:10px;
-      padding:9px 12px;
-    }
-    .tienda-search svg { width:16px; height:16px; color:#999; flex-shrink:0; }
-    .tienda-search input {
-      border:none; outline:none; flex:1; font-size:.85rem; font-family:inherit;
-      background:transparent; color:var(--text,#1a1a1a); min-width:0;
-    }
-    .tienda-orden {
-      border:1px solid var(--border,#e8ddd2); border-radius:10px;
-      padding:9px 10px; font-size:.8rem; font-family:inherit;
-      background:#fff; color:var(--text,#1a1a1a); max-width:118px;
-    }
 
     .categories-wrapper { width:100%; overflow-x:auto; margin-bottom:20px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
     .categories-wrapper::-webkit-scrollbar { display:none; }
@@ -529,19 +513,6 @@
         <div id="horario-texto" style="font-size:.78rem;color:var(--text);line-height:1.7;white-space:pre-line;"></div>
       </div>
 
-      <!-- Buscador y orden -->
-      <div class="tienda-toolbar">
-        <div class="tienda-search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="input-buscar" placeholder="Buscar producto..." oninput="buscarProductos(this.value)">
-        </div>
-        <select id="select-orden" class="tienda-orden" onchange="ordenarProductos(this.value)">
-          <option value="">Orden</option>
-          <option value="precio-asc">Precio: menor a mayor</option>
-          <option value="precio-desc">Precio: mayor a menor</option>
-        </select>
-      </div>
-
       <!-- Categorías -->
       <div class="categories-wrapper">
         <div class="categories" id="lista-categorias">
@@ -678,9 +649,6 @@ let productosFiltrados = [];
 let lbImagenes = [];
 let lbIndex = 0;
 let categoriaActiva = '';
-let textoBusqueda = '';
-let textoBusquedaLower = '';
-let ordenPrecio = '';
 let moneda = 'Bs.';
 let tiendaId = null;
 
@@ -914,33 +882,7 @@ function filtrarPorCategoria(btn, catId) {
   document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   categoriaActiva = catId;
-  aplicarFiltros();
-}
-
-function buscarProductos(texto) {
-  textoBusqueda = texto.trim();
-  textoBusquedaLower = textoBusqueda.toLowerCase();
-  aplicarFiltros();
-}
-
-function ordenarProductos(valor) {
-  ordenPrecio = valor;
-  aplicarFiltros();
-}
-
-function aplicarFiltros() {
-  let lista = categoriaActiva
-    ? productos.filter(p => String(p.categoria_id) === String(categoriaActiva))
-    : productos.slice();
-
-  if (textoBusquedaLower) {
-    lista = lista.filter(p => (p.nombre || '').toLowerCase().includes(textoBusquedaLower));
-  }
-
-  if (ordenPrecio === 'precio-asc')  lista.sort((a, b) => (a.precio || 0) - (b.precio || 0));
-  if (ordenPrecio === 'precio-desc') lista.sort((a, b) => (b.precio || 0) - (a.precio || 0));
-
-  renderProductos(lista);
+  renderProductos(catId ? productos.filter(p => String(p.categoria_id) === String(catId)) : productos);
 }
 
 // ══════════════════════════════════════════════
@@ -961,10 +903,7 @@ function renderProductos(lista) {
   const el = document.getElementById('lista-productos');
 
   if (!lista.length) {
-    const msg = textoBusqueda
-      ? `No se encontraron productos para "${textoBusqueda}"`
-      : 'No hay productos disponibles';
-    el.innerHTML = `<p style="text-align:center;color:#888;padding:30px;">${msg}</p>`;
+    el.innerHTML = '<p style="text-align:center;color:#888;padding:30px;">No hay productos disponibles</p>';
     return;
   }
 
