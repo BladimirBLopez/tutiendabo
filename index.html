@@ -667,6 +667,10 @@
 // ══════════════════════════════════════════════
 //  ESTADO GLOBAL
 // ══════════════════════════════════════════════
+// Dominio oficial de la plataforma (para que "Compartir tienda" siempre
+// muestre este link, sin importar desde qué dominio esté entrando el cliente)
+const DOMINIO_PUBLICO = 'https://tutiendabo.online';
+
 let configTienda = {};
 let categorias = [];
 let productos = [];
@@ -1147,7 +1151,8 @@ function cerrarPopupDirecto() {
 //  COMPARTIR TIENDA
 // ══════════════════════════════════════════════
 function abrirCompartir() {
-  const url = window.location.href.split('?')[0].split('#')[0];
+  const slug = getShopSlug();
+  const url  = `${DOMINIO_PUBLICO}/${slug}`;
   document.getElementById('share-link-text').textContent = url;
   document.getElementById('share-qr-img').src =
     `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;

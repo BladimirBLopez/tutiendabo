@@ -851,6 +851,9 @@
 // ══════════════════════════════════════════════
 //  LOGIN — verificación contra la base de datos
 // ══════════════════════════════════════════════
+// Dominio oficial de la plataforma (para el botón "Ver tienda")
+const DOMINIO_PUBLICO = 'https://tutiendabo.online';
+
 let tiendaId = null;
 let tiendaSlug = null;
 
@@ -940,7 +943,7 @@ const MAX_IMAGENES = 6;
 //  INIT
 // ══════════════════════════════════════════════
 async function iniciarAdmin() {
-  document.getElementById('link-ver-tienda').href = `${window.location.origin}/${tiendaSlug}`;
+  document.getElementById('link-ver-tienda').href = `${DOMINIO_PUBLICO}/${tiendaSlug}`;
   initTabs();
   await cargarConfig();
   await cargarCategorias();

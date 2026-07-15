@@ -255,6 +255,10 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// Dominio oficial de la plataforma (siempre se usa este, sin importar
+// desde qué dominio se esté usando el super-admin en ese momento)
+const DOMINIO_PUBLICO = 'https://tutiendabo.online';
+
 let tiendas = [];
 let tiendaSeleccionada = null;
 let claveSeleccionada = '';
@@ -345,7 +349,7 @@ function renderTiendas() {
     const nombre = cfg?.nombre || t.slug;
     const logo   = cfg?.logo_url || '';
     const color  = cfg?.color_principal || '#6c3fc5';
-    const base   = window.location.origin;
+    const base   = DOMINIO_PUBLICO;
 
     // Badge vencimiento
     let vencBadge = '';
@@ -443,7 +447,7 @@ function verLinks(id) {
 
   const cfg    = t.config_tienda;
   const nombre = cfg?.nombre || t.slug;
-  const base   = window.location.origin;
+  const base   = DOMINIO_PUBLICO;
 
   document.getElementById('modal-links-titulo').textContent = `🏪 ${nombre}`;
   document.getElementById('link-tienda').textContent = `${base}/${t.slug}`;
@@ -526,7 +530,7 @@ async function guardarNotas() {
 
 function abrirTienda() {
   if (!tiendaSeleccionada) return;
-  window.open(`${window.location.origin}/${tiendaSeleccionada.slug}`, '_blank');
+  window.open(`${DOMINIO_PUBLICO}/${tiendaSeleccionada.slug}`, '_blank');
 }
 
 async function eliminarTiendaActual() {
