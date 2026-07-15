@@ -16,6 +16,11 @@ function escapeHtml(str) {
   ));
 }
 
+const RUTAS_SISTEMA = new Set([
+  'favicon.ico', 'robots.txt', 'sitemap.xml', 'sw.js',
+  'manifest.json', 'supabase.js', 'apple-touch-icon.png',
+]);
+
 module.exports = async function handler(req, res) {
   const shop = req.query.shop;
 
@@ -23,25 +28,27 @@ module.exports = async function handler(req, res) {
   let descripcion = 'Catálogo de productos por WhatsApp';
   let imagen = '';
 
-  try {
-    const url = `${SUPABASE_URL}/rest/v1/tiendas?slug=eq.${encodeURIComponent(shop)}&select=activa,config_tienda(nombre,descripcion,logo_url,portada_url)`;
-    const r = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      },
-    });
-    const data = await r.json();
-    const tienda = Array.isArray(data) ? data[0] : null;
-    const cfg = tienda && (Array.isArray(tienda.config_tienda) ? tienda.config_tienda[0] : tienda.config_tienda);
+  if (shop && !RUTAS_SISTEMA.has(shop)) {
+    try {
+      const url = `${SUPABASE_URL}/rest/v1/tiendas?slug=eq.${encodeURIComponent(shop)}&select=activa,config_tienda(nombre,descripcion,logo_url,portada_url)`;
+      const r = await fetch(url, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      });
+      const data = await r.json();
+      const tienda = Array.isArray(data) ? data[0] : null;
+      const cfg = tienda && (Array.isArray(tienda.config_tienda) ? tienda.config_tienda[0] : tienda.config_tienda);
 
-    if (cfg) {
-      if (cfg.nombre)      nombre = cfg.nombre;
-      if (cfg.descripcion) descripcion = cfg.descripcion;
-      imagen = cfg.portada_url || cfg.logo_url || '';
+      if (cfg) {
+        if (cfg.nombre)      nombre = cfg.nombre;
+        if (cfg.descripcion) descripcion = cfg.descripcion;
+        imagen = cfg.portada_url || cfg.logo_url || '';
+      }
+    } catch (e) {
+      // Si Supabase falla, se sirve la página igual con los valores por defecto
     }
-  } catch (e) {
-    // Si Supabase falla, se sirve la página igual con los valores por defecto
   }
 
   const htmlPath = path.join(process.cwd(), 'index.html');
