@@ -2,6 +2,6 @@
   "rewrites": [
     { "source": "/super-admin", "destination": "/super-admin.html" },
     { "source": "/:shop/admin", "destination": "/admin.html" },
-    { "source": "/:shop",       "destination": "/index.html" }
+    { "source": "/:shop",       "destination": "/api/tienda?shop=:shop" }
   ]
 }
