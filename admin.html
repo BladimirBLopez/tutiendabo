@@ -681,7 +681,8 @@
     <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-phone"/></svg></span> Contacto y redes</div>
 
     <label>WhatsApp para pedidos (con código de país, sin +)</label>
-    <input type="text" id="cfg-whatsapp" placeholder="59169356292">
+    <input type="text" id="cfg-whatsapp" placeholder="59169356292" inputmode="numeric" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'')">
+    <p style="font-size:.72rem;color:var(--muted);margin-top:4px;">Formato: 591 + 8 dígitos (código de país + número)</p>
 
     <label style="margin-top:14px;">Redes sociales</label>
     <div id="social-icons-row" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;"></div>
@@ -1015,10 +1016,16 @@ async function cargarConfig() {
 }
 
 async function guardarConfig() {
+  const whatsapp = document.getElementById('cfg-whatsapp').value.trim();
+  if (whatsapp && !/^591\d{8}$/.test(whatsapp)) {
+    toast('El WhatsApp debe ser 591 + 8 dígitos (ej. 59169356292)', 'error');
+    return;
+  }
+
   const payload = {
     nombre:          document.getElementById('cfg-nombre').value.trim(),
     descripcion:     document.getElementById('cfg-descripcion').value.trim(),
-    whatsapp:        document.getElementById('cfg-whatsapp').value.trim(),
+    whatsapp:        whatsapp,
     facebook:        redesSociales.facebook || '',
     tiktok:          redesSociales.tiktok || '',
     instagram:       redesSociales.instagram || '',
@@ -1223,6 +1230,7 @@ async function subirImagenConfig(tipo) {
 
   const img = document.getElementById(tipo + '-preview');
   img.src = url; img.style.display = 'block';
+  document.getElementById('btn-quitar-' + tipo).style.display = 'inline-flex';
   const kb = Math.round(blob.size / 1024);
   toast(`Imagen actualizada ✓ (${kb}KB)`, 'success');
 }
