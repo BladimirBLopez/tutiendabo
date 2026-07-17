@@ -303,6 +303,15 @@
       animation:slideIn .25s ease;
     }
     @keyframes slideIn { from { transform:translateX(100%); } to { transform:translateX(0); } }
+
+    /* Modal compacto centrado (confirmaciones simples, no formularios largos) */
+    .modal-overlay.centrado { align-items:center; justify-content:center; }
+    .modal-overlay.centrado .modal {
+      height:auto; max-height:85vh; width:calc(100% - 48px); max-width:380px;
+      border-radius:20px; margin:0; padding:22px 20px;
+      animation:popIn .2s ease;
+    }
+    @keyframes popIn { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
     .modal-header {
       display:flex; align-items:center; justify-content:space-between;
       margin-bottom:20px;
@@ -742,7 +751,7 @@
 </div>
 
 <!-- Modal genérico: confirmar / pedir texto (fuera de las pestañas: debe verse desde cualquier tab) -->
-<div class="modal-overlay" id="modal-generico">
+<div class="modal-overlay centrado" id="modal-generico">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="mg-titulo">Confirmar</span>
@@ -758,7 +767,7 @@
 </div>
 
 <!-- Modal: cambios sin guardar al salir del tab Tienda -->
-<div class="modal-overlay" id="modal-cambios">
+<div class="modal-overlay centrado" id="modal-cambios">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title">Cambios sin guardar</span>
