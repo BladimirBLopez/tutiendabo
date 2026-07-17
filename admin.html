@@ -13,17 +13,17 @@
     * { margin:0; padding:0; box-sizing:border-box; }
 
     :root {
-      --brand:   #B25A28;
-      --brand-dk: #7A3C18;
-      --brand-lt: #FBEEE3;
-      --bg:      #F6F5F3;
+      --brand:   #1E4C7A;
+      --brand-dk: #123049;
+      --brand-lt: #E8F0F7;
+      --bg:      #F5F6F8;
       --card:    #ffffff;
-      --text:    #1C1B1A;
-      --muted:   #6F6B67;
-      --border:  #E4E1DC;
+      --text:    #1A202C;
+      --muted:   #64748B;
+      --border:  #E2E8F0;
       --danger:  #DC2626;
       --success: #16A34A;
-      --radius:  12px;
+      --radius:  10px;
     }
 
     body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; letter-spacing:-.01em; }
@@ -79,7 +79,7 @@
       padding:16px 20px;
       display:flex; align-items:center; justify-content:space-between;
       position:sticky; top:0; z-index:100;
-      box-shadow:0 2px 12px rgba(0,0,0,.06);
+      box-shadow:0 1px 2px rgba(16,24,40,.05);
     }
     .header h1 { font-size:.95rem; font-weight:700; color:var(--brand-dk); letter-spacing:-.01em; }
     .header-logo { font-size:1.4rem; }
@@ -118,9 +118,9 @@
       background:var(--card); border-radius:var(--radius);
       border:1px solid var(--border);
       padding:18px; margin-bottom:14px;
-      box-shadow:0 2px 8px rgba(0,0,0,.04);
+      box-shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
     }
-    .card-title { font-size:.85rem; font-weight:700; color:var(--brand-dk); margin-bottom:14px; }
+    .card-title { font-size:.85rem; font-weight:700; color:var(--brand-dk); margin-bottom:14px; letter-spacing:-.01em; }
 
     /* ── Form elements ── */
     label { display:block; font-size:.75rem; font-weight:600; color:var(--muted); margin:10px 0 4px; }
@@ -353,7 +353,7 @@
       width:56px; height:56px; border-radius:50%;
       background:var(--brand); color:#fff; border:none;
       font-size:1.5rem; cursor:pointer;
-      box-shadow:0 4px 20px rgba(178,90,40,.35);
+      box-shadow:0 4px 20px rgba(30,76,122,.35);
       display:flex; align-items:center; justify-content:center;
       z-index:200; transition:all .2s;
     }
@@ -945,13 +945,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (debugEl) debugEl.textContent = 'Tienda detectada: ' + (tiendaSlug || '(ninguna)');
 
   if (!tiendaSlug) {
-    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;stroke:#B25A28;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;stroke:#1E4C7A;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><h2 style="margin:12px 0 6px;">TuTiendaBo Admin</h2><p style="color:#888;font-size:.85rem;">Ingresa a través del link de tu panel admin</p></div></div>`;
     return;
   }
 
   const { data: tienda } = await db.from('tiendas').select('*').eq('slug', tiendaSlug).single();
   if (!tienda) {
-    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;stroke:#B25A28;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h2 style="margin:12px 0 6px;">Tienda no encontrada</h2></div></div>`;
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;font-family:'Inter',sans-serif;"><div><div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" style="width:3rem;height:3rem;stroke:#1E4C7A;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h2 style="margin:12px 0 6px;">Tienda no encontrada</h2></div></div>`;
     return;
   }
 
