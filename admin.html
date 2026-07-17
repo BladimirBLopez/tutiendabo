@@ -512,6 +512,10 @@
   <a href="#" id="link-ver-tienda" target="_blank" class="btn-ver-tienda">Ver tienda</a>
 </div>
 
+<div id="banner-demo" style="display:none; background:#FEF3C7; color:#92400E; text-align:center; font-size:.78rem; font-weight:600; padding:8px 12px;">
+  🧪 Modo demostración — los cambios que hagas aquí son solo de prueba
+</div>
+
 <!-- Tabs -->
 <div class="tabs" style="display:none;">
   <button class="tab active" data-tab="productos"><svg class="icon"><use href="#ic-box"/></svg> Productos</button>
@@ -894,6 +898,11 @@ async function verificarClave() {
   }
 }
 
+function mostrarBannerDemo() {
+  const el = document.getElementById('banner-demo');
+  if (el) el.style.display = 'block';
+}
+
 function toggleVerClave() {
   const inp = document.getElementById('login-input');
   const ojo = document.getElementById('btn-ojo');
@@ -919,11 +928,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  if (sessionStorage.getItem('admin_ok_' + tiendaSlug) === '1') {
+  if (tienda.es_demo || sessionStorage.getItem('admin_ok_' + tiendaSlug) === '1') {
     tiendaId = tienda.id;
     document.getElementById('pantalla-login').style.display = 'none';
     document.getElementById('contenido-admin').style.display = 'flex';
     document.querySelectorAll('.tabs, .section, .fab').forEach(el => el.style.display = '');
+    if (tienda.es_demo) mostrarBannerDemo();
     iniciarAdmin();
   }
 });

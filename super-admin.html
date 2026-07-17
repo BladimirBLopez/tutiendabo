@@ -244,6 +244,15 @@
       <button class="btn btn-primary" style="margin-top:8px;" onclick="guardarNotas()">💾 Guardar notas</button>
     </div>
 
+    <!-- Restablecer demo (solo visible si la tienda es demo) -->
+    <div id="bloque-restablecer-demo" style="display:none; padding:14px 0; border-bottom:1px solid var(--border);">
+      <label style="margin-top:0;">🧪 Tienda de demostración</label>
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:8px;">
+        Borra todos sus productos/categorías y la deja como plantilla lista para el próximo cliente.
+      </div>
+      <button class="btn" style="width:100%;background:var(--brand-lt);color:var(--brand-dk);" onclick="restablecerDemo()">🔄 Restablecer demo</button>
+    </div>
+
     <!-- Acciones -->
     <div style="display:flex;gap:8px;margin-top:14px;">
       <button class="btn btn-primary" style="flex:1;" onclick="abrirTienda()">Ver tienda →</button>
@@ -468,6 +477,9 @@ function verLinks(id) {
   // Notas
   document.getElementById('input-notas').value = t.notas || '';
 
+  // Bloque de restablecer demo
+  document.getElementById('bloque-restablecer-demo').style.display = t.es_demo ? 'block' : 'none';
+
   document.getElementById('modal-links').classList.add('open');
 }
 
@@ -531,6 +543,74 @@ async function guardarNotas() {
 function abrirTienda() {
   if (!tiendaSeleccionada) return;
   window.open(`${DOMINIO_PUBLICO}/${tiendaSeleccionada.slug}`, '_blank');
+}
+
+// ══════════════════════════════════════════════
+//  RESTABLECER TIENDA DEMO
+// ══════════════════════════════════════════════
+async function restablecerDemo() {
+  if (!tiendaSeleccionada) return;
+  if (!tiendaSeleccionada.es_demo) { toast('Esta tienda no es una demo', 'error'); return; }
+
+  if (!confirm('¿Restablecer esta tienda demo? Se borrarán todos sus productos y categorías actuales, y se dejará una plantilla de ejemplo lista para mostrar.')) return;
+
+  const tid = tiendaSeleccionada.id;
+  const btn = document.querySelector('#bloque-restablecer-demo button');
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Restableciendo...';
+
+  try {
+    // 1. Borrar productos y categorías actuales
+    const { error: errProd } = await db.from('productos').delete().eq('tienda_id', tid);
+    if (errProd) throw errProd;
+    const { error: errCat } = await db.from('categorias').delete().eq('tienda_id', tid);
+    if (errCat) throw errCat;
+
+    // 2. Restablecer la configuración visual a la plantilla base
+    const { error: errCfg } = await db.from('config_tienda').update({
+      nombre: 'Mi Tienda Demo',
+      descripcion: 'Así se ve tu catálogo con TuTiendaBo ✨ Personalízalo como quieras.',
+      whatsapp: '59100000000',
+      facebook: '', tiktok: '', instagram: '', whatsapp_grupo: '',
+      logo_url: '', portada_url: '',
+      color_principal: '#c27e4a', color_boton: '#c27e4a',
+      color_fondo: '#fef8f0', color_texto: '#1a1a1a', color_texto_boton: '#ffffff',
+      fuente: 'elegante', mostrar_precios: true, mostrar_redes: false,
+      horario: 'Lunes a Sábado: 9am - 7pm',
+    }).eq('tienda_id', tid);
+    if (errCfg) throw errCfg;
+
+    // 3. Crear categorías de ejemplo
+    const { data: cats, error: errNuevasCat } = await db.from('categorias')
+      .insert([
+        { tienda_id: tid, nombre: 'Ropa',        orden: 0 },
+        { tienda_id: tid, nombre: 'Accesorios',  orden: 1 },
+      ])
+      .select();
+    if (errNuevasCat) throw errNuevasCat;
+
+    const catRopa       = cats.find(c => c.nombre === 'Ropa')?.id;
+    const catAccesorios = cats.find(c => c.nombre === 'Accesorios')?.id;
+
+    // 4. Crear productos de ejemplo
+    const { error: errProdNuevos } = await db.from('productos').insert([
+      { tienda_id: tid, categoria_id: catRopa, nombre: 'Polera básica', precio: 60, tallas: ['S','M','L'], estado: 'nuevo',   activo: true, orden: 0, imagenes: [] },
+      { tienda_id: tid, categoria_id: catRopa, nombre: 'Chompa de invierno', precio: 120, precio_original: 150, en_descuento: true, tallas: ['M','L','XL'], estado: 'oferta', activo: true, orden: 1, imagenes: [] },
+      { tienda_id: tid, categoria_id: catAccesorios, nombre: 'Gorra', precio: 35, tallas: ['Único'], estado: 'normal', activo: true, orden: 0, imagenes: [] },
+      { tienda_id: tid, categoria_id: catAccesorios, nombre: 'Mochila', precio: 90, tallas: ['Único'], estado: 'agotado', activo: true, orden: 1, imagenes: [] },
+    ]);
+    if (errProdNuevos) throw errProdNuevos;
+
+    cerrarModalDirecto();
+    await cargarTiendas();
+    await cargarStats();
+    toast('Demo restablecida ✓', 'success');
+  } catch (e) {
+    console.error(e);
+    toast('Error al restablecer la demo', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = original;
+  }
 }
 
 async function eliminarTiendaActual() {
