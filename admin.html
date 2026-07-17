@@ -661,19 +661,19 @@
     <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-type"/></svg></span> Tipografía</div>
     <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">Elige el estilo de letra para el nombre de tu tienda y productos</p>
     <div id="fuente-opciones" style="display:flex;flex-direction:column;gap:8px;">
-      <div class="fuente-card" data-val="elegante" onclick="elegirFuente('elegante')">
+      <div class="fuente-card" data-val="elegante" onclick="elegirFuente('elegante'); configDirty=true;">
         <div class="fuente-preview" style="font-family:'Playfair Display',serif;">Mi Tienda</div>
         <div class="fuente-label">Elegante</div>
       </div>
-      <div class="fuente-card" data-val="moderna" onclick="elegirFuente('moderna')">
+      <div class="fuente-card" data-val="moderna" onclick="elegirFuente('moderna'); configDirty=true;">
         <div class="fuente-preview" style="font-family:'Poppins',sans-serif;">Mi Tienda</div>
         <div class="fuente-label">Moderna</div>
       </div>
-      <div class="fuente-card" data-val="divertida" onclick="elegirFuente('divertida')">
+      <div class="fuente-card" data-val="divertida" onclick="elegirFuente('divertida'); configDirty=true;">
         <div class="fuente-preview" style="font-family:'Baloo 2',cursive;">Mi Tienda</div>
         <div class="fuente-label">Divertida</div>
       </div>
-      <div class="fuente-card" data-val="clasica" onclick="elegirFuente('clasica')">
+      <div class="fuente-card" data-val="clasica" onclick="elegirFuente('clasica'); configDirty=true;">
         <div class="fuente-preview" style="font-family:'Montserrat',sans-serif;">Mi Tienda</div>
         <div class="fuente-label">Clásica</div>
       </div>
@@ -753,6 +753,23 @@
     <div style="display:flex; gap:10px; margin-top:18px;">
       <button class="btn btn-secondary" style="flex:1;" onclick="mgCerrar(null)">Cancelar</button>
       <button class="btn btn-primary" id="mg-btn-ok" style="flex:1;" onclick="mgConfirmarClick()">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: cambios sin guardar al salir del tab Tienda -->
+<div class="modal-overlay" id="modal-cambios">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Cambios sin guardar</span>
+    </div>
+    <p style="font-size:.85rem; color:var(--text); line-height:1.5;">
+      Tienes cambios sin guardar en la configuración de la tienda. ¿Qué quieres hacer?
+    </p>
+    <div style="display:flex; flex-direction:column; gap:8px; margin-top:18px;">
+      <button class="btn btn-primary" onclick="resolverCambios('guardar')"><svg class="icon" style="width:16px;height:16px;"><use href="#ic-save"/></svg> Guardar y continuar</button>
+      <button class="btn btn-danger" onclick="resolverCambios('descartar')">Descartar cambios</button>
+      <button class="btn btn-secondary" onclick="resolverCambios('cancelar')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -860,6 +877,7 @@
 const DOMINIO_PUBLICO = 'https://tutiendabo.online';
 
 let tiendaId = null;
+let configDirty = false;
 let tiendaSlug = null;
 
 async function verificarClave() {
@@ -965,8 +983,28 @@ async function iniciarAdmin() {
 //  TABS
 // ══════════════════════════════════════════════
 function initTabs() {
+  // Cualquier input/checkbox/textarea dentro del tab de Tienda marca cambios pendientes
+  const tabConfig = document.getElementById('tab-config');
+  if (tabConfig) {
+    tabConfig.addEventListener('input',  e => { if (e.target.matches('input, textarea')) configDirty = true; });
+    tabConfig.addEventListener('change', e => { if (e.target.matches('input, textarea')) configDirty = true; });
+  }
+
   document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', async () => {
+      const tabActivo = document.querySelector('.tab.active');
+      const saliendoDeConfig = tabActivo && tabActivo.dataset.tab === 'config' && tab.dataset.tab !== 'config';
+
+      if (saliendoDeConfig && configDirty) {
+        const accion = await preguntarCambiosSinGuardar();
+        if (accion === 'cancelar') return;
+        if (accion === 'guardar') {
+          const ok = await guardarConfig();
+          if (!ok) return; // si falló el guardado (ej. WhatsApp inválido), no cambiar de tab
+        }
+        configDirty = false;
+      }
+
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
       tab.classList.add('active');
@@ -1023,13 +1061,15 @@ async function cargarConfig() {
     img.src = data.portada_url; img.style.display = 'block';
     document.getElementById('btn-quitar-portada').style.display = 'inline-flex';
   }
+
+  configDirty = false;
 }
 
 async function guardarConfig() {
   const whatsapp = document.getElementById('cfg-whatsapp').value.trim();
   if (whatsapp && !/^591\d{8}$/.test(whatsapp)) {
     toast('El WhatsApp debe ser 591 + 8 dígitos (ej. 59169356292)', 'error');
-    return;
+    return false;
   }
 
   const payload = {
@@ -1054,9 +1094,11 @@ async function guardarConfig() {
 
   payload.tienda_id = tiendaId;
   const { error } = await db.from('config_tienda').upsert(payload, { onConflict: 'tienda_id' });
-  if (error) { toast('Error al guardar', 'error'); console.error(error); return; }
+  if (error) { toast('Error al guardar', 'error'); console.error(error); return false; }
   document.getElementById('header-store-name').textContent = payload.nombre;
   toast('Configuración guardada ✓', 'success');
+  configDirty = false;
+  return true;
 }
 
 // ══════════════════════════════════════════════
@@ -1102,6 +1144,23 @@ function mgConfirmarClick() {
 function mgCerrar(valor) {
   document.getElementById('modal-generico').classList.remove('open');
   if (mgResolver) { mgResolver(valor); mgResolver = null; }
+}
+
+// ══════════════════════════════════════════════
+//  CAMBIOS SIN GUARDAR (tab Tienda)
+// ══════════════════════════════════════════════
+let cambiosResolver = null;
+
+function preguntarCambiosSinGuardar() {
+  return new Promise(resolve => {
+    cambiosResolver = resolve;
+    document.getElementById('modal-cambios').classList.add('open');
+  });
+}
+
+function resolverCambios(accion) {
+  document.getElementById('modal-cambios').classList.remove('open');
+  if (cambiosResolver) { cambiosResolver(accion); cambiosResolver = null; }
 }
 // ══════════════════════════════════════════════
 //  REDES SOCIALES (estilo Linktree)
@@ -1186,6 +1245,7 @@ function guardarRedSocial() {
   redesSociales[redEditando] = valor;
   renderSocialIcons();
   cerrarModalRed();
+  configDirty = true;
   toast('Agregado, no olvides tocar "Guardar configuración"', 'success');
 }
 
@@ -1194,6 +1254,7 @@ function quitarRedSocial() {
   redesSociales[redEditando] = '';
   renderSocialIcons();
   cerrarModalRed();
+  configDirty = true;
 }
 
 // ══════════════════════════════════════════════
@@ -1805,6 +1866,7 @@ function iniciarPickrs(cfg) {
 
     pickrs[elId] = crearPickr(elId, color, hex => {
       document.getElementById(hexIds[elId]).textContent = hex;
+      configDirty = true;
     });
   });
 }
