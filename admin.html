@@ -1011,6 +1011,9 @@ function initTabs() {
           const ok = await guardarConfig();
           if (!ok) return; // si falló el guardado (ej. WhatsApp inválido), no cambiar de tab
         }
+        if (accion === 'descartar') {
+          await cargarConfig(); // vuelve a traer lo guardado, borrando los cambios sin guardar
+        }
         configDirty = false;
       }
 
