@@ -580,10 +580,14 @@
     <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-store"/></svg></span> Info de la tienda</div>
 
     <label>Nombre de la tienda</label>
-    <input type="text" id="cfg-nombre" placeholder="Mi Tienda">
+    <input type="text" id="cfg-nombre" placeholder="Mi Tienda" oninput="validarNombreTienda()">
+    <p id="cfg-nombre-error" style="display:none; color:var(--danger); font-size:.72rem; margin-top:4px;">El título no puede tener más de 30 caracteres.</p>
 
     <label>Descripción</label>
-    <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes"></textarea>
+    <div style="position:relative;">
+      <textarea id="cfg-descripcion" placeholder="Breve descripción para tus clientes" maxlength="160" oninput="actualizarContadorDescripcion()"></textarea>
+      <span id="cfg-descripcion-contador" style="position:absolute; bottom:8px; right:10px; font-size:.7rem; color:var(--muted); background:var(--card); padding:0 2px;">0/160</span>
+    </div>
 
     <div style="display:flex; align-items:center; gap:6px; margin-top:12px; color:var(--muted); font-size:.78rem;">
       <svg class="icon" style="width:14px;height:14px;"><use href="#ic-eye"/></svg>
@@ -1040,6 +1044,8 @@ async function cargarConfig() {
 
   document.getElementById('cfg-nombre').value       = data.nombre       || '';
   document.getElementById('cfg-descripcion').value  = data.descripcion  || '';
+  validarNombreTienda();
+  actualizarContadorDescripcion();
   document.getElementById('cfg-whatsapp').value     = data.whatsapp     || '';
   document.getElementById('cfg-horario').value      = data.horario      || '';
   document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
@@ -1077,7 +1083,24 @@ async function cargarConfig() {
   configDirty = false;
 }
 
+function validarNombreTienda() {
+  const val = document.getElementById('cfg-nombre').value;
+  document.getElementById('cfg-nombre-error').style.display = val.length > 30 ? 'block' : 'none';
+}
+
+function actualizarContadorDescripcion() {
+  const val = document.getElementById('cfg-descripcion').value;
+  document.getElementById('cfg-descripcion-contador').textContent = `${val.length}/160`;
+}
+
 async function guardarConfig() {
+  const nombreTienda = document.getElementById('cfg-nombre').value.trim();
+  if (nombreTienda.length > 30) {
+    toast('El título no puede tener más de 30 caracteres', 'error');
+    document.getElementById('cfg-nombre-error').style.display = 'block';
+    return false;
+  }
+
   const whatsapp = document.getElementById('cfg-whatsapp').value.trim();
   if (whatsapp && !/^591\d{8}$/.test(whatsapp)) {
     toast('El WhatsApp debe ser 591 + 8 dígitos (ej. 59169356292)', 'error');
