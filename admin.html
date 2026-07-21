@@ -1089,8 +1089,11 @@ function validarNombreTienda() {
 }
 
 function actualizarContadorDescripcion() {
-  const val = document.getElementById('cfg-descripcion').value;
-  document.getElementById('cfg-descripcion-contador').textContent = `${val.length}/160`;
+  const el = document.getElementById('cfg-descripcion');
+  if (el.value.length > 160) {
+    el.value = el.value.slice(0, 160);
+  }
+  document.getElementById('cfg-descripcion-contador').textContent = `${el.value.length}/160`;
 }
 
 async function guardarConfig() {
@@ -1109,7 +1112,7 @@ async function guardarConfig() {
 
   const payload = {
     nombre:          document.getElementById('cfg-nombre').value.trim(),
-    descripcion:     document.getElementById('cfg-descripcion').value.trim(),
+    descripcion:     document.getElementById('cfg-descripcion').value.trim().slice(0, 160),
     whatsapp:        whatsapp,
     facebook:        redesSociales.facebook || '',
     tiktok:          redesSociales.tiktok || '',
