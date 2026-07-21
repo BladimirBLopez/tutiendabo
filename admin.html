@@ -697,9 +697,9 @@
   <div class="card">
     <div class="card-title"><span class="icon-circle"><svg class="icon"><use href="#ic-phone"/></svg></span> Contacto y redes</div>
 
-    <label>WhatsApp para pedidos (con código de país, sin +)</label>
-    <input type="text" id="cfg-whatsapp" placeholder="59169356292" inputmode="numeric" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'')">
-    <p style="font-size:.72rem;color:var(--muted);margin-top:4px;">Formato: 591 + 8 dígitos (código de país + número)</p>
+    <label>WhatsApp para pedidos (número boliviano, 8 dígitos)</label>
+    <input type="text" id="cfg-whatsapp" placeholder="75180321" inputmode="numeric" maxlength="8" oninput="this.value=this.value.replace(/\D/g,'')">
+    <p style="font-size:.72rem;color:var(--muted);margin-top:4px;">Solo el número, sin 591 ni +591 — se agrega automáticamente.</p>
 
     <label style="margin-top:14px;">Redes sociales</label>
     <div id="social-icons-row" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;"></div>
@@ -1046,7 +1046,7 @@ async function cargarConfig() {
   document.getElementById('cfg-descripcion').value  = data.descripcion  || '';
   validarNombreTienda();
   actualizarContadorDescripcion();
-  document.getElementById('cfg-whatsapp').value     = data.whatsapp     || '';
+  document.getElementById('cfg-whatsapp').value     = (data.whatsapp || '').replace(/^591/, '');
   document.getElementById('cfg-horario').value      = data.horario      || '';
   document.getElementById('cfg-mostrar-precios').checked = data.mostrar_precios;
   document.getElementById('cfg-mostrar-redes').checked   = data.mostrar_redes;
@@ -1104,11 +1104,12 @@ async function guardarConfig() {
     return false;
   }
 
-  const whatsapp = document.getElementById('cfg-whatsapp').value.trim();
-  if (whatsapp && !/^591\d{8}$/.test(whatsapp)) {
-    toast('El WhatsApp debe ser 591 + 8 dígitos (ej. 59169356292)', 'error');
+  const whatsappLocal = document.getElementById('cfg-whatsapp').value.trim();
+  if (whatsappLocal && !/^\d{8}$/.test(whatsappLocal)) {
+    toast('El WhatsApp debe tener 8 dígitos (ej. 75180321)', 'error');
     return false;
   }
+  const whatsapp = whatsappLocal ? '591' + whatsappLocal : '';
 
   const payload = {
     nombre:          document.getElementById('cfg-nombre').value.trim(),
